@@ -53,7 +53,7 @@ void Solution::Initialize(std::string fileName,
     readInputBackgroundConditions(input, amb_Value, aer_Value, fileName);
 
     const double AMBIENT_VALID_TIME = 8.0; //hours
-    SpinUp(amb_Value, input, airDens, AMBIENT_VALID_TIME, varSpeciesArray);
+    SpinUp(amb_Value, input, Input_Opt, airDens, AMBIENT_VALID_TIME, varSpeciesArray);
 
     /* Enforce pre-defined values? *
      * Read input defined values for background concentrations */
@@ -364,7 +364,7 @@ void Solution::getData(Vector_1D &varSpeciesArray, const UInt i, const UInt j) {
 /* 
 No functions check the return code of this function, temp fix is to return void
 */
-void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const double airDens,
+void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &Input_Opt, const double airDens,
                       const double startTime, Vector_1D &varSpeciesArray, const bool DBG) {
     /* Chemistry timestep
      * DT_CHEM               = 10 mins */
@@ -437,6 +437,137 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const double air
             RCONST[iReact] = 0.0E+00;
 
         Update_RCONST( input.temperature_K(), input.pressure_Pa(), airDens, varSpeciesArray[ind_H2O] );
+
+        
+        if ( input_Opt.CHEMISTRY_HETERO) {
+
+        double spinup_NACL_SAD = 0.0; double spinup_NACL_RAD = 1.0e-7;
+        double spinup_CACO3_SAD = 0.0; double spinup_CACO3_RAD = 1.0e-7;
+        double spinup_AL2O3_SAD = 0.0; double spinup_AL2O3_RAD = 1.0e-7;
+        double spinup_DUST_SAD = 0.0; double spinup_DUST_RAD = 1.0e-7;
+        double spinup_DIAMOND_SAD = 0.0; double spinup_DIAMOND_RAD = 1.0e-7;
+        double spinup_GEO_SAD = 0.0; double spinup_GEO_RADIUS = 1.0e-7; double spinup_GEO_GAMMA = 1.0e-7;
+
+	double N_geo = input.backgroundGeoengineeringNumber(); /* /cm3*/
+	double R_geo = input.backgroundGeoengineeringRadius(); /* /m*/
+
+	/* Adding surface area based on input.yaml radius of aerosol particles, 4PIR^2*/
+	double R_geo_to_cm = R_geo * 100;
+	double SAD_cgs = N_geo * 4.0 * PI * R_geo_to_cm * R_geo_to_cm ; /* cm2/cm2*/
+
+
+
+	switch (type) {
+	  case 0: /* None*/
+	   std::cout << " Geoengineering: None selected." << std::endl;
+	   break;
+
+	  case 1: /* NACL*/
+	   spinup_NACL_SAD = SAD_cgs;
+	   varSpeciesArray[ind_NACL] = N_geo;
+	   std::cout << " Geoengineering: NACL selected." << std::endl;
+	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
+	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   break;
+
+	  case 2: /*AGI*/
+	   std::cout << " Geoengineering: AGI selected." << std::endl;
+	   spinup_NACL_SAD = SAD_cgs;
+	   varSpeciesArray[ind_AGI] = N_geo;
+	   std::cout << " Geoengineering: AGI selected." << std::endl; 
+	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
+	   /* std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl; No heterogeneous chemistry for AGI*/
+	   break;
+
+	  case 3: /* BII3*/
+	   std::cout << " Geoengineering: BII3 selected." << std::endl;
+	   spinup_NACL_SAD = SAD_cgs;
+	   varSpeciesArray[ind_NACL] = N_geo;
+	   std::cout << " Geoengineering: NACL selected." << std::endl;
+	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
+	   /* std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl; No heterogenous processes for BII3*/
+	   break;
+
+	  case 4: /* AL2O3*/
+	   std::cout << " Geoengineering: AL2O3 selected." << std::endl;
+	   spinup_NACL_SAD = SAD_cgs;
+	   varSpeciesArray[ind_NACL] = N_geo;
+	   std::cout << " Geoengineering: NACL selected." << std::endl;
+	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
+	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   break;
+
+	  case 5: /* CACO3*/
+	   std::cout << " Geoengineering: CACO3 selected." << std::endl;
+	   spinup_NACL_SAD = SAD_cgs;
+	   varSpeciesArray[ind_NACL] = N_geo;
+	   std::cout << " Geoengineering: NACL selected." << std::endl;
+	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
+	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   break;
+
+	  case 6: /* DIAMOND*/
+	   std::cout << " Geoengineering: DIAMOND selected." << std::endl;
+	   spinup_NACL_SAD = SAD_cgs;
+	   varSpeciesArray[ind_NACL] = N_geo;
+	   std::cout << " Geoengineering: NACL selected." << std::endl;
+	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
+	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   break;
+
+	  case 7: /* DUST*/
+	   std::cout << " Geoengineering: DUST selected." << std::endl;
+	   spinup_NACL_SAD = SAD_cgs;
+	   varSpeciesArray[ind_NACL] = N_geo;
+	   std::cout << " Geoengineering: NACL selected." << std::endl;
+	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
+	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   break;
+
+	  case 8: /* None*/
+	   std::cout << " Geoengineering: Generic selected." << std::endl;
+	   spinup_GENERIC_SAD = SAD_cgs;
+	   varSpeciesArray[ind_GENERIC] = N_geo;
+	   std::cout << " Geoengineering: Generic selected." << std::endl;
+	   /* std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl; No gas phase chemistry for generic */
+	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   break;
+
+
+        double spinup_area[NAERO];
+        double spinup_radi[NAERO];
+        for(int k=0; k<NAERO; k++) {
+            spinup_area[k] = 0.0;
+            spinup_radi[k] = 1.0e-7; }
+
+        GC_SETHET(
+         input.temperature_K(),
+         input.pressure_Pa(),
+         airDens,
+         input.relHumidity_w(),
+         0,
+         varSpeciesArray.data(),
+         spinup_area,
+         spinup_radi,
+         0.0,
+         KHETI_SLA.data(),
+         Input_Opt.ADV_TROPOPAUSE_PRESSURE,
+         spinup_GEO_SAD, 
+         spinup_GEO_RADIUS, 
+         spinup_GEO_GAMMA, 
+         spinup_NACL_SAD,
+         spinup_CACO3_SAD,  
+         spinup_AL2O3_SAD,
+         spinup_DUST_SAD,
+         spinup_DIAMOND_SAD,  
+         spinup_NACL_RADIUS,
+         spinup_CACO3_RADIUS,
+         spinup_AL2O3_RADIUS,
+         spinup_DUST_RADIUS,
+         spinup_DIAMOND_RADIUS
+      );
+    }
+
 
         /* ~~~~~~~~~~~~~~~~~~~~~~~~ */
         /* ~~~~~ Integration ~~~~~~ */
