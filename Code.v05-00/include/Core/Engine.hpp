@@ -41,6 +41,11 @@ class Engine
         double getEI_HNO2() const;
         double getEI_CO() const;
         double getEI_HC() const;
+        double getEI_H2() const;
+        double getEI_H2O2() const;
+        double getEI_NH3() const;
+        double getEI_N2O() const;
+        double getEI_LUB() const;
         double getEI_Soot() const;
         double getSootRad() const;
         double getFuelFlow() const;
@@ -49,6 +54,11 @@ class Engine
         void setEI_NOx(const double NOx);
         void setEI_CO(const double CO);
         void setEI_HC(const double HC);
+        void setEI_H2(const double H2);
+        void setEI_H2O2(const double H2O2);
+        void setEI_NH3(const double NH3);
+        void setEI_N2O(const double N2O);
+        void setEI_LUB(const double LUB);
         void setEI_Soot(const double Soot);
         void setSootRad(const double sootRad);
         void setFuelFlow(const double ff);
@@ -68,6 +78,11 @@ class Engine
         double EI_CO;  /* [g/kg fuel] */
         /** UHC emission index */
         double EI_HC;  /* [g/kg fuel] */
+        double EI_H2;  /* [g/kg fuel] */
+        double EI_H2O2;  /* [g/kg fuel] */
+        double EI_NH3;  /* [g/kg fuel] */
+        double EI_N2O;  /* [g/kg fuel] */
+        double EI_LUB;  /* [g/kg fuel] */
 
         /* Soot */
         double EI_Soot; /* [g/kg fuel] */
@@ -88,6 +103,11 @@ class Engine
         std::vector<double> LTO_NOx = std::vector<double>(4);
         std::vector<double> LTO_CO = std::vector<double>(4);
         std::vector<double> LTO_HC = std::vector<double>(4);
+        std::vector<double> LTO_H2 = std::vector<double>(4);
+        std::vector<double> LTO_H2O2 = std::vector<double>(4);
+        std::vector<double> LTO_NH3 = std::vector<double>(4);
+        std::vector<double> LTO_N2O = std::vector<double>(4);
+        std::vector<double> LTO_LUB = std::vector<double>(4);
 
         double NOxtoHNO2 = 0.015;
         double NOxtoNO2 = 0.20 * ( 1.0 - NOxtoHNO2 );

@@ -103,7 +103,20 @@ void GC_SETHET( const double TEMP, const double PATM, const double AIRDENS, \
                 const double RELHUM, const unsigned int STATE_PSC,          \
                 const double SPC[], const double AREA[NAERO],               \
                 const double RADI[NAERO], const double IWC,                 \
-                const double KHETI_SLA[11], double tropopausePressure )
+                const double KHETI_SLA[11], double tropopausePressure, 
+                const double GEO_SAD,
+                const double GEO_RADIUS,
+                const double GEO_GAMMA,
+                const double NACL_SAD,
+                const double CACO3_SAD,
+                const double AL2O3_SAD,
+                const double DUST_SAD,
+                const double DIAMOND_SAD,
+                const double NACL_RADIUS,
+                const double CACO3_RADIUS,
+                const double AL2O3_RADIUS,
+                const double DUST_RADIUS,
+                const double DIAMOND_RADIUS )
 {
 
     /* Sets up the array of heterogeneous chemistry rates for the KPP chemistry solver */
@@ -514,6 +527,61 @@ void GC_SETHET( const double TEMP, const double PATM, const double AIRDENS, \
         }
 
     }
+
+
+    double SQ_TEMP = sqrt(TEMP);
+
+    double SQ_HNO3   = sqrt(63.0128);
+    double SQ_N2O5   = sqrt(107.98072110);
+    double SQ_CLONO2 = sqrt(96.9566706);
+    double SQ_HOCL   = sqrt(51.9715923);
+    double SQ_HCL    = sqrt(36.46);
+    double SQ_H2SO4  = sqrt(98.08);
+    double SQ_HOBR   = sqrt(96.911);
+    double SQ_O3     = sqrt(47.984743858);
+    double SQ_NO3    = sqrt(61.987817862 );
+    double SQ_NO2    = sqrt(5.992903243 );
+
+    /* HET[ind_NO3][1] += ARSL1K(DUST_SAD, DUST_RADIUS, AIRDENS, GEO_GAMMA, SQ_TEMP, SQM_NO3); */
+
+
+    HET[ind_HNO3][0] += ARSL1K(NACL_SAD, NACL_RADIUS, AIRDENS, 0.1, SQ_TEMP, SQM_HNO3);
+
+    HET[ind_N2O5][2] += ARSL1K(NACL_SAD, NACL_RADIUS, AIRDENS, 0.03, SQ_TEMP, SQM_N2O5);
+
+    HET[ind_CLNO3][3] += ARSL1K(NACL_SAD, NACL_RADIUS, AIRDENS, 0.05, SQ_TEMP, SQM_CLNO3);
+
+    HET[ind_HOCL][2] += ARSL1K(NACL_SAD, NACL_RADIUS, AIRDENS, 0.05, SQ_TEMP, SQM_HOCL);
+
+    HET[ind_H2SO4][0] += ARSL1K(CACO3_SAD, CACO3_RADIUS, AIRDENS, 0.1, SQ_TEMP, SQM_H2SO4);
+
+    HET[ind_HNO3][1] += ARSL1K(CACO3_SAD, CACO3_RADIUS, AIRDENS, 0.1, SQ_TEMP, SQM_HNO3);
+
+    HET[ind_HCL][0] += ARSL1K(CACO3_SAD, CACO3_RADIUS, AIRDENS, 0.1, SQ_TEMP, SQM_HCL);
+
+    HET[ind_CLNO3][4] += ARSL1K(AL2O3_SAD, AL2O3_RADIUS, AIRDENS, 0.02, SQ_TEMP, SQM_CLNO3);
+
+    HET[ind_CLNO3][5] += ARSL1K(AL2O3_SAD, AL2O3_RADIUS, AIRDENS, 0.02, SQ_TEMP, SQM_CLNO3);
+
+    HET[ind_N2O5][3] += ARSL1K(AL2O3_SAD, AL2O3_RADIUS, AIRDENS, 0.03, SQ_TEMP, SQM_N2O5); 
+
+    HET[ind_HOBR][3] += ARSL1K(NACL_SAD, NACL_RADIUS, AIRDENS, 0.3, SQ_TEMP, SQM_HOBR);
+
+    HET[ind_O3][0] += ARSL1K(DUST_SAD, DUST_RADIUS, AIRDENS, 5.0E-05, SQ_TEMP, SQM_O3); 
+
+    HET[ind_NO3][1] += ARSL1K(DUST_SAD, DUST_RADIUS, AIRDENS, 0.01, SQ_TEMP, SQM_NO3); 
+
+    HET[ind_N2O5][4] += ARSL1K(DIAMOND_SAD, DIAMOND_RADIUS, AIRDENS, 1.0E-04, SQ_TEMP, SQM_N2O5);  
+
+    HET[ind_NO2][4] += ARSL1K(DUST_SAD, DUST_RADIUS, AIRDENS, 1.0E-04, SQ_TEMP, SQM_NO2);  /* lubricant effect?, could add soot/water? */
+
+    HET[ind_H2SO4][1] += ARSL1K(AREA[0], RADI[0], AIRDENS, 0.1, SQ_TEMP, SQM_H2SO4); /* [0] ice */
+
+    HET[ind_H2SO4][2] += ARSL1K(AREA[3], RADI[3], AIRDENS, 0.1, SQ_TEMP, SQM_H2SO4); /* [3] */
+
+    HET[ind_HNO3][2] += ARSL1K(AREA[0], RADI[0], AIRDENS, 0.1, SQ_TEMP, SQM_H2SO4);
+
+    HET[ind_HNO3][3] += ARSL1K(AREA[3], RADI[3], AIRDENS, 0.1, SQ_TEMP, SQM_H2SO4);
 
 
 } /* End of GC_SETHET */

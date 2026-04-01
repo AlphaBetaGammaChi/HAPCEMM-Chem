@@ -163,7 +163,7 @@ Engine::Engine(std::string engineName, std::string engineFileName,
     if (LTO_HC[i] <= 0.0) {
       std::cout << "LTO_HC is negative for engine: " << engineName
                 << " LTO index: " << i << ", EI_HC: " << LTO_HC[i] << std::endl;
-      LTO_CO[i] = 0.1;
+      LTO_HC[i] = 0.1;
     }
   }
 
@@ -379,6 +379,11 @@ Engine& Engine::operator=( const Engine &e )
     EI_HNO2 = e.getEI_HNO2();
     EI_CO = e.getEI_CO();
     EI_HC = e.getEI_HC();
+    EI_H2 = e.getEI_H2();
+    EI_H2O2 = e.getEI_H2O2();
+    EI_NH3 = e.getEI_NH3();
+    EI_N2O = e.getEI_N2O();
+    EI_LUB = e.getEI_LUB();
     EI_Soot = e.getEI_Soot();
     SootRad = e.getSootRad();
     fuelflow = e.getFuelFlow();
@@ -540,6 +545,37 @@ void Engine::setEI_HC(const double HC)
 
 } /* End of Engine::setEI_HC */
 
+void Engine::setEI_H2(const double H2)
+{
+
+    EI_H2 = H2;
+
+} /* End of Engine::setEI_H2 */
+
+void Engine::setEI_H2O2(const double H2O2)
+{
+
+    EI_H2O2 = H2O2;
+
+} /* End of Engine::setEI_H2O2 */
+void Engine::setEI_NH3(const double NH3)
+{
+
+    EI_NH3 = NH3;
+
+} /* End of Engine::setEI_NH3 */
+void Engine::setEI_N2O(const double N2O)
+{
+
+    EI_N2O = N2O;
+
+} /* End of Engine::setEI_N2O */
+void Engine::setEI_LUB(const double LUB)
+{
+
+    EI_LUB = LUB;
+
+} /* End of Engine::setEI_LUB */
 void Engine::setEI_Soot(const double Soot)
 {
 

@@ -25,10 +25,10 @@
 #define NVAR                 127         /* Number of Variable species */
 #define NVARACT              126         /* Number of Active species */
 #define NFIX                 8           /* Number of Fixed species */
-#define NREACT               475         /* Number of reactions */
+#define NREACT               475         /* Number of reactions, was 475, set to 568 */
 #define NFAM                 9           /* Number of prod/loss families */
 #define NVARST               0           /* Starting of variables in conc. vect. */
-#define NFIXST               127         /* Starting of fixed in conc. vect. */
+#define NFIXST               183         /* Starting of fixed in conc. vect., WAS 127 set to 183 */
 #define NONZERO              1643        /* Number of nonzero entries in Jacobian */
 #define LU_NONZERO           2114        /* Number of nonzero entries in LU factoriz. of Jacobian */
 #define CNVAR                128         /* (NVAR+1) Number of elements in compressed row format */
@@ -37,7 +37,7 @@
 #define NLOOKAT              135         /* Number of species to look at */
 #define NMONITOR             0           /* Number of species to monitor */
 #define NMASS                1           /* Number of atoms to check mass balance */
-#define NPHOTOL              105         /* Number of photolysis reactions */
+#define NPHOTOL              114         /* Number of photolysis reactions, was 105, set to 114, 113 +1 to account for 0 indexing */
 #define NAERO                4           /* Number of aerosol types considered for heterogeneous chemistry */
 #define PSC                  1           /* Consider PSCs? */
 #define NOPT                 3           /* Number of optimization variables for KPP_Adjoint */
@@ -171,7 +171,68 @@
 #define ind_HBr              123        
 #define ind_HCl              124        
 #define ind_CO               125        
-#define ind_MO2              126        
+#define ind_MO2              126
+/*The following have been added for geo-particles, hydrogen and ammonia aircraft from NH2 and onwards MUST CONTINUE FROM 134 ONWARDS DUE TO ACTA-RCOOH TAKING 127-134*/ 
+#define ind_NH2              135
+#define ind_NH4NO3           136
+#define ind_NH42SO4          137
+#define ind_SO3              138
+#define ind_H2SO4            139
+#define ind_CACO3            140
+#define ind_CASO4            141
+#define ind_CANO32           142
+#define ind_AL2O3            143
+#define ind_NACL             144
+#define ind_NANO3            145
+#define ind_CLNO2            146
+#define ind_AGI              147
+#define ind_BII3             148
+#define ind_DUST             149
+#define ind_C                150
+#define ind_OCS              151
+#define ind_DMS              152
+#define ind_HONO             153
+#define ind_HNO              154
+#define ind_N2H4             155
+#define ind_CLONO2           156
+#define ind_LI               157
+#define ind_HF               158
+#define ind_POF3             159
+#define ind_DMC              160
+#define ind_F                161
+#define ind_FO               162
+#define ind_H2S              163
+#define ind_CS2              164
+#define ind_DMSO             165
+#define ind_HCN              166
+#define ind_CH3CN            167
+#define ind_MGO              168
+#define ind_LIIOH            169
+#define ind_NAOH             170
+#define ind_ZNOH2            171
+#define ind_SIH4             172
+#define ind_SIO2             173
+#define ind_CARB3            174
+#define ind_H2NO             175
+#define ind_NH4              176
+#define ind_CH3O2            177
+#define ind_MSA              178
+#define ind_AG               179
+#define ind_I                180
+#define ind_BI               181
+#define ind_IO               182
+#define ind_IO2              183
+#define ind_HOI              183
+#define ind_OIO              184
+#define ind_CACL2            185
+#define ind_LUB              186
+#define ind_RO2              187
+#define ind_RO               188
+#define ind_RONO2            189
+#define ind_SOA              190
+#define ind_NH2O             191
+
+       
 
 /* Index declaration for fixed species in C                         */
 /*   C(ind_spc)                                                     */

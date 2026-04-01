@@ -124,6 +124,28 @@ void Update_JRates ( double JRates[], const double CSZA )
         JRates[102] = NOON_JRATES[102] * CSZA;
         JRates[103] = NOON_JRATES[103] * CSZA;
         JRates[104] = NOON_JRATES[104] * CSZA;
+        JRates[105] = 1.0E-05 * CSZA;
+        JRates[106] = 7.8E-05 * CSZA;
+        JRates[107] = 2.0E-09 * CSZA;
+        JRates[108] = 1.5E-04 * CSZA;
+        JRates[109] = 1.0E-03 * CSZA;
+        JRates[110] = 4.0E-03 * CSZA;
+        JRates[111] = 2.0E-01 * CSZA;
+        JRates[112] = 3.0E-03 * CSZA;
+        JRates[113] = 1.6E-01 * CSZA;
+
+
+
+
+/*      JRates[105] = NOON_JRATES[105] * CSZA; */
+/*        JRates[106] = NOON_JRATES[106] * CSZA; */
+/*        JRates[107] = NOON_JRATES[107] * CSZA; */
+/*        JRates[108] = NOON_JRATES[108] * CSZA; */
+/*        JRates[109] = NOON_JRATES[109] * CSZA; */
+/*        JRates[110] = NOON_JRATES[110] * CSZA; */ 
+/*        JRates[111] = NOON_JRATES[111] * CSZA; */
+/*        JRates[112] = NOON_JRATES[112] * CSZA; */
+/*        JRates[113] = NOON_JRATES[113] * CSZA;*/
 
     } else {
 
@@ -138,7 +160,7 @@ void Update_JRates ( double JRates[], const double CSZA )
         JRates[  6] = 6.691081018469171E-05 * CSZA;
         JRates[  7] = 9.626531309479235E-05 * CSZA;
         JRates[  8] = 1.169508931495838E-05 * CSZA;
-        JRates[  9] = 1.028595226318751E-05 * CSZA;
+        JRates[  9] = 1 .028595226318751E-05 * CSZA;
         JRates[ 10] = 1.393569905839789E-02 * CSZA;
         JRates[ 11] = 2.528397217582879E-01 * CSZA;
         JRates[ 12] = 3.253242469494527E-02 * CSZA;
@@ -234,7 +256,15 @@ void Update_JRates ( double JRates[], const double CSZA )
         JRates[102] = 5.244341892327872E-05 * CSZA;
         JRates[103] = 4.243699140578246E-07 * CSZA;
         JRates[104] = 8.063028367437723E-06 * CSZA;
-
+        JRates[105] = 1.0E-05 * CSZA;
+        JRates[106] = 7.8E-05 * CSZA;
+        JRates[107] = 2.0E-09 * CSZA;
+        JRates[108] = 1.5E-04 * CSZA;
+        JRates[109] = 1.0E-03 * CSZA;
+        JRates[110] = 4.0E-03 * CSZA;
+        JRates[111] = 2.0E-01 * CSZA;
+        JRates[112] = 3.0E-03 * CSZA;
+        JRates[113] = 1.6E-01 * CSZA;       
     }
 
 } /* End of Update_JRates */

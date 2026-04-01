@@ -39,6 +39,11 @@ class Emission
         double getSO2( ) const;
         double getCO( ) const;
         double getHC( ) const;
+        double getH2( ) const;
+        double getH2O2( ) const;
+        double getNH3( ) const;
+        double getN2O( ) const;
+        double getLUB( ) const;
         double getCH4( ) const;
         double getC2H6( ) const;
         double getPRPE( ) const;
@@ -66,6 +71,11 @@ class Emission
         double SO2;  /* [g/kg fuel] */
         double CO;   /* [g/kg fuel] */
         double HC;   /* [g/kg fuel] */
+        double H2;   /* [g/kg fuel] */
+        double H2O2;   /* [g/kg fuel] */
+        double NH3;   /* [g/kg fuel] */
+        double N2O;   /* [g/kg fuel] */
+        double LUB;   /* [g/kg fuel] */
         double CH4;  /* [g/kg fuel] */
         double C2H6; /* [g/kg fuel] */
         double PRPE; /* [g/kg fuel] */

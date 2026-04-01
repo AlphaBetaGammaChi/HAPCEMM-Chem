@@ -36,6 +36,11 @@ Input::Input( unsigned int iCase,               \
     EI_NOx_        ( parameters[iCase].at("EI_NOX")),
     EI_CO_         ( parameters[iCase].at("EI_CO")),
     EI_HC_         ( parameters[iCase].at("EI_UHC")),
+    EI_H2_         ( parameters[iCase].at("EI_H2")),
+    EI_H2O2_         ( parameters[iCase].at("EI_H2O2")),
+    EI_NH3_         ( parameters[iCase].at("EI_NH3")),
+    EI_N2O_         ( parameters[iCase].at("EI_N2O")),
+    EI_LUB_         ( parameters[iCase].at("EI_LUB")),
     EI_SO2_        ( parameters[iCase].at("EI_SO2")),
     EI_SO2TOSO4_   ( parameters[iCase].at("EI_SO2TOSO4")),
     EI_Soot_       ( parameters[iCase].at("EI_SOOT")),
@@ -44,6 +49,14 @@ Input::Input( unsigned int iCase,               \
     fuelFlow_      ( parameters[iCase].at("FF")),
     aircraftMass_  ( parameters[iCase].at("AMASS")),
 
+    backgroundGeoengineeringRho_      ( parameters[iCase].count("Background_Geoengineering_Rho") ? parameters[iCase].at("Background_Geoengineering_Rho") : 1769.0 ), 
+    backgroundGeoengineeringRadius_   ( parameters[iCase].count("Background_Geoengineering_Radius") ? parameters[iCase].at("Background_Geoengineering_Radius") : 20.0e-9 ),
+    backgroundGeoengineeringNumber_ ( parameters[iCase].count("Background_Geoengineering_Number_Density") ? parameters[iCase].at("Background_Geoengineering_Number_Density") : 1.0e8 ),
+    backgroundGeoengineeringGamma_ ( parameters[iCase].count("Background_Geoengineering_Gamma") ? parameters[iCase].at("Background_Geoengineering_Gamma") : 0.02 ),
+    backgroundGeoengineeringShapeFactor_ ( parameters[iCase].count("Background_Geoengineering_Shape_Factor") ? parameters[iCase].at("Background_Geoengineering_Shape_Factor") : 1.00 ),
+    backgroundGeoengineeringContactAngle_ ( parameters[iCase].count("Background_Geoengineering_ContactAngle") ? parameters[iCase].at("Background_Geoengineering_ContactAngle") : 1.0 ),
+    backgroundGeoengineeringWettability_ ( parameters[iCase].count("Background_Geoengineering_Wettability") ? parameters[iCase].at("Background_Geoengineering_Wettability") : 1.0 ),
+    
     backgNOx_      ( parameters[iCase].at("BACKG_NOX")),
     backgHNO3_     ( parameters[iCase].at("BACKG_HNO3")),
     backgO3_       ( parameters[iCase].at("BACKG_O3")),
@@ -141,6 +154,41 @@ void Input::checkInputValidity(){
         std::cout << EI_HC_ << " [g/kg_fuel]" << std::endl;
         exit(-1);
     }
+
+    if ( EI_H2_ < 0.0E+00 || EI_H2_ > 1.0E+10 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " EI_H2 takes an unrealisable value: EI_H2 = ";
+        std::cout << EI_H2_ << " [g/kg_fuel]" << std::endl;
+        exit(-1);
+    }
+
+    if ( EI_H2O2_ < 0.0E+00 || EI_H2O2_ > 1.0E+10 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " EI_H2O2 takes an unrealisable value: EI_H2O2 = ";
+        std::cout << EI_H2O2_ << " [g/kg_fuel]" << std::endl;
+        exit(-1);
+    }
+
+    if ( EI_NH3_ < 0.0E+00 || EI_NH3_ > 1.0E+10 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " EI_NH3 takes an unrealisable value: EI_NH3 = ";
+        std::cout << EI_NH3_ << " [g/kg_fuel]" << std::endl;
+        exit(-1);
+    }
+
+    if ( EI_N2O_ < 0.0E+00 || EI_N2O_ > 1.0E+10 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " EI_N2O takes an unrealisable value: EI_N2O = ";
+        std::cout << EI_N2O_ << " [g/kg_fuel]" << std::endl;
+        exit(-1);
+    }
+
+    if ( EI_LUB_ < 0.0E+00 || EI_LUB_ > 1.0E+10 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " EI_LUB takes an unrealisable value: EI_LUB = ";
+        std::cout << EI_LUB_ << " [g/kg_fuel]" << std::endl;
+        exit(-1);
+    }
     
     if ( EI_SO2_ < 0.0E+00 || EI_SO2_ > 1.0E+02 ) {
         std::cout << " In Input::Input:";
@@ -203,6 +251,49 @@ void Input::checkInputValidity(){
         std::cout << " In Input::Input:";
         std::cout << " backgCO takes an unrealisable value: backgCO = ";
         std::cout << backgCO_ << " [ppb]" << std::endl;
+        exit(-1);
+    }
+
+    if ( backgroundGeoengineeringRho_  < 0.0E+00 || backgroundGeoengineeringRho_  > 1.0E+09 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " backgroundGeoengineeringRho_  takes an unrealisable value: backgroundGeoengineeringRho_  = ";
+        std::cout << backgroundGeoengineeringRho_  << " []" << std::endl;
+        exit(-1);
+    }
+    if ( backgroundGeoengineeringRadius_ < 0.0E+00 || backgroundGeoengineeringRadius_  > 1.0E+09 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " backgroundGeoengineeringRadius_ takes an unrealisable value: backgroundGeoengineeringRadius_ = ";
+        std::cout << backgroundGeoengineeringRadius_ << " []" << std::endl;
+        exit(-1);
+    }
+    if ( backgroundGeoengineeringNumber_ < 0.0E+00 || backgroundGeoengineeringNumber_  > 1.0E+09 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " backgroundGeoengineeringNumber_  takes an unrealisable value: backgroundGeoengineeringNumber_  = ";
+        std::cout << backgroundGeoengineeringNumber_  << " []" << std::endl;
+        exit(-1);
+    }
+    if ( backgroundGeoengineeringGamma_ < 0.0E+00 || backgroundGeoengineeringGamma_  > 1.0E+09 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " backgroundGeoengineeringGamma_  takes an unrealisable value: backgroundGeoengineeringGamma_  = ";
+        std::cout << backgroundGeoengineeringGamma_  << " []" << std::endl;
+        exit(-1);
+    }
+    if ( backgroundGeoengineeringShapeFactor_ < 0.0E+00 || backgroundGeoengineeringShapeFactor_  > 1.0E+09 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " backgroundGeoengineeringShapeFactor_  takes an unrealisable value: backgroundGeoengineeringShapeFactor_  = ";
+        std::cout << backgroundGeoengineeringShapeFactor_  << " []" << std::endl;
+        exit(-1);
+    }
+    if ( backgroundGeoengineeringContactAngle_ < 0.0E+00 || backgroundGeoengineeringContactAngle_  > 1.0E+09 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " backgroundGeoengineeringContactAngle_  takes an unrealisable value: backgroundGeoengineeringContactAngle_  = ";
+        std::cout << backgroundGeoengineeringContactAngle_  << " []" << std::endl;
+        exit(-1);
+    }
+    if ( backgroundGeoengineeringWettability_ < 0.0E+00 || backgroundGeoengineeringWettability_  > 1.0E+09 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " backgroundGeoengineeringWettability takes an unrealisable value: backgroundGeoengineeringWettability = ";
+        std::cout << backgroundGeoengineeringWettability_ << " []" << std::endl;
         exit(-1);
     }
     

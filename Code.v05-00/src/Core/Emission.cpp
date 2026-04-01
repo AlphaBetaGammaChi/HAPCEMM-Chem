@@ -27,6 +27,11 @@ Emission::Emission( )
     HNO2= 0.0;
     SO2 = 0.0;
     CO  = 0.0;
+    H2  = 0.0;
+    H2O2  = 0.0;
+    NH3  = 0.0;
+    N2O  = 0.0;
+    LUB  = 0.0;
     HC  = 0.0;
 
     SO2toSO4 = 0.0;
@@ -92,7 +97,26 @@ Emission::Emission( const Engine &engine, const Fuel &fuel, const double SO2ToSO
         std::cout << "HC emissions are negative: EI(HC) = " << HC << "g/kg" << std::endl;
         HC = 0.0;
     }
-
+    if ( H2 <= 0.0 ) {
+        std::cout << "H2 emissions are negative: EI(H2) = " << H2 << "g/kg" << std::endl;
+        H2 = 0.0;
+    }
+    if ( H2O2 <= 0.0 ) {
+        std::cout << "H2O2 emissions are negative: EI(H2O2) = " << H2O2 << "g/kg" << std::endl;
+        H2O2 = 0.0;
+    }
+    if ( NH3 <= 0.0 ) {
+        std::cout << "NH3 emissions are negative: EI(NH3) = " << NH3 << "g/kg" << std::endl;
+        NH3 = 0.0;
+    }
+    if ( N2O <= 0.0 ) {
+        std::cout << "N2O emissions are negative: EI(N2O) = " << N2O << "g/kg" << std::endl;
+        N2O = 0.0;
+    }
+    if ( LUB <= 0.0 ) {
+        std::cout << "LUB emissions are negative: EI(LUB) = " << LUB << "g/kg" << std::endl;
+        LUB = 0.0;
+    }
     if ( Soot <= 0.0 ) {
         std::cout << "Soot emissions are negative: EI(Soot) = " << Soot << "g/kg" << std::endl;
         Soot = 0.0;
@@ -123,6 +147,11 @@ Emission::Emission( const Emission &e )
     SO2 = e.SO2;
     CO  = e.CO;
     HC  = e.HC;
+    H2  = e.HC;
+    H2O2  = e.H2O2;
+    NH3  = e.NH3;
+    N2O  = e.N2O;
+    LUB  = e.LUB;
     
     /* HC splitting */
     CH4  = e.CH4;
@@ -162,6 +191,11 @@ void Emission::Populate_withEngine( const Engine &engine )
     HNO2 = engine.getEI_HNO2(); /* g(HNO2)/kg */
     CO   = engine.getEI_CO();
     HC   = engine.getEI_HC();
+    H2   = engine.getEI_H2();
+    H2O2   = engine.getEI_H2O2();
+    NH3   = engine.getEI_NH3();
+    N2O   = engine.getEI_N2O();
+    LUB   = engine.getEI_LUB();
 
     /* BC */
     Soot = engine.getEI_Soot();
@@ -177,9 +211,20 @@ void Emission::Populate_withFuel( const Fuel &fuel )
     /* Convert to g/kg */
     CO2 *= 1000; /* [ g/kg fuel ]*/
     H2O *= 1000; /* [ g/kg fuel ]*/
-    /* getFSC from fuel */
-    SO2 = fuel.getFSC() * 2.0 / 1000.0;
+    
 
+    if (fuel.getAtomC() == 0 && fuel.getAtomN() ==  0 && fuel.getAtomH() > 0) {
+        H2O = 8940.0; /* [8940 g/kg fuel for H2, 8.94 kg H2O/kg H2 see Schumann U. (1996) ]*/
+        CO2  = 0.0; 
+        SO2  = 0.0;
+     } else if (fuel.getAtomC() == 0 && fuel.getAtomN() == 0 && fuel.getAtomH() ==  0) {
+        H2O = 1590.0; /* [1590.0 g/kg fuel for H2, 1.590 kg H2O/kg nh3 see Schumann U. (1996) ]*/
+        CO2  = 0.0; 
+        SO2  = 0.0;
+      } else{
+    /* getFSC from fuel */
+    SO2 = fuel.getFSC() * 2.0 / 1000.0; 
+       }
 } /* End of Emission::Populate_withFuel */
 
 Emission& Emission::operator=( const Emission &em )
@@ -197,6 +242,11 @@ Emission& Emission::operator=( const Emission &em )
     SO2 = em.SO2 ;
     CO  = em.CO  ;
     HC  = em.HC  ;
+    H2  = em.H2  ;
+    H2O2  = em.H2O2  ;
+    NH3  = em.NH3  ;
+    N2O  = em.N2O  ;
+    LUB  = em.LUB  ;
     CH4 = em.CH4 ;
     C2H6= em.C2H6;
     PRPE= em.PRPE;
@@ -224,6 +274,11 @@ Emission& Emission::operator+( const Emission &em )
     this->SO2  += em.SO2 ;
     this->CO   += em.CO  ;
     this->HC   += em.HC  ;
+    this->H2   += em.H2  ;
+    this->H2O2   += em.H2O2  ;
+    this->NH3   += em.NH3  ;
+    this->N2O   += em.N2O  ;
+    this->LUB   += em.LUB  ;
     this->CH4  += em.CH4 ;
     this->C2H6 += em.C2H6;
     this->PRPE += em.PRPE;
@@ -304,6 +359,41 @@ double Emission::getHC( ) const
     return HC;
 
 } /* End of Emission::getHC */
+
+double Emission::getH2( ) const
+{
+
+    return H2;
+
+} /* End of Emission::getH2 */
+
+double Emission::getH2O2( ) const
+{
+
+    return H2O2;
+
+} /* End of Emission::getN2O */
+
+double Emission::getNH3( ) const
+{
+
+    return NH3;
+
+} /* End of Emission::getNH3 */
+
+double Emission::getN2O( ) const
+{
+
+    return N2O;
+
+} /* End of Emission::getN2O */
+
+double Emission::getLUB( ) const
+{
+
+    return LUB;
+
+} /* End of Emission::getLUB */
 
 double Emission::getCH4( ) const
 {
@@ -445,6 +535,26 @@ void Emission::Debug( ) const
     std::cout << " -> HC  : ";
     std::cout << std::setw(12);
     std::cout << HC << "   [ g/kg fuel ] " << std::endl;
+    std::cout << std::setw(12);
+    std::cout << " -> H2  : ";
+    std::cout << std::setw(12);
+    std::cout << H2 << "   [ g/kg fuel ] " << std::endl;
+    std::cout << std::setw(12);
+    std::cout << " -> H2O2  : ";
+    std::cout << std::setw(12);
+    std::cout << H2O2 << "   [ g/kg fuel ] " << std::endl;
+    std::cout << std::setw(12);
+    std::cout << " -> NH3  : ";
+    std::cout << std::setw(12);
+    std::cout << NH3 << "   [ g/kg fuel ] " << std::endl;
+    std::cout << std::setw(12);
+    std::cout << " -> N2O  : ";
+    std::cout << std::setw(12);
+    std::cout << N2O << "   [ g/kg fuel ] " << std::endl;
+    std::cout << std::setw(12);
+    std::cout << " -> LUB  : ";
+    std::cout << std::setw(12);
+    std::cout << LUB << "   [ g/kg fuel ] " << std::endl;
     std::cout << std::setw(14);
     std::cout << " ---> CH4 : ";
     std::cout << std::setw(10);

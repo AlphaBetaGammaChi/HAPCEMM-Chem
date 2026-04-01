@@ -47,6 +47,22 @@ class Input
     double EI_Soot_;
     double sootRad_;
 
+    // New emission indices for alternative fuels
+    double EI_H2_;
+    double EI_H2O2_;
+    double EI_NH3_;
+    double EI_N2O_;
+    double EI_LUB_;
+
+    // Background geoengineering parameters
+    double backgroundGeoengineeringRho_;
+    double backgroundGeoengineeringRadius_;
+    double backgroundGeoengineeringNumber_;
+    double backgroundGeoengineeringGamma_;
+    double backgroundGeoengineeringShapeFactor_;
+    double backgroundGeoengineeringContactAngle_;
+    double backgroundGeoengineeringWettability_;
+
     double fuelFlow_;
     double aircraftMass_;
 
@@ -127,6 +143,22 @@ class Input
         double EI_SO2TOSO4() const { return EI_SO2TOSO4_; }
         double EI_Soot() const { return EI_Soot_; }
         double sootRad() const { return sootRad_; }
+        
+        // New emission accessors for alternative fuels
+        double EI_H2() const { return EI_H2_; }
+        double EI_H2O2() const { return EI_H2O2_; }
+        double EI_NH3() const { return EI_NH3_; }
+        double EI_N2O() const { return EI_N2O_; }
+        double EI_LUB() const { return EI_LUB_; }
+
+        // Background geoengineering accessors
+        double backgroundGeoengineeringRho() const { return backgroundGeoengineeringRho_; }
+        double backgroundGeoengineeringRadius() const { return backgroundGeoengineeringRadius_; }
+        double backgroundGeoengineeringNumber() const { return backgroundGeoengineeringNumber_; }
+        double backgroundGeoengineeringGamma() const { return backgroundGeoengineeringGamma_; }
+        double backgroundGeoengineeringShapeFactor() const { return backgroundGeoengineeringShapeFactor_; }
+        double backgroundGeoengineeringContactAngle() const { return backgroundGeoengineeringContactAngle_; }
+        double backgroundGeoengineeringWettability() const { return backgroundGeoengineeringWettability_; }
         
         double fuelFlow() const { return fuelFlow_; }
 

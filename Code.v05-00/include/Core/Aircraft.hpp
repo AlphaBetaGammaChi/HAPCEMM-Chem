@@ -72,6 +72,11 @@ class Aircraft
         void setEI_NOx(const double NOx);
         void setEI_CO(const double CO);
         void setEI_HC(const double HC);
+        void setEI_H2(const double H2);
+        void setEI_H2O2(const double H2O2);
+        void setEI_NH3(const double NH3);
+        void setEI_N2O(const double N2O);
+        void setEI_LUB(const double LUB);
         void setEI_Soot(const double Soot);
         void setSootRad(const double sootRad);
         void setFuelFlow(const double ff);

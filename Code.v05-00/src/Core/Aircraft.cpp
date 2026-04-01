@@ -45,6 +45,11 @@ Aircraft::Aircraft( const Input& input, std::string engineFilePath, std::string 
     setEI_NOx( input.EI_NOx() );
     setEI_CO( input.EI_CO() );
     setEI_HC( input.EI_HC() );
+    setEI_H2( input.EI_H2() );
+    setEI_H2O2( input.EI_H2O2() );
+    setEI_NH3( input.EI_NH3() );
+    setEI_N2O( input.EI_N2O() );
+    setEI_LUB( input.EI_LUB() );
     setEI_Soot( input.EI_Soot() );
     setSootRad( input.sootRad() );
     fuel_per_dist_ = input.fuelFlow() / vFlight_ms_;
@@ -128,6 +133,41 @@ void Aircraft::setEI_HC(const double HC)
         engine_.setEI_HC(HC);
 
 } /* End of Aircraft::setEI_HC */
+void Aircraft::setEI_H2(const double H2)
+{
+
+    if ( H2 > 0.0E+00 )
+        engine_.setEI_H2(H2);
+
+} /* End of Aircraft::setEI_H2 */
+void Aircraft::setEI_H2O2(const double H2O2)
+{
+
+    if ( H2O2 > 0.0E+00 )
+        engine_.setEI_H2O2(H2O2);
+
+} /* End of Aircraft::setEI_H2O2 */
+void Aircraft::setEI_NH3(const double NH3)
+{
+
+    if ( NH3 > 0.0E+00 )
+        engine_.setEI_NH3(NH3);
+
+} /* End of Aircraft::setEI_NH3 */
+void Aircraft::setEI_N2O(const double N2O)
+{
+
+    if ( N2O > 0.0E+00 )
+        engine_.setEI_N2O(N2O);
+
+} /* End of Aircraft::setEI_N2O */
+void Aircraft::setEI_LUB(const double LUB)
+{
+
+    if ( LUB > 0.0E+00 )
+        engine_.setEI_LUB(LUB);
+
+} /* End of Aircraft::setEI_LUB */
 
 void Aircraft::setEI_Soot(const double Soot)
 {
@@ -231,6 +271,16 @@ void Aircraft::Debug( ) const
     std::cout << "      +Engine EI CO       : ";
     std::cout << std::setw(10) << engine_.getEI_CO() << " [ g/kg ]" << "\n";
     std::cout << "      +Engine EI HC       : ";
+    std::cout << std::setw(10) << engine_.getEI_H2() << " [ g/kg ]" << "\n";
+    std::cout << "      +Engine EI H2       : ";
+    std::cout << std::setw(10) << engine_.getEI_H2O2() << " [ g/kg ]" << "\n";
+    std::cout << "      +Engine EI H2O2       : ";
+    std::cout << std::setw(10) << engine_.getEI_NH3() << " [ g/kg ]" << "\n";
+    std::cout << "      +Engine EI NH3       : ";
+    std::cout << std::setw(10) << engine_.getEI_N2O() << " [ g/kg ]" << "\n";
+    std::cout << "      +Engine EI N2O       : ";
+    std::cout << std::setw(10) << engine_.getEI_LUB() << " [ g/kg ]" << "\n";
+    std::cout << "      +Engine EI LUB       : ";
     std::cout << std::setw(10) << engine_.getEI_HC() << " [ g/kg ]" << "\n";
     std::cout << "      +Engine EI Soot     : ";
     std::cout << std::setw(10) << engine_.getEI_Soot() << " [ g/kg ]" << "\n";
