@@ -93,7 +93,10 @@ class Input
     private:
     void checkInputValidity();
     void adjustLatLong();
-    
+    void calculate_emissionMonth();
+
+    public:
+
     // Setters for box model coupling - allow overriding background values
     void setBackgNOx(double val) { backgNOx_ = val; }
     void setBackgHNO3(double val) { backgHNO3_ = val; }
@@ -101,13 +104,8 @@ class Input
     void setBackgCO(double val) { backgCO_ = val; }
     void setBackgCH4(double val) { backgCH4_ = val; }
     void setBackgSO2(double val) { backgSO2_ = val; }
-    
-    friend class BoxModel;  // Allow BoxModel to call setters
-    void calculate_emissionMonth();
 
-    public:
-
-        Input( unsigned int iCase,               \
+    Input( unsigned int iCase,               \
                const Vector_2D &parameters,      \
                const std::string fileName,       \
                const std::string fileName_ADJ,   \
