@@ -1,6 +1,7 @@
 # Source files that need to be compiled
 set(SRCS
     Aircraft.cpp
+    BoxModel.cpp
     Cluster.cpp
     Diag_Mod.cpp
     Emission.cpp

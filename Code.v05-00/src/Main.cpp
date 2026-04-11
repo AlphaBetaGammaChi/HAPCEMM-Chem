@@ -32,6 +32,7 @@
 #include "Core/LAGRIDPlumeModel.hpp"
 #include "Core/Status.hpp"
 #include "Core/Diag_Mod.hpp"
+#include "Core/BoxModel.hpp"
 #include "Util/MC_Rand.hpp"
 
 void CreateREADME( const std::string folder, const std::string fileName, \
@@ -236,6 +237,17 @@ int main( int argc, char* argv[])
                 /* Plume Model (APCEMM) */
                 case 1: {
                     std::cout << "running epm... " << std::endl;
+                    
+                    // Run box model if enabled (Option ii: whole domain)
+                    if (Input_Opt.SIMULATION_BOXMODEL) {
+                        std::cout << "Running box model first..." << std::endl;
+                        int boxStatus = BoxModel::runBoxModel(Input_Opt, inputCase);
+                        if (boxStatus != 0) {
+                            std::cout << "Warning: Box model failed with status " << boxStatus << std::endl;
+                            // Continue with LAGRID even if box model fails
+                        }
+                    }
+                    
                     LAGRIDPlumeModel LAGRID_Model(Input_Opt, inputCase);
                     case_status = LAGRID_Model.runFullModel();
                     // iERR = PlumeModel( Input_Opt, inputCase );
