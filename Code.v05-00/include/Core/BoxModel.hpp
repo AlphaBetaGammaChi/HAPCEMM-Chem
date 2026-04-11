@@ -42,6 +42,33 @@ struct EPMCouplingData {
 };
 
 /**
+ * Data structure to pass evolved species from box model to LAGRID
+ * Contains final concentrations at end of EPM simulation time
+ */
+struct LAGRIDCouplingData {
+    double NO;     // NO [ppb]
+    double NO2;    // NO2 [ppb]
+    double O3;     // Ozone [ppb]
+    double CO;     // Carbon monoxide [ppb]
+    double CH4;    // Methane [ppb]
+    double SO2;    // Sulfur dioxide [ppb]
+    double HNO3;   // Nitric acid [ppb]
+    double H2O;    // Water vapor [ppb]
+    bool isValid;  // Whether data is available
+    
+    // Default constructor
+    LAGRIDCouplingData() : NO(0.0), NO2(0.0), O3(0.0), CO(0.0), CH4(0.0), SO2(0.0), HNO3(0.0), H2O(0.0), isValid(false) {}
+};
+
+/**
+ * Get the final evolved species concentrations from box model
+ * Used for LAGRID coupling
+ * 
+ * @return LAGRIDCouplingData - Final species at end of box model integration
+ */
+LAGRIDCouplingData getFinalSpecies();
+
+/**
  * Run the box model chemistry over the entire simulation domain
  * 
  * This is a 0-dimensional model that simulates gas-phase chemistry

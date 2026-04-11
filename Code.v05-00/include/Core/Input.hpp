@@ -91,9 +91,19 @@ class Input
     UInt emissionMonth_;
 
     private:
-        void checkInputValidity();
-        void adjustLatLong();
-        void calculate_emissionMonth();
+    void checkInputValidity();
+    void adjustLatLong();
+    
+    // Setters for box model coupling - allow overriding background values
+    void setBackgNOx(double val) { backgNOx_ = val; }
+    void setBackgHNO3(double val) { backgHNO3_ = val; }
+    void setBackgO3(double val) { backgO3_ = val; }
+    void setBackgCO(double val) { backgCO_ = val; }
+    void setBackgCH4(double val) { backgCH4_ = val; }
+    void setBackgSO2(double val) { backgSO2_ = val; }
+    
+    friend class BoxModel;  // Allow BoxModel to call setters
+    void calculate_emissionMonth();
 
     public:
 

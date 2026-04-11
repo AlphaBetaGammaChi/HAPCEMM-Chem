@@ -242,26 +242,43 @@ int main( int argc, char* argv[])
                     LAGRIDPlumeModel LAGRID_Model(Input_Opt, inputCase);
                     case_status = LAGRID_Model.runFullModel();
                     
-                    // If box model coupling is enabled, run box model with EPM data
-                    if (Input_Opt.SIMULATION_BOXMODEL && Input_Opt.SIMULATION_BOXMODEL_COUPLING) {
-                        std::cout << "Running box model with EPM coupling..." << std::endl;
+                    // If box model is enabled, run it to get evolved background for LAGRID
+                    if (Input_Opt.SIMULATION_BOXMODEL) {
+                        // Run box model to get evolved species at EPM end time
+                        BoxModel::EPMCouplingData epmData;  // Default ambient values
                         
-                        // Extract EPM microphysical properties after LAGRID/EPM completes
-                        // Note: LAGRID_Model has access to EPM::Solution via internal state
-                        // For now, use default ambient values (extraction requires more infrastructure)
-                        BoxModel::EPMCouplingData epmData;  // Default: no coupling data
+                        // If coupling enabled, pass EPM data to box model for heterogeneous chemistry
+                        if (Input_Opt.SIMULATION_BOXMODEL_COUPLING) {
+                            std::cout << "Running box model with EPM coupling..." << std::endl;
+                        } else {
+                            std::cout << "Running box model (standalone)..." << std::endl;
+                        }
                         
                         int boxStatus = BoxModel::runBoxModel(Input_Opt, inputCase, epmData);
                         if (boxStatus != 0) {
-                            std::cout << "Warning: Box model with coupling failed with status " << boxStatus << std::endl;
-                        }
-                    }
-                    // If box model enabled but coupling disabled, box model runs after (Phase 1 behavior)
-                    else if (Input_Opt.SIMULATION_BOXMODEL) {
-                        std::cout << "Running box model (standalone)..." << std::endl;
-                        int boxStatus = BoxModel::runBoxModel(Input_Opt, inputCase);
-                        if (boxStatus != 0) {
                             std::cout << "Warning: Box model failed with status " << boxStatus << std::endl;
+                        } else {
+                            // Box model completed - get final species and pass to LAGRID
+                            BoxModel::LAGRIDCouplingData evolvedSpecies = BoxModel::getFinalSpecies();
+                            
+                            if (evolvedSpecies.isValid) {
+                                std::cout << "\n===== Applying evolved species to LAGRID =====" << std::endl;
+                                std::cout << "NO: " << evolvedSpecies.NO << " ppb" << std::endl;
+                                std::cout << "NO2: " << evolvedSpecies.NO2 << " ppb" << std::endl;
+                                std::cout << "O3: " << evolvedSpecies.O3 << " ppb" << std::endl;
+                                std::cout << "CO: " << evolvedSpecies.CO << " ppb" << std::endl;
+                                std::cout << "CH4: " << evolvedSpecies.CH4 << " ppb" << std::endl;
+                                std::cout << "SO2: " << evolvedSpecies.SO2 << " ppb" << std::endl;
+                                std::cout << "H2O: " << evolvedSpecies.H2O << " ppb" << std::endl;
+                                
+                                // Update the input object with evolved background concentrations
+                                // This will be used by subsequent LAGRID transport runs as ambient
+                                inputCase.setBackgNOx(evolvedSpecies.NO);
+                                inputCase.setBackgO3(evolvedSpecies.O3);
+                                inputCase.setBackgCO(evolvedSpecies.CO);
+                                inputCase.setBackgCH4(evolvedSpecies.CH4);
+                                inputCase.setBackgSO2(evolvedSpecies.SO2);
+                            }
                         }
                     }
                     

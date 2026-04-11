@@ -42,6 +42,20 @@
 namespace BoxModel {
 
 // ============================================================================
+// Global storage for final species (used for LAGRID coupling)
+// ============================================================================
+
+static LAGRIDCouplingData g_finalSpecies;  // Final species after box model integration
+
+// ============================================================================
+// Getter for final species (used by Main.cpp to pass to LAGRID)
+// ============================================================================
+
+LAGRIDCouplingData getFinalSpecies() {
+    return g_finalSpecies;
+}
+
+// ============================================================================
 // Time Array Building Function
 // ============================================================================
 
@@ -415,6 +429,18 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
             std::cout << "  " << KPP[i].name << ": " << concentration_ppb << " ppb" << std::endl;
         }
     }
+    
+    // Store final species for LAGRID coupling
+    g_finalSpecies.isValid = true;
+    g_finalSpecies.NO   = VAR[ind_NO]   / airDens * 1.0e9;
+    g_finalSpecies.NO2  = VAR[ind_NO2]  / airDens * 1.0e9;
+    g_finalSpecies.O3  = VAR[ind_O3]   / airDens * 1.0e9;
+    g_finalSpecies.CO   = VAR[ind_CO]   / airDens * 1.0e9;
+    g_finalSpecies.CH4  = VAR[ind_CH4]  / airDens * 1.0e9;
+    g_finalSpecies.SO2  = VAR[ind_SO2]  / airDens * 1.0e9;
+    g_finalSpecies.H2O  = VAR[ind_H2O]  / airDens * 1.0e9;
+    // HNO3 index may not be in the current list - only store if available
+    g_finalSpecies.HNO3 = 0.0;  // Default if not in mechanism
     
     std::cout << "\nBox model completed successfully!" << std::endl;
     
