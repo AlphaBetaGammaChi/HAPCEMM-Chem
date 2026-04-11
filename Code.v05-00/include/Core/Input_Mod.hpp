@@ -46,6 +46,7 @@ struct OptInput
     std::string  SIMULATION_ADJOINT_FILENAME;
     bool         SIMULATION_BOXMODEL;
     std::string  SIMULATION_BOX_FILENAME;
+    bool         SIMULATION_BOXMODEL_COUPLING;
     bool         SIMULATION_FORCE_SEED;
     int          SIMULATION_SEED_VALUE;
     epm_type     SIMULATION_EPM_TYPE;

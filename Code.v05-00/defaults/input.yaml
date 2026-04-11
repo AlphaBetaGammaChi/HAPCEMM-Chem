@@ -30,7 +30,8 @@ SIMULATION MENU:
     netCDF filename format (string): APCEMM_ADJ_Case_*
   BOX MODEL SUBMENU:
     Run box model (T/F): F
-    netCDF filename format (string): APCEMM_BOX_CASE_*
+    netCDF filename format (string): APCEMM_BOX_CASE_*  
+    Box model coupling (T/F): F
   RANDOM NUMBER GENERATION SUBMENU:
     Force seed value (T/F): F
     Seed value (positive int): 0

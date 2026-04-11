@@ -146,6 +146,15 @@ namespace YamlInputReader{
         YAML::Node boxModelSubmenu = simNode["BOX MODEL SUBMENU"];
         input.SIMULATION_BOXMODEL = parseBoolString(boxModelSubmenu["Run box model (T/F)"].as<string>(), "Run box model (T/F)");
         input.SIMULATION_BOX_FILENAME = boxModelSubmenu["netCDF filename format (string)"].as<string>();
+        
+        // Box model coupling flag - only relevant if box model is enabled
+        if (boxModelSubmenu["Box model coupling (T/F)"]) {
+            input.SIMULATION_BOXMODEL_COUPLING = parseBoolString(
+                boxModelSubmenu["Box model coupling (T/F)"].as<string>(), 
+                "Box model coupling (T/F)");
+        } else {
+            input.SIMULATION_BOXMODEL_COUPLING = false;  // Default: false
+        }
 
         if (simNode["RANDOM NUMBER GENERATION SUBMENU"]){
             YAML::Node seedSubmenu = simNode["RANDOM NUMBER GENERATION SUBMENU"];
