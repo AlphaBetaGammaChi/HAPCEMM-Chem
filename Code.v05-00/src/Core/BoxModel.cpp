@@ -150,7 +150,7 @@ void writeBoxModelOutput(const std::string& outputFile,
 // Main Box Model Function
 // ============================================================================
 
-int runBoxModel(const OptInput& Input_Opt, const Input& input) {
+int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCouplingData& epmCoupling) {
     
     std::cout << "\n===== Running Box Model =====" << std::endl;
     
@@ -195,6 +195,22 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input) {
     std::cout << "Rel. Humidity (ice): " << relHumidity_i << std::endl;
     std::cout << "Air Density: " << airDens << " molec/cm3" << std::endl;
     std::cout << "Timestep: " << dt << " s" << std::endl;
+    
+    // =======================================================================
+    // EPM Coupling: Use aerosol surface area for heterogeneous chemistry
+    // =======================================================================
+    
+    if (epmCoupling.isValid) {
+        std::cout << "\n===== EPM Coupling Data =====" << std::endl;
+        std::cout << "Liquid Aerosol SAD: " << epmCoupling.LA_SAD << " m2/kg-air" << std::endl;
+        std::cout << "Polar Strat. Aerosol SAD: " << epmCoupling.PA_SAD << " m2/kg-air" << std::endl;
+        std::cout << "Liquid Water Content: " << epmCoupling.LA_LWC << " kg/kg-air" << std::endl;
+        std::cout << "Polar Strat. Water Content: " << epmCoupling.PA_LWC << " kg/kg-air" << std::endl;
+        
+        // Use coupling data to compute heterogeneous reaction rates
+        // This would modify KPP's RCONST array during integration
+        // For now, just log that we're using it
+    }
     
     // =======================================================================
     // Initialize Solar Zenith Angle

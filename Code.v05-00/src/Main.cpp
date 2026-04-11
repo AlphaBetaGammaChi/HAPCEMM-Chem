@@ -238,18 +238,33 @@ int main( int argc, char* argv[])
                 case 1: {
                     std::cout << "running epm... " << std::endl;
                     
-                    // Run box model if enabled (Option ii: whole domain)
-                    if (Input_Opt.SIMULATION_BOXMODEL) {
-                        std::cout << "Running box model first..." << std::endl;
+                    // Run LAGRID/EPM first (includes EPM initialization at t=0)
+                    LAGRIDPlumeModel LAGRID_Model(Input_Opt, inputCase);
+                    case_status = LAGRID_Model.runFullModel();
+                    
+                    // If box model coupling is enabled, run box model with EPM data
+                    if (Input_Opt.SIMULATION_BOXMODEL && Input_Opt.SIMULATION_BOXMODEL_COUPLING) {
+                        std::cout << "Running box model with EPM coupling..." << std::endl;
+                        
+                        // Extract EPM microphysical properties after LAGRID/EPM completes
+                        // Note: LAGRID_Model has access to EPM::Solution via internal state
+                        // For now, use default ambient values (extraction requires more infrastructure)
+                        BoxModel::EPMCouplingData epmData;  // Default: no coupling data
+                        
+                        int boxStatus = BoxModel::runBoxModel(Input_Opt, inputCase, epmData);
+                        if (boxStatus != 0) {
+                            std::cout << "Warning: Box model with coupling failed with status " << boxStatus << std::endl;
+                        }
+                    }
+                    // If box model enabled but coupling disabled, box model runs after (Phase 1 behavior)
+                    else if (Input_Opt.SIMULATION_BOXMODEL) {
+                        std::cout << "Running box model (standalone)..." << std::endl;
                         int boxStatus = BoxModel::runBoxModel(Input_Opt, inputCase);
                         if (boxStatus != 0) {
                             std::cout << "Warning: Box model failed with status " << boxStatus << std::endl;
-                            // Continue with LAGRID even if box model fails
                         }
                     }
                     
-                    LAGRIDPlumeModel LAGRID_Model(Input_Opt, inputCase);
-                    case_status = LAGRID_Model.runFullModel();
                     // iERR = PlumeModel( Input_Opt, inputCase );
                     break;
                     
