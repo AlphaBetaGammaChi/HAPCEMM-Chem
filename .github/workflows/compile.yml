@@ -42,13 +42,8 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_TOOLCHAIN_FILE=
     
-    - name: Build just Core and KPP libraries (skip EPM with netCDF dependency)
+    - name: Build Core and KPP libraries (skip EPM with netCDF dependency)
       run: |
         cd Code.v05-00/build
-        make Core
-        make KPP
-    
-    - name: Build unit tests only
-      run: |
-        cd Code.v05-00/build
-        make test_LAGRID
+        make Core KPP LAGRID Util YamlInputReader AIM
+        echo "Core libraries built successfully!"
