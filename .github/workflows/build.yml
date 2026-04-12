@@ -23,7 +23,7 @@ jobs:
           cmake \
           g++ \
           libnetcdf-dev \
-          libnetcdf-cxx4-dev \
+          libnetcdf-c++4-dev \
           libyaml-cpp-dev \
           libboost-all-dev \
           libfmt-dev \
@@ -39,7 +39,8 @@ jobs:
         cd build
         cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_TOOLCHAIN_FILE=
+          -DCMAKE_TOOLCHAIN_FILE= \
+          -DnetCDF_DIR=/usr/lib/x86_64-linux-gnu/cmake/netCDF
     
     - name: Build
       run: |
