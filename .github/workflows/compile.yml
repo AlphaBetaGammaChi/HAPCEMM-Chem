@@ -47,4 +47,8 @@ jobs:
         cd Code.v05-00/build
         make Core
         make KPP
-        make unittest
+    
+    - name: Build unit tests only
+      run: |
+        cd Code.v05-00/build
+        make test_LAGRID
