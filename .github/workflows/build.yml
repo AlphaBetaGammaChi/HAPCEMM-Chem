@@ -27,8 +27,15 @@ jobs:
           libyaml-cpp-dev \
           libboost-all-dev \
           libfmt-dev \
-          libeigen3-dev \
-          libcatch2-dev
+          libeigen3-dev
+        
+        # Catch2 - download and install from source
+        cd /tmp
+        git clone --depth 1 --branch v3.7.0 https://github.com/catchorg/Catch2.git
+        cd Catch2
+        cmake -B build -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release
+        sudo cmake --install build
+        cd /
     
     - name: Create build directory
       run: mkdir -p build
@@ -41,7 +48,8 @@ jobs:
         cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_TOOLCHAIN_FILE= \
-          -DnetCDF_DIR=/usr/lib/x86_64-linux-gnu/cmake/netCDF
+          -DnetCDF_DIR=/usr/lib/x86_64-linux-gnu/cmake/netCDF \
+          -DCATCH_DIR=/usr/local/lib/cmake/Catch2
     
     - name: Build
       run: |
