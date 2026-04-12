@@ -45,5 +45,7 @@ jobs:
     - name: Build Core and KPP libraries only
       run: |
         cd Code.v05-00/build
-        make Core KPP
-        echo "Build completed without netCDF dependencies!"
+        # Build only Core and KPP - do NOT use default 'all' target
+        cmake --build . --target Core
+        cmake --build . --target KPP
+        echo "Build completed without EPM!"
