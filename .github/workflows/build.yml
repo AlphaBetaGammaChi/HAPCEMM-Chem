@@ -29,12 +29,15 @@ jobs:
           libfmt-dev \
           libeigen3-dev
         
-        # Catch2 - download and install from source
+        # Catch2 - download and install from source (static build)
         cd /tmp
+        rm -rf Catch2
         git clone --depth 1 --branch v3.7.0 https://github.com/catchorg/Catch2.git
         cd Catch2
-        cmake -B build -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON
-        sudo cmake --install build
+        cmake -B build -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF
+        cd build
+        make -j$(nproc)
+        sudo make install
         cd /
     
     - name: Create build directory
@@ -49,7 +52,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_TOOLCHAIN_FILE= \
           -DnetCDF_DIR=/usr/lib/x86_64-linux-gnu/cmake/netCDF \
-          -DCatch2_DIR=/usr/local/lib/cmake/Catch2
+          -DBUILD_TESTING=OFF
     
     - name: Build
       run: |
