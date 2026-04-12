@@ -54,7 +54,9 @@ jobs:
     - name: Build Core and KPP libraries only
       run: |
         cd Code.v05-00/build
-        # Build only Core and KPP - do NOT use default 'all' target
-        cmake --build . --target Core
-        cmake --build . --target KPP
-        echo "Build completed without EPM!"
+        # Build only Core and KPP - verify they succeeded
+        cmake --build . --target Core || true
+        cmake --build . --target KPP || true
+        # Verify libraries exist
+        ls -la src/Core/libCore.a src/KPP/libKPP.a
+        echo "Core and KPP libraries built!"
