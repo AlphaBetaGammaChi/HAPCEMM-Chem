@@ -27,7 +27,8 @@ jobs:
           libyaml-cpp-dev \
           libboost-all-dev \
           libfmt-dev \
-          libeigen3-dev
+          libeigen3-dev \
+          libcatch2-dev
     
     - name: Create build directory
       run: mkdir -p build
