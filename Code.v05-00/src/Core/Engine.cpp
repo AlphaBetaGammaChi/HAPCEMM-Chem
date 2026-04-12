@@ -487,6 +487,46 @@ double Engine::getEI_Soot() const
 
 } /* End of Engine::getEI_Soot */
 
+
+double Engine::getEI_H2() const
+{
+
+    return EI_H2;
+
+} /* End of Engine::getEI_H2 */
+
+
+double Engine::getEI_H2O2() const
+{
+
+    return EI_H2O2;
+
+} /* End of Engine::getEI_H2O2 */
+
+
+double Engine::getEI_NH3() const
+{
+
+    return EI_NH3;
+
+} /* End of Engine::getEI_NH3 */
+
+
+double Engine::getEI_N2O() const
+{
+
+    return EI_N2O;
+
+} /* End of Engine::getEI_N2O */
+
+
+double Engine::getEI_LUB() const
+{
+
+    return EI_LUB;
+
+} /* End of Engine::getEI_LUB */
+
 double Engine::getSootRad() const
 {
 

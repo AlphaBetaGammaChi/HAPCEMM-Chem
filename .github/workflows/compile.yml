@@ -42,7 +42,9 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_TOOLCHAIN_FILE=
     
-    - name: Build
+    - name: Build just Core and KPP libraries (skip EPM with netCDF dependency)
       run: |
         cd Code.v05-00/build
-        make -j$(nproc)
+        make Core
+        make KPP
+        make unittest
