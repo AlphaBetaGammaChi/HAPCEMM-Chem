@@ -33,7 +33,7 @@ jobs:
         cd /tmp
         git clone --depth 1 --branch v3.7.0 https://github.com/catchorg/Catch2.git
         cd Catch2
-        cmake -B build -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=ON
         sudo cmake --install build
         cd /
     
@@ -49,7 +49,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_TOOLCHAIN_FILE= \
           -DnetCDF_DIR=/usr/lib/x86_64-linux-gnu/cmake/netCDF \
-          -DCATCH_DIR=/usr/local/lib/cmake/Catch2
+          -DCatch2_DIR=/usr/local/lib/cmake/Catch2
     
     - name: Build
       run: |
