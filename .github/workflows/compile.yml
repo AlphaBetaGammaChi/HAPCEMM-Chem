@@ -23,12 +23,11 @@ jobs:
           cmake \
           g++ \
           libnetcdf-dev \
-          libnetcdf-cxx4-dev \
+          libnetcdf-c++4-dev \
           libyaml-cpp-dev \
           libboost-all-dev \
           libfmt-dev \
-          libeigen3-dev \
-          libcatch2-dev
+          libeigen3-dev
     
     - name: Create build directory
       run: mkdir -p build
