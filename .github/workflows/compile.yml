@@ -39,7 +39,8 @@ jobs:
         cd build
         cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_TOOLCHAIN_FILE=
+          -DCMAKE_TOOLCHAIN_FILE= \
+          -DBUILD_TESTING=OFF
     
     - name: Build Core and KPP libraries only
       run: |
