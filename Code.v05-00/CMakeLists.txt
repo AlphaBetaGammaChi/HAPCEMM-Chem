@@ -79,7 +79,9 @@ find_package(Boost REQUIRED)
 # All the Boost libraries we use are header-only, so no need to link here.
 
 find_package(Catch2 CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2 Catch2::Catch2WithMain)
+if(Catch2_FOUND)
+  target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2 Catch2::Catch2WithMain)
+endif()
 
 find_package(Eigen3 CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Eigen3::Eigen)
