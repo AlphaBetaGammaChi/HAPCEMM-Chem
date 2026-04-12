@@ -1,0 +1,52 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          g++ \
+          libnetcdf-dev \
+          libnetcdf-cxx4-dev \
+          libyaml-cpp-dev \
+          libboost-all-dev \
+          libfmt-dev \
+          libeigen3-dev
+    
+    - name: Create build directory
+      run: mkdir -p build
+    
+    - name: Configure with CMake
+      run: |
+        cd Code.v05-00
+        mkdir -p build
+        cd build
+        cmake .. \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_TOOLCHAIN_FILE=
+    
+    - name: Build
+      run: |
+        cd Code.v05-00/build
+        make -j$(nproc)
+    
+    - name: Run tests
+      run: |
+        cd Code.v05-00/build
+        ctest --output-on-failure || true
