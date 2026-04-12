@@ -28,6 +28,16 @@ jobs:
           libboost-all-dev \
           libfmt-dev \
           libeigen3-dev
+        
+        # Catch2 - download and install from source (static build)
+        cd /tmp
+        rm -rf Catch2
+        git clone --depth 1 --branch v3.7.0 https://github.com/catchorg/Catch2.git
+        cd Catch2
+        cmake -B build -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF
+        cd build
+        make -j$(nproc)
+        sudo make install
     
     - name: Create build directory
       run: mkdir -p build
@@ -35,13 +45,11 @@ jobs:
     - name: Configure with CMake
       run: |
         cd Code.v05-00
-        rm -rf build
         mkdir -p build
         cd build
         cmake .. \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_TOOLCHAIN_FILE= \
-          -DBUILD_TESTING=OFF
+          -DCMAKE_TOOLCHAIN_FILE=
     
     - name: Build Core and KPP libraries only
       run: |
