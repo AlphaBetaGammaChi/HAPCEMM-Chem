@@ -42,7 +42,20 @@ void GC_SETHET( const double TEMP, const double PATM, const double AIRDENS, \
                 const double RELHUM, const unsigned int STATE_PSC,          \
                 const double SPC[], const double AREA[NAERO],               \
                 const double RADI[NAERO], const double IWC,                 \
-                const double KHETI_SLA[11], double tropopausePressure);
+                const double KHETI_SLA[11], double tropopausePressure,
+                const double GEO_SAD,
+                const double GEO_RADIUS,
+                const double GEO_GAMMA,
+                const double NACL_SAD,
+                const double CACO3_SAD,
+                const double AL2O3_SAD,
+                const double DUST_SAD,
+                const double DIAMOND_SAD,
+                const double NACL_RADIUS,
+                const double CACO3_RADIUS,
+                const double AL2O3_RADIUS,
+                const double DUST_RADIUS,
+                const double DIAMOND_RADIUS);
 void Update_JRates ( double JRates[], const double CSZA );
 void ComputeFamilies( const double V[], const double F[], const double RCT[], \
                       double familyRates[] );

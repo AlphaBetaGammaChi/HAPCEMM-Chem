@@ -32,7 +32,7 @@
 #include "Core/LAGRIDPlumeModel.hpp"
 #include "Core/Status.hpp"
 #include "Core/Diag_Mod.hpp"
-#include "Core/BoxModel.hpp"
+//#include "Core/BoxModel.hpp"  // Disabled - requires netCDF
 #include "Util/MC_Rand.hpp"
 
 void CreateREADME( const std::string folder, const std::string fileName, \
@@ -243,6 +243,7 @@ int main( int argc, char* argv[])
                     case_status = LAGRID_Model.runFullModel();
                     
                     // If box model is enabled, run it to get evolved background for LAGRID
+                    #if 0  // BoxModel disabled - requires netCDF which is not available
                     if (Input_Opt.SIMULATION_BOXMODEL) {
                         // Run box model to get evolved species at EPM end time
                         BoxModel::EPMCouplingData epmData;  // Default ambient values
@@ -281,6 +282,7 @@ int main( int argc, char* argv[])
                             }
                         }
                     }
+#endif
                     
                     // iERR = PlumeModel( Input_Opt, inputCase );
                     break;

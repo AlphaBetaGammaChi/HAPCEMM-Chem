@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
-set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/submodules/vcpkg/scripts/buildsystems/vcpkg.cmake"
-  CACHE STRING "Vcpkg toolchain file")
+# Use system libraries instead of vcpkg
+# set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/submodules/vcpkg/scripts/buildsystems/vcpkg.cmake"
+#   CACHE STRING "Vcpkg toolchain file")
 
 project(APCEMM)
 
@@ -87,11 +88,15 @@ find_package(fmt CONFIG REQUIRED)
 # target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 
-find_package(FFTW3 CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE FFTW3::fftw3)
+# find_package(FFTW3 CONFIG REQUIRED)
+# target_link_libraries(${PROJECT_NAME} PRIVATE FFTW3::fftw3)
 
-find_package(netCDFCxx CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE netCDF::netcdf netCDF::netcdf-cxx4)
+find_package(netCDF CONFIG REQUIRED)
+# For netCDF C++4, need to link in correct order: C++ lib first, then C lib
+target_link_libraries(${PROJECT_NAME} PRIVATE netCDF::netcdf)
+# C++ library before C library for proper symbol resolution
+target_link_libraries(${PROJECT_NAME} PRIVATE netcdf_c++4 netcdf)
+link_directories(/workspace/conda/envs/hapcemm/lib)
 
 find_package(yaml-cpp CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp::yaml-cpp)

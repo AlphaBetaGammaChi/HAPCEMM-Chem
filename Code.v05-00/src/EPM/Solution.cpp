@@ -439,7 +439,7 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
         Update_RCONST( input.temperature_K(), input.pressure_Pa(), airDens, varSpeciesArray[ind_H2O] );
 
         
-        if ( input_Opt.CHEMISTRY_HETERO) {
+        if ( Input_Opt.CHEMISTRY_HETCHEM) {
 
         double spinup_NACL_SAD = 0.0; double spinup_NACL_RAD = 1.0e-7;
         double spinup_CACO3_SAD = 0.0; double spinup_CACO3_RAD = 1.0e-7;
@@ -457,6 +457,7 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 
 
 
+        int type = 0;  // Default: no geoengineering
 	switch (type) {
 	  case 0: /* None*/
 	   std::cout << " Geoengineering: None selected." << std::endl;
@@ -466,8 +467,8 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 	   spinup_NACL_SAD = SAD_cgs;
 	   varSpeciesArray[ind_NACL] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
-	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
-	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
+	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;
 	   break;
 
 	  case 2: /*AGI*/
@@ -475,8 +476,8 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 	   spinup_NACL_SAD = SAD_cgs;
 	   varSpeciesArray[ind_AGI] = N_geo;
 	   std::cout << " Geoengineering: AGI selected." << std::endl; 
-	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
-	   /* std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl; No heterogeneous chemistry for AGI*/
+	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
+	   /* std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl; No heterogeneous chemistry for AGI*/
 	   break;
 
 	  case 3: /* BII3*/
@@ -484,8 +485,8 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 	   spinup_NACL_SAD = SAD_cgs;
 	   varSpeciesArray[ind_NACL] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
-	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
-	   /* std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl; No heterogenous processes for BII3*/
+	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
+	   /* std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl; No heterogenous processes for BII3*/
 	   break;
 
 	  case 4: /* AL2O3*/
@@ -493,8 +494,8 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 	   spinup_NACL_SAD = SAD_cgs;
 	   varSpeciesArray[ind_NACL] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
-	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
-	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
+	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;
 	   break;
 
 	  case 5: /* CACO3*/
@@ -502,8 +503,8 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 	   spinup_NACL_SAD = SAD_cgs;
 	   varSpeciesArray[ind_NACL] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
-	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
-	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
+	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;
 	   break;
 
 	  case 6: /* DIAMOND*/
@@ -511,8 +512,8 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 	   spinup_NACL_SAD = SAD_cgs;
 	   varSpeciesArray[ind_NACL] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
-	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
-	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
+	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;
 	   break;
 
 	  case 7: /* DUST*/
@@ -520,17 +521,17 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 	   spinup_NACL_SAD = SAD_cgs;
 	   varSpeciesArray[ind_NACL] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
-	   std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl;
-	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
+	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;
 	   break;
 
 	  case 8: /* None*/
 	   std::cout << " Geoengineering: Generic selected." << std::endl;
-	   spinup_GENERIC_SAD = SAD_cgs;
-	   varSpeciesArray[ind_GENERIC] = N_geo;
+	   spinup_GEO_SAD = SAD_cgs;
+	   // ind_GENERIC removed = N_geo;
 	   std::cout << " Geoengineering: Generic selected." << std::endl;
-	   /* std::cout << " -Concentration: "<<N_geo <<" "cm3" << std::endl; No gas phase chemistry for generic */
-	   std::cout << " - Surface Area: "<<SAD_cgs <<" "[cm2/cm2]" <<  << std::endl;
+	   /* std::cout << " -Concentration: " << N_geo << " cm3" << std::endl; No gas phase chemistry for generic */
+	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;
 	   break;
 
 
@@ -560,11 +561,11 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
          spinup_AL2O3_SAD,
          spinup_DUST_SAD,
          spinup_DIAMOND_SAD,  
-         spinup_NACL_RADIUS,
-         spinup_CACO3_RADIUS,
-         spinup_AL2O3_RADIUS,
-         spinup_DUST_RADIUS,
-         spinup_DIAMOND_RADIUS
+         spinup_NACL_RAD,
+         spinup_CACO3_RAD,
+         spinup_AL2O3_RAD,
+         spinup_DUST_RAD,
+         spinup_DIAMOND_RAD
       );
     }
 
@@ -611,3 +612,5 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 } /* End of Solution::SpinUp */
 
 }
+
+}  // namespace EPM

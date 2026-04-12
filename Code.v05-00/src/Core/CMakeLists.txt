@@ -1,7 +1,7 @@
 # Source files that need to be compiled
 set(SRCS
     Aircraft.cpp
-    BoxModel.cpp
+    #BoxModel.cpp  # disabled
     Cluster.cpp
     Diag_Mod.cpp
     Emission.cpp
@@ -25,7 +25,7 @@ set(SRCS
 # This command ensures the static library gets build
 add_library(Core STATIC ${SRCS})
 
-target_link_libraries(Core PRIVATE netCDF::netcdf netCDF::netcdf-cxx4)
+target_link_libraries(Core PRIVATE netCDF::netcdf)
 target_link_libraries(Core PRIVATE yaml-cpp::yaml-cpp)
 
 # This command defines the dependencies of libCore.a

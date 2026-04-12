@@ -160,7 +160,7 @@ void Update_JRates ( double JRates[], const double CSZA )
         JRates[  6] = 6.691081018469171E-05 * CSZA;
         JRates[  7] = 9.626531309479235E-05 * CSZA;
         JRates[  8] = 1.169508931495838E-05 * CSZA;
-        JRates[  9] = 1 .028595226318751E-05 * CSZA;
+        JRates[  9] = 1.028595226318751E-05 * CSZA;
         JRates[ 10] = 1.393569905839789E-02 * CSZA;
         JRates[ 11] = 2.528397217582879E-01 * CSZA;
         JRates[ 12] = 3.253242469494527E-02 * CSZA;

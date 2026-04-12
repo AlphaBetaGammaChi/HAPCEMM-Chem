@@ -34,10 +34,7 @@
 #include "Util/PhysConstant.hpp"
 #include "Util/PhysFunction.hpp"
 
-#include <netcdf>
-#include <ncFile>
-#include <ncDim>
-#include <ncVar>
+#include <netcdf.h>
 
 namespace BoxModel {
 
@@ -202,7 +199,7 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
                               / physFunc::pSat_H2Os(temperature_K);
     
     // Air density [molec/cm3]
-    double airDens = pressure_Pa / (physConst::KB * temperature_K) * 1.0e-6;
+    double airDens = pressure_Pa / (physConst::kB * temperature_K) * 1.0e-6;
     
     std::cout << "Temperature: " << temperature_K << " K" << std::endl;
     std::cout << "Pressure: " << pressure_Pa << " Pa" << std::endl;
@@ -426,7 +423,7 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
     for (int i = 0; i < NVAR; i++) {
         if (VAR[i] > 0.0) {
             double concentration_ppb = VAR[i] / airDens * 1.0e9;
-            std::cout << "  " << KPP[i].name << ": " << concentration_ppb << " ppb" << std::endl;
+            std::cout << "  " << SPC_NAMES[i] << ": " << concentration_ppb << " ppb" << std::endl;
         }
     }
     

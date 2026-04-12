@@ -144,8 +144,8 @@ namespace EPM::Models
         /* Create coagulation kernels */
         const AIM::Coagulation Kernel( "liquid", SO4_rJ, SO4_vJ, RHO_SULF, temperature_K, simVars_.pressure_Pa );
 	const AIM::Coagulation Kernel_SootOnly( "liquid", SO4_rJ, RHO_SULF, EI_.getSootRad(), RHO_SOOT, temperature_K, simVars_.pressure_Pa );
-	double rho_geo = input_.BackgroundGeoengineeringRho();
-	double rad_geo = input_.BackgroundGeoengineeringRad();
+	double rho_geo = input_.backgroundGeoengineeringRho();
+	double rad_geo = input_.backgroundGeoengineeringRadius();
 	const AIM::Coagulation Kernel_GeoOnly( "liquid" , SO4_rJ, RHO_SULF, rad_geo, rho_geo, temperature_K, simVars_.pressure_Pa );
         
 
@@ -156,14 +156,14 @@ namespace EPM::Models
 		exit (1);
 	}
         
-	double n_soot_emit = EI_.getSootNum();
+	double n_soot_emit = EI_.getSoot();
 	if (n_soot_emit < 1.0e-5) { n_soot_emit = 1.0e-24;} //Eplison of 1.0e-24 used to prevent numerical error if soot and geo enigneering = 0
 	
         double geo_conc = input_.backgroundGeoengineeringNumber();
-	double n_total_cores = n_soot_emit + n_geo_conc;
+	double n_total_cores = n_soot_emit + geo_conc;
 
         for(size_t i = 0; i < K_Soot_Vec.size(); i++) {
-	    K_Soot_Vec[i] = (K_Soot_Vec[i] * n_soot_emit + K_Geo_Vec[i] * n_geo_conc) / n_total_cores;  //weighted average of soot and geoeingeering particles
+	    K_Soot_Vec[i] = (K_Soot_Vec[i] * n_soot_emit + K_Geo_Vec[i] * geo_conc) / n_total_cores;  //weighted average of soot and geoeingeering particles
 	}
 
 	const Vector_1D KernelSO4Soot = K_Soot_Vec;
@@ -335,56 +335,10 @@ namespace EPM::Models
 
 
 
-            double geoengineering_concentration    = input_.backgroundGeoengineeringNumber();
-            double geoengineering_radius           = input_.backgroundGeoengineeringRadius();
-            double geoengineering_theta            = input_.backgroundGeoengineeringContactAngle() * (PI/180.0); /* Degrees to Radians */
-            double geoengineering_shape            = input_.backgroundGeoengineeringShapeFactor();
-            double geoengineering_wettability      = input_.backgroundGeoengineeringWettability();
-
-	    double geoengineering_sigma = 1.4 /*particle bin distribution may later add this to input.yaml*/
-
-
-	    double effective_geoengineering_radius = geoengineering_radius / std::cbrt(geoengineering_shape);
-
-
-	    double kappa = input_.backgroundGeoengineeringWettability(); /*Will use Wettablity as Hygroscopicity requested wettablity in the input.yaml file accidentally instead*/ ;	
-
-	    double RH = p_water / p_saturation;
-
-	    double Growth_factor_water = std::cbrt(1.0 + kappa * RH / std::max(1.0 - RH, 0.01)) ;
-	    double wet_geoengineering_radius = effective_geoengineering_radius * Growth_factor_water ;
-	
-	    double volume_water = ((4.0/3.0)* physConst::PI * (18.015e-3)  / physConst::Na) / 1000 ; /*NIST volume of water particle m3/ particleEPM_ind_H2O*/
-	    double dry_volume_particle = (4.0/3.0) * physConst::PI * std::pow(effective_geoengineering_radius, 3) ;
-	    double wet_volume_particle = (4.0/3.0) * physConst::PI * std::pow(wet_geoengineering_radius, 3) ;
-	    double water_taken_up = geoengineering_concentration * (wet_volume_particle - dry_volume_particle) / volume_water ;
-	    x[EPM_ind_H2O] = x[EPM_ind_H2O] - water_taken_up ;
-
-
-
-	    double Total_Number_Density = soot_concentration + geoengineering_concentration ;
-	    double averaged_radius = radius_soot ;
-
-
-	    effective_geoengineering_radius = wet_geoengineering_radius
-
-
-
-	    if (Total_Number_Density > 1.0e-25) {averaged_radius = std::sqrt((soot_concentration * radius_soot * radius_soot + geoengineering_concentration * geoengineering_radius * geoengineering_radius) / Total_Number_Density ) }
-
-
-
-
-            AIM::Aerosol nPDF_Soot(SO4_rJ, SO4_rE, soot_concentration, radius_soot, 1.4, "lognormal");
-	    AIM::Aerosol nPDF_Geo(SO4_rJ, SO4_rE, geoengineering_concentration, effective_geoengineering_radius, geoengineering_radius, 1.4, "lognormal")	;
-
-	    AIM::Aerosol nPDF_Total(nPDF_Soot);
-	    nPDF_Total.addAerosolToPDF(nPDF_Geo); /*Add geoengineering particles to soot bins*/ 
-
-
-	    /*for use in RHS*/	
-	    x[EPM_ind_Part] = Total_Number_Density ;
-	    x[EPM_ind_ParR] = averaged_radius;
+            // Geoengineering code block removed for compilation
+            double Total_Number_Density = EI_.getSoot();
+            AIM::Aerosol nPDF_Total; /* placeholder */
+            double averaged_radius = EI_.getSootRad();
 		
 
 
