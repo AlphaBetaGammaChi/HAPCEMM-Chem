@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     
     steps:
     - name: Checkout code
@@ -52,12 +52,7 @@ jobs:
           -DCMAKE_BUILD_TYPE=Release \
           -DCMAKE_TOOLCHAIN_FILE=
     
-    - name: Build Core and KPP libraries only
+    - name: Build
       run: |
         cd Code.v05-00/build
-        # Build only Core and KPP - verify they succeeded
-        cmake --build . --target Core || true
-        cmake --build . --target KPP || true
-        # Verify libraries exist
-        ls -la src/Core/libCore.a src/KPP/libKPP.a
-        echo "Core and KPP libraries built!"
+        cmake --build . -j$(nproc)

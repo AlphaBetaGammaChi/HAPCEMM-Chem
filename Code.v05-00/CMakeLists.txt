@@ -93,12 +93,19 @@ target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 # find_package(FFTW3 CONFIG REQUIRED)
 # target_link_libraries(${PROJECT_NAME} PRIVATE FFTW3::fftw3)
 
-find_package(netCDF CONFIG REQUIRED)
-# For netCDF C++4, need to link in correct order: C++ lib first, then C lib
-target_link_libraries(${PROJECT_NAME} PRIVATE netCDF::netcdf)
-# C++ library before C library for proper symbol resolution
-target_link_libraries(${PROJECT_NAME} PRIVATE netcdf_c++4 netcdf)
-link_directories(/workspace/conda/envs/hapcemm/lib)
+find_package(PkgConfig REQUIRED)
+
+# Use pkg-config for netCDF C++4 (more reliable than CMake's find_package)
+pkg_check_modules(NETCDF REQUIRED netcdf-cxx4)
+
+# Link using the pkg-config variables (C++ lib first for proper symbol resolution)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${NETCDF_LIBRARIES})
+
+# Remove old broken netCDF config that used hardcoded paths
+# find_package(netCDF CONFIG REQUIRED)
+# target_link_libraries(${PROJECT_NAME} PRIVATE netCDF::netcdf)
+# target_link_libraries(${PROJECT_NAME} PRIVATE netcdf_c++4 netcdf)
+# link_directories(/workspace/conda/envs/hapcemm/lib)
 
 find_package(yaml-cpp CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE yaml-cpp::yaml-cpp)
@@ -116,8 +123,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE OpenMP::OpenMP_CXX)
 include_directories(SYSTEM ${Boost_INCLUDES})
 include_directories(SYSTEM ${OpenMP_INCLUDES})
 include_directories(SYSTEM ${FFTW_INCLUDES})
-include_directories(SYSTEM ${NETCDF_INCLUDES})
-include_directories(SYSTEM ${netCDFCxx_INCLUDE_DIRS})
+include_directories(SYSTEM ${NETCDF_INCLUDE_DIRS})
 include_directories(SYSTEM ${YAML_CPP_INCLUDE_DIR})
 
 # Ensure header files of APCEMM are included
