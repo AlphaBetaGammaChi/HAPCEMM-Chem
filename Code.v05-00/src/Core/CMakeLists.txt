@@ -25,7 +25,7 @@ set(SRCS
 # This command ensures the static library gets build
 add_library(Core STATIC ${SRCS})
 
-target_link_libraries(Core PRIVATE netCDF::netcdf)
+target_link_libraries(Core PRIVATE ${NETCDF_LIBRARIES})
 target_link_libraries(Core PRIVATE yaml-cpp::yaml-cpp)
 
 # This command defines the dependencies of libCore.a
