@@ -78,9 +78,11 @@ add_executable(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/src/Main.cpp)
 find_package(Boost REQUIRED)
 # All the Boost libraries we use are header-only, so no need to link here.
 
-find_package(Catch2 CONFIG REQUIRED)
-if(Catch2_FOUND)
-  target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2 Catch2::Catch2WithMain)
+if(BUILD_TEST)
+  find_package(Catch2 CONFIG REQUIRED)
+  if(Catch2_FOUND)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2 Catch2::Catch2WithMain)
+  endif()
 endif()
 
 find_package(Eigen3 CONFIG REQUIRED)
@@ -97,9 +99,20 @@ find_package(PkgConfig REQUIRED)
 
 # Use pkg-config for netCDF C++4 (more reliable than CMake's find_package)
 pkg_check_modules(NETCDF REQUIRED netcdf-cxx4)
+pkg_check_modules(NETCDF_C REQUIRED netcdf)
 
-# Link using the pkg-config variables (C++ lib first for proper symbol resolution)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${NETCDF_LIBRARIES})
+# Make these available globally
+set(NETCDF_LIBRARIES /workspace/conda/envs/hapcemm/lib/libnetcdf-cxx4.so CACHE INTERNAL "")
+set(NETCDF_C_LIBRARIES /workspace/conda/envs/hapcemm/lib/libnetcdf.so CACHE INTERNAL "")
+
+# Add the library directory explicitly
+link_directories(/workspace/conda/envs/hapcemm/lib)
+
+# Link using explicit library paths (pkg-config variables aren't resolving properly)
+target_link_libraries(${PROJECT_NAME} PRIVATE 
+  /workspace/conda/envs/hapcemm/lib/libnetcdf-cxx4.so
+  /workspace/conda/envs/hapcemm/lib/libnetcdf.so
+)
 
 # Remove old broken netCDF config that used hardcoded paths
 # find_package(netCDF CONFIG REQUIRED)
@@ -137,11 +150,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   FVM_ANDS Util AIM KPP EPM Core YamlInputReader LAGRID)
 
 # Tests
-#if (BUILD_TEST)
+if (BUILD_TEST)
 include(CTest)
 enable_testing()
 add_subdirectory(tests)
-#endif()
+endif()
 
 if (DEBUG)
   message(STATUS "DEBUG mode is enabled")

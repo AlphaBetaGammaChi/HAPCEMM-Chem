@@ -178,13 +178,12 @@ namespace YamlInputReader{
             input.SIMULATION_EPM_TYPE = epm_type::EPM_ORIGINAL;
           } else if (iequals(epm, "external")) {
             input.SIMULATION_EPM_TYPE = epm_type::EPM_EXTERNAL;
+            input.SIMULATION_EXTERNAL_EPM_NETCDF_FILENAME = simNode["External EPM NetCDF file"].as<string>();
           } else if (iequals(epm, "new")) {
             input.SIMULATION_EPM_TYPE = epm_type::EPM_NEW_PHYSICS;
         } else {
             throw std::invalid_argument("Invalid EPM type specified in SIMULATION MENU: " + epm);
         }
-
-        input.SIMULATION_EXTERNAL_EPM_NETCDF_FILENAME = simNode["External EPM NetCDF file"].as<string>();
     }
     void readParamMenu(OptInput& input, const YAML::Node& paramNode){
 
