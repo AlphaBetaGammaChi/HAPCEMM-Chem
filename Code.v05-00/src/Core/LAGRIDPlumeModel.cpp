@@ -8,6 +8,8 @@
 #include "Core/LAGRIDPlumeModel.hpp"
 #include "EPM/Models/Original.hpp"
 
+#include "Core/LAGRIDPlumeModel.hpp"
+#include "Core/BoxModel_PerCell.hpp"
 using physConst::Na, physConst::PI, physConst::R_Air;
 
 /*
@@ -238,6 +240,79 @@ SimStatus LAGRIDPlumeModel::runFullModel() {
         std::cout << "  Ran remapping in " << regrid_duration.count() << " ms" << std::endl;
         #endif
 
+        // =====================================================================
+        // Per-cell chemistry (mode=2): Run chemistry on each grid cell
+        // =====================================================================
+        if (optInput_.SIMULATION_BOXMODEL_MODE == 2) {
+            int nx = xCoords_.size();
+            int ny = yCoords_.size();
+            
+            // Only run if species array is initialized
+            if (species_.size() > 0) {
+                std::cout << "Running per-cell chemistry for " << nx << "x" << ny << " grid..." << std::endl;
+                
+                // Get meteorology
+                const Vector_2D& tempField = met_.Temp();
+                const Vector_1D& pressField = met_.Press();
+                const Vector_2D& h2oField = met_.H2O_field();
+                
+                // Flatten for BoxModel function
+                double* speciesFlat = new double[NVAR * nx * ny];
+                double* tempFlat = new double[nx * ny];
+                double* pressFlat = new double[nx * ny];
+                double* h2oFlat = new double[nx * ny];
+                
+                for (int j = 0; j < ny; j++) {
+                    for (int i = 0; i < nx; i++) {
+                        int idx = j * nx + i;
+                        for (int ispec = 0; ispec < NVAR; ispec++) {
+                            speciesFlat[ispec * nx * ny + idx] = species_[ispec][j][i];
+                        }
+                        tempFlat[idx] = tempField[j][i];
+                        pressFlat[idx] = pressField[j];
+                        h2oFlat[idx] = h2oField[j][i] * 1.0e-9 * (pressField[j] / (physConst::kB * tempField[j][i]) * 1.0e-6);
+                    }
+                }
+                
+                // Run chemistry
+                BoxModel::runPerCellChemistry(
+                    optInput_, input_,
+                    nx, ny,
+                    speciesFlat,
+                    tempFlat, pressFlat, h2oFlat,
+                    nullptr,  // No aerosol SAD for now
+                    optInput_.CHEMISTRY_TIMESTEP * 60.0,  // Convert min to s
+                    BoxModel::PerCellMode::INDEPENDENT
+                );
+                
+                // Unflatten back to species_
+                for (int j = 0; j < ny; j++) {
+                    for (int i = 0; i < nx; i++) {
+                        int idx = j * nx + i;
+                        for (int ispec = 0; ispec < NVAR; ispec++) {
+                            species_[ispec][j][i] = speciesFlat[ispec * nx * ny + idx];
+                        }
+                    }
+                }
+                
+                // Write output periodically
+                static int outputCounter = 0;
+                outputCounter++;
+                if (outputCounter % 10 == 0) {
+                    double timeHours = timestepVars_.curr_Time_s / 3600.0;
+                    std::string outputFile = optInput_.SIMULATION_OUTPUT_FOLDER + "/APCEMM_PERCELL_CASE_" + std::to_string(outputCounter) + ".nc";
+                    BoxModel::writePerCellOutput(outputFile, nx, ny, speciesFlat, timeHours);
+                }
+                
+                delete[] speciesFlat;
+                delete[] tempFlat;
+                delete[] pressFlat;
+                delete[] h2oFlat;
+                
+                std::cout << "Per-cell chemistry completed" << std::endl;
+            }
+        }
+
         Vector_2D areas = VectorUtils::cellAreas(xEdges_, yEdges_);
         double numparts = iceAerosol_.TotalNumber_sum(areas);
         std::cout << "Num Particles: " << numparts << std::endl;
@@ -415,6 +490,30 @@ void LAGRIDPlumeModel::initH2O() {
         }
     }
 }
+
+    // =====================================================================
+    // Initialize species array for per-cell chemistry (mode=2)
+    // =====================================================================
+    if (optInput_.SIMULATION_BOXMODEL_MODE == 2) {
+        std::cout << "Initializing species array for per-cell chemistry..." << std::endl;
+        
+        int nx = xCoords_.size();
+        int ny = yCoords_.size();
+        
+        // Create 3D species array [NVAR][ny][nx]
+        species_ = Vector_3D(NVAR, Vector_2D(ny, Vector_1D(nx, 0.0)));
+        
+        // Calculate air density for conversion
+        double T_ref = met_.tempRef();
+        double P_ref = met_.referencePress();
+        double airDens_ref = P_ref / (physConst::kB * T_ref) * 1.0e-6;  // molec/cm3
+        
+        // Initialize with background concentrations
+        BoxModel::initSpeciesArray(nx, ny, species_.data(), input_, airDens_ref);
+        
+        std::cout << "Species array initialized: " << nx << "x" << ny << "x" << NVAR << std::endl;
+    }
+    // =====================================================================
 
 void LAGRIDPlumeModel::updateDiffVecs() {
     double dh_enhanced, dv_enhanced;
@@ -743,6 +842,17 @@ void LAGRIDPlumeModel::remapAllVars(double remapTimestep, const std::vector<std:
 
     //Remap H2O
     H2O_ = applyWeights(remapWeights, nx_old,  ny_old,  nx_new,  ny_new, H2O_);
+
+    // =====================================================================
+    // Remap species array for per-cell chemistry (mode=2)
+    // =====================================================================
+    if (optInput_.SIMULATION_BOXMODEL_MODE == 2 && species_.size() > 0) {
+        Vector_3D species_new(NVAR, Vector_2D(ny_new, Vector_1D(nx_new, 0.0)));
+        for (int ispec = 0; ispec < NVAR; ispec++) {
+            species_new[ispec] = applyWeights(remapWeights, nx_old, ny_old, nx_new, ny_new, species_[ispec]);
+        }
+        species_ = std::move(species_new);
+    }
 
     //Need to update bottom-of-domain altitude before updating coordinates
     xCoords_ = std::move(xCoordsNew);

@@ -54,6 +54,7 @@ class LAGRIDPlumeModel {
         Vector_1D xEdges_;
         Vector_2D H2O_;
         Vector_2D Contrail_;
+        Vector_3D species_;  // [NVAR][ny][nx] - chemical species for per-cell chemistry (mode=2)
         Vector_1D vFall_;
         double initNumParts_;
         double simTime_h_;
