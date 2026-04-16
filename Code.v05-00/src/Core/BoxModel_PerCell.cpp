@@ -252,6 +252,7 @@ int runPerCellChemistry(
 
 // ============================================================================
 // Write per-cell output to NetCDF
+// Follows same pattern as BoxModel.cpp writeBoxModelOutput()
 // ============================================================================
 
 #ifdef NETCDF
@@ -262,40 +263,68 @@ void writePerCellOutput(
     double timeHours) {
     
     try {
+        using namespace netCDF;
+        using namespace netCDF::exceptions;
+        
         NcFile ncFile(outputFile, NcFile::replace);
         
-        // Add dimensions
+        // Create dimensions
         NcDim xDim = ncFile.addDim("x", nx);
         NcDim yDim = ncFile.addDim("y", ny);
         NcDim specDim = ncFile.addDim("species", NVAR);
-        
-        // Add time dimension (single timestep for now)
         NcDim timeDim = ncFile.addDim("time", 1);
         
-        // Add time variable
+        // Create time variable
         NcVar timeVar = ncFile.addVar("time", ncFloat, timeDim);
-        timeVar.putAtt("units", "hours");
+        timeVar.putAtt("units", "hours since emission start");
         timeVar.putAtt("description", "Simulation time from start");
         float timeVal = static_cast<float>(timeHours);
         timeVar.putVar(&timeVal);
         
-        // Add species concentrations
-        NcVar specVar = ncFile.addVar("species_concentrations", ncFloat,
+        // Create x coordinate
+        NcVar xVar = ncFile.addVar("x", ncFloat, xDim);
+        xVar.putAtt("units", "m");
+        xVar.putAtt("description", "x-coordinate (horizontal distance from emission point)");
+        
+        // Create y coordinate  
+        NcVar yVar = ncFile.addVar("y", ncFloat, yDim);
+        yVar.putAtt("units", "m");
+        yVar.putAtt("description", "y-coordinate (vertical distance from emission point)");
+        
+        // Create species variable [species x y x x]
+        NcVar specVar = ncFile.addVar("concentrations", ncFloat,
                                        std::vector<NcDim>{specDim, yDim, xDim});
         specVar.putAtt("units", "molec/cm3");
-        specVar.putAtt("description", "Species concentrations");
+        specVar.putAtt("description", "Species concentrations at each grid cell");
+        specVar.putAtt("long_name", "Chemical species concentrations");
         
-        // Flatten and write data
+        // Add global attributes matching LAGRID format
+        ncFile.putAtt("Conventions", "COARDS");
+        ncFile.putAtt("Model", "APCEMM");
+        ncFile.putAtt("BoxModel_Mode", "Per-cell (mode=2)");
+        ncFile.putAtt("History", "Created by per-cell chemistry model");
+        
+        // Create 1D array for output
         std::vector<float> specData(NVAR * ny * nx);
+        
+        // Flatten: species varies slowest in netCDF (C order)
         for (int ispec = 0; ispec < NVAR; ispec++) {
             for (int j = 0; j < ny; j++) {
                 for (int i = 0; i < nx; i++) {
-                    specData[ispec * ny * nx + j * nx + i] = 
-                        static_cast<float>(species[NVAR * (j * nx + i) + ispec]);
+                    int flatIdx = ispec * ny * nx + j * nx + i;
+                    int srcIdx = NVAR * (j * nx + i) + ispec;
+                    specData[flatIdx] = static_cast<float>(species[srcIdx]);
                 }
             }
         }
         specVar.putVar(specData.data());
+        
+        // Write coordinate arrays (just indices for now)
+        std::vector<float> xCoords(nx), yCoords(ny);
+        for (int i = 0; i < nx; i++) xCoords[i] = static_cast<float>(i);
+        for (int j = 0; j < ny; j++) yCoords[j] = static_cast<float>(j);
+        xVar.putVar(xCoords.data());
+        yVar.putVar(yCoords.data());
         
         std::cout << "Per-cell output written to: " << outputFile << std::endl;
         
