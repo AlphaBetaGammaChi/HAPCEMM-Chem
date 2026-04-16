@@ -34,7 +34,8 @@
 #include "Util/PhysConstant.hpp"
 #include "Util/PhysFunction.hpp"
 
-#include <netcdf.h>
+#include <netcdf>
+using namespace netCDF;
 
 namespace BoxModel {
 
@@ -109,32 +110,32 @@ void writeBoxModelOutput(const std::string& outputFile,
         NcDim speciesDim = ncFile.addDim("species", nVar);
         
         // Create and write time variable [hours from start]
-        ncFile.addVar("time", "float", timeDim)
+        ncFile.addVar("time", ncFloat, timeDim)
             .putVar(timeArray.data());
         
         // Create and write cosine of SZA
-        NcVar cosSZAVar = ncFile.addVar("cosSZA", "float", timeDim);
+        NcVar cosSZAVar = ncFile.addVar("cosSZA", ncFloat, timeDim);
         cosSZAVar.putVar(cosSZASeries.data());
         cosSZAVar.putAtt("units", "dimensionless");
         cosSZAVar.putAtt("description", "Cosine of solar zenith angle");
         
         // Create and write air density
-        NcVar airDensVar = ncFile.addVar("airDensity", "float", timeDim);
+        NcVar airDensVar = ncFile.addVar("airDensity", ncFloat, timeDim);
         std::vector<double> airDensArr(nTime, airDens);
         airDensVar.putVar(airDensArr.data());
         airDensVar.putAtt("units", "molec/cm3");
         airDensVar.putAtt("description", "Air number density");
         
         // Create and write relative humidity (ice)
-        NcVar relHumIVar = ncFile.addVar("relHumidity_ice", "float", timeDim);
+        NcVar relHumIVar = ncFile.addVar("relHumidity_ice", ncFloat, timeDim);
         std::vector<double> relHumIArr(nTime, relHumidity_i);
         relHumIVar.putVar(relHumIArr.data());
         relHumIVar.putAtt("units", "dimensionless");
         relHumIVar.putAtt("description", "Relative humidity with respect to ice");
         
         // Create and write species concentrations [species x time]
-        NcVar specVar = ncFile.addVar("concentrations", "float", 
-                                    {speciesDim, timeDim});
+        NcVar specVar = ncFile.addVar("concentrations", ncFloat, 
+                                    std::vector<NcDim>{speciesDim, timeDim});
         
         // Convert from molec/cm3 to ppb and write
         std::vector<float> specData(nTime * nVar);
@@ -277,10 +278,13 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
     // =======================================================================
     // Initialize KPP Species
     // =======================================================================
+
+    // Local arrays for KPP species
+    double VAR_local[NVAR];
     
     // Reset all species to zero
     for (int i = 0; i < NVAR; i++) {
-        VAR[i] = 0.0;
+        VAR_local[i] = 0.0;
     }
     
     // =======================================================================
@@ -295,14 +299,14 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
     double so2_ppb = input.backgSO2();
     
     // Convert from ppb to molec/cm3
-    VAR[ind_NO] = no_ppb * 1.0e-9 * airDens;
-    VAR[ind_O3] = o3_ppb * 1.0e-9 * airDens;
-    VAR[ind_CO] = co_ppb * 1.0e-9 * airDens;
-    VAR[ind_CH4] = ch4_ppb * 1.0e-9 * airDens;
-    VAR[ind_NO2] = no_ppb * 0.5 * 1.0e-9 * airDens;
-    VAR[ind_H2O] = airDens * relHumidity_w * 1.0e-4;
+    VAR_local[ind_NO] = no_ppb * 1.0e-9 * airDens;
+    VAR_local[ind_O3] = o3_ppb * 1.0e-9 * airDens;
+    VAR_local[ind_CO] = co_ppb * 1.0e-9 * airDens;
+    VAR_local[ind_CH4] = ch4_ppb * 1.0e-9 * airDens;
+    VAR_local[ind_NO2] = no_ppb * 0.5 * 1.0e-9 * airDens;
+    VAR_local[ind_H2O] = airDens * relHumidity_w * 1.0e-4;
     if (so2_ppb > 0.0) {
-        VAR[ind_SO2] = so2_ppb * 1.0e-9 * airDens;
+        VAR_local[ind_SO2] = so2_ppb * 1.0e-9 * airDens;
     }
     
     std::cout << "Initial species concentrations [ppb]:" << std::endl;
@@ -316,6 +320,9 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
     // KPP tolerances
     double RTOL[NVAR];
     double ATOL[NVAR];
+    // Fixed species array (all zero for box model)
+    double FIX[NFIX];
+    for (int i = 0; i < NFIX; i++) FIX[i] = 0.0;
     for (int i = 0; i < NVAR; i++) {
         RTOL[i] = 1.0e-4;
         ATOL[i] = 1.0e6;
@@ -375,10 +382,59 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
         }
         
         // Update temperature- and pressure-dependent reaction rates
-        Update_RCONST(temperature_K, pressure_Pa, airDens, VAR[ind_H2O]);
+        Update_RCONST(temperature_K, pressure_Pa, airDens, VAR_local[ind_H2O]);
+        
+        // ===================================================================
+        // Heterogeneous chemistry on background aerosols (if enabled)
+        // Uses GC_SETHET from KPP_HetRates.cpp
+        // ===================================================================
+        if (input.chemHET()) {
+            // Get geoengineering parameters from input
+            double geoRadius = input.backgroundGeoengineeringRadius();  // meters
+            double geoGamma = input.backgroundGeoengineeringGamma();   // accommodation coefficient
+            
+            // Get background aerosol surface area (simplified: use default values)
+            double defaultSAD = 1.0e-6;  // m²/cm³ (very small background)
+            double area[NAERO];
+            double radi[NAERO];
+            for (int k = 0; k < NAERO; k++) {
+                area[k] = defaultSAD;
+                radi[k] = 1.0e-7;  // 100 nm default radius
+            }
+            
+            // Set geoengineering aerosol SAD
+            double geoRadius_cm = geoRadius * 100.0;  // Convert m to cm
+            double geoSAD = input.backgroundGeoengineeringNumber() * 4.0 * PI * geoRadius_cm * geoRadius_cm;  // cm²/cm³
+            
+            // Other aerosol SADs (set to zero for now)
+            double naclSAD = 0.0, caco3SAD = 0.0, al2o3SAD = 0.0, dustSAD = 0.0, diamondSAD = 0.0;
+            double naclRad = 1.0e-7, caco3Rad = 1.0e-7, al2o3Rad = 1.0e-7, dustRad = 1.0e-7, diamondRad = 1.0e-7;
+            
+            // Sticking coefficients (default values)
+            double kheti_sla[11] = {0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8};
+            
+            // Call GC_SETHET to compute heterogeneous reaction rates
+            GC_SETHET(
+                temperature_K, 
+                pressure_Pa / 101325.0,  // Convert Pa to atm
+                airDens,
+                relHumidity_w,
+                0,  // STATE_PSC: not in PSC
+                VAR_local.data(),
+                area, radi,
+                0.0,  // IWC
+                kheti_sla,
+                input.ADV_TROPOPAUSE_PRESSURE(),
+                geoSAD,
+                geoRadius,
+                geoGamma,
+                naclSAD, caco3SAD, al2o3SAD, dustSAD, diamondSAD,
+                naclRad, caco3Rad, al2o3Rad, dustRad, diamondRad
+            );
+        }
         
         // Integrate chemistry
-        int IERR = INTEGRATE(VAR, t, nextT, ATOL, RTOL, 0.0);
+        int IERR = INTEGRATE(VAR_local, FIX, t, nextT, ATOL, RTOL, 0.0);
         
         if (IERR < 0) {
             std::cout << "Integration failed at timestep " << iTime 
@@ -388,7 +444,7 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
         
         // Store results
         for (int i = 0; i < NVAR; i++) {
-            speciesHistory[i][iTime] = VAR[i];
+            speciesHistory[i][iTime] = VAR_local[i];
         }
         
         if (iTime % 10 == 0) {
@@ -399,7 +455,7 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
     
     // Store final values
     for (int i = 0; i < NVAR; i++) {
-        speciesHistory[i][nTime - 1] = VAR[i];
+        speciesHistory[i][nTime - 1] = VAR_local[i];
     }
     cosSZASeries[nTime - 1] = sun.CSZA;
     
@@ -421,21 +477,21 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
     std::cout << "Final species concentrations:" << std::endl;
     
     for (int i = 0; i < NVAR; i++) {
-        if (VAR[i] > 0.0) {
-            double concentration_ppb = VAR[i] / airDens * 1.0e9;
+        if (VAR_local[i] > 0.0) {
+            double concentration_ppb = VAR_local[i] / airDens * 1.0e9;
             std::cout << "  " << SPC_NAMES[i] << ": " << concentration_ppb << " ppb" << std::endl;
         }
     }
     
     // Store final species for LAGRID coupling
     g_finalSpecies.isValid = true;
-    g_finalSpecies.NO   = VAR[ind_NO]   / airDens * 1.0e9;
-    g_finalSpecies.NO2  = VAR[ind_NO2]  / airDens * 1.0e9;
-    g_finalSpecies.O3  = VAR[ind_O3]   / airDens * 1.0e9;
-    g_finalSpecies.CO   = VAR[ind_CO]   / airDens * 1.0e9;
-    g_finalSpecies.CH4  = VAR[ind_CH4]  / airDens * 1.0e9;
-    g_finalSpecies.SO2  = VAR[ind_SO2]  / airDens * 1.0e9;
-    g_finalSpecies.H2O  = VAR[ind_H2O]  / airDens * 1.0e9;
+    g_finalSpecies.NO   = VAR_local[ind_NO]   / airDens * 1.0e9;
+    g_finalSpecies.NO2  = VAR_local[ind_NO2]  / airDens * 1.0e9;
+    g_finalSpecies.O3  = VAR_local[ind_O3]   / airDens * 1.0e9;
+    g_finalSpecies.CO   = VAR_local[ind_CO]   / airDens * 1.0e9;
+    g_finalSpecies.CH4  = VAR_local[ind_CH4]  / airDens * 1.0e9;
+    g_finalSpecies.SO2  = VAR_local[ind_SO2]  / airDens * 1.0e9;
+    g_finalSpecies.H2O  = VAR_local[ind_H2O]  / airDens * 1.0e9;
     // HNO3 index may not be in the current list - only store if available
     g_finalSpecies.HNO3 = 0.0;  // Default if not in mechanism
     

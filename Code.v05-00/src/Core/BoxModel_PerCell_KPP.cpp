@@ -105,4 +105,43 @@ void updateRateConstants(double temperature_K, double pressure_Pa,
     }
 }
 
+void callHetRates(double temperature_K, double pressure_atm,
+                  double airDens, double relHum, unsigned int state_PSC,
+                  const double* species,
+                  const double* area, const double* radii,
+                  double IWC, const double* kheti_sla, double tropopausePress,
+                  double geoSAD, double geoRadius, double geoGamma,
+                  double naclSAD, double caco3SAD, double al2o3SAD, double dustSAD, double diamondSAD,
+                  double naclRadius, double caco3Radius, double al2o3Radius, double dustRadius, double diamondRadius) {
+    
+    // Call the KPP GC_SETHET function to compute heterogeneous reaction rates
+    // This will populate the global HET array used by KPP during integration
+    GC_SETHET(
+        temperature_K,           // Temperature [K]
+        pressure_atm,           // Pressure [atm]
+        airDens,                // Air density [molec/cm3]
+        relHum,                 // Relative humidity [0-1]
+        state_PSC,              // PSC state flag
+        species,                // Species array
+        area,                   // Aerosol surface areas
+        radii,                  // Aerosol radii
+        IWC,                    // Ice water content
+        kheti_sla,              // Sticking coefficients
+        tropopausePress,        // Tropopause pressure
+        geoSAD,                 // Geoengineering SAD
+        geoRadius,              // Geoengineering radius
+        geoGamma,               // Geoengineering gamma
+        naclSAD,                // NaCl SAD
+        caco3SAD,               // CaCO3 SAD
+        al2o3SAD,               // Al2O3 SAD
+        dustSAD,                // Dust SAD
+        diamondSAD,             // Diamond SAD
+        naclRadius,             // NaCl radius
+        caco3Radius,            // CaCO3 radius
+        al2o3Radius,            // Al2O3 radius
+        dustRadius,             // Dust radius
+        diamondRadius           // Diamond radius
+    );
+}
+
 }} // namespace BoxModel::PerCell

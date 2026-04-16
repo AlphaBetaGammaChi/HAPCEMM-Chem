@@ -76,6 +76,43 @@ void updatePhotolysisRates(double cosSZA);
 void updateRateConstants(double temperature_K, double pressure_Pa, 
                          double airDens, double h2o_molec);
 
+/**
+ * Call GC_SETHET to compute heterogeneous chemistry rates.
+ * 
+ * @param temperature_K     Temperature [K]
+ * @param pressure_atm     Pressure [atm]
+ * @param airDens          Air density [molec/cm3]
+ * @param relHum           Relative humidity [0-1]
+ * @param state_PSC        PSC state flag
+ * @param species          Species array [molec/cm3]
+ * @param area             Aerosol surface areas [m2/cm3]
+ * @param radii            Aerosol radii [m]
+ * @param IWC              Ice water content [kg/cm3]
+ * @param kheti_sla        Sticking coefficients [11]
+ * @param tropopausePress  Tropopause pressure [Pa]
+ * @param geoSAD           Geoengineering SAD [cm2/cm3]
+ * @param geoRadius        Geoengineering radius [m]
+ * @param geoGamma         Geoengineering gamma (accommodation coefficient)
+ * @param naclSAD          NaCl SAD [cm2/cm3]
+ * @param caco3SAD         CaCO3 SAD [cm2/cm3]
+ * @param al2o3SAD         Al2O3 SAD [cm2/cm3]
+ * @param dustSAD          Dust SAD [cm2/cm3]
+ * @param diamondSAD       Diamond SAD [cm2/cm3]
+ * @param naclRadius       NaCl radius [m]
+ * @param caco3Radius      CaCO3 radius [m]
+ * @param al2o3Radius      Al2O3 radius [m]
+ * @param dustRadius       Dust radius [m]
+ * @param diamondRadius     Diamond radius [m]
+ */
+void callHetRates(double temperature_K, double pressure_atm,
+                  double airDens, double relHum, unsigned int state_PSC,
+                  const double* species,
+                  const double* area, const double* radii,
+                  double IWC, const double* kheti_sla, double tropopausePress,
+                  double geoSAD, double geoRadius, double geoGamma,
+                  double naclSAD, double caco3SAD, double al2o3SAD, double dustSAD, double diamondSAD,
+                  double naclRadius, double caco3Radius, double al2o3Radius, double dustRadius, double diamondRadius);
+
 }} // namespace BoxModel::PerCell
 
 #endif // BOXMODEL_PERCELL_KPP_HPP

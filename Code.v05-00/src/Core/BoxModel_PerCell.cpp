@@ -107,6 +107,7 @@ void initSpeciesArray(int nx, int ny, double* species, const Input& input, doubl
 // ============================================================================
 // Run per-cell chemistry - Simplified (INDEPENDENT) mode
 // Each cell runs independently without species transport
+// Includes heterogeneous chemistry on background aerosols
 // ============================================================================
 
 int runPerCellChemistry(
@@ -125,6 +126,7 @@ int runPerCellChemistry(
     std::cout << "Grid size: " << nx << " x " << ny << " = " << nx*ny << " cells" << std::endl;
     std::cout << "Chemistry timestep: " << dt << " s" << std::endl;
     std::cout << "Mode: " << (mode == PerCellMode::INDEPENDENT ? "INDEPENDENT (simplified)" : "COUPLED (full)") << std::endl;
+    std::cout << "Heterogeneous chemistry: " << (Input_Opt.CHEMISTRY_HETCHEM ? "ENABLED" : "DISABLED") << std::endl;
     
     if (mode == PerCellMode::COUPLED) {
         std::cout << "WARNING: COUPLED mode not yet implemented - falling back to INDEPENDENT" << std::endl;
@@ -221,6 +223,55 @@ int runPerCellChemistry(
                 
                 // Update reaction rate constants
                 PerCell::updateRateConstants(T, P, airDens, cellSpecies[ind_H2O]);
+                
+                // ===================================================================
+                // Heterogeneous chemistry on background aerosols (if enabled)
+                // Uses GC_SETHET from KPP_HetRates.cpp
+                // ===================================================================
+                if (Input_Opt.CHEMISTRY_HETCHEM) {
+                    // Get geoengineering parameters from input
+                    double geoSAD = 0.0;
+                    double geoRadius = input.backgroundGeoengineeringRadius();  // meters
+                    double geoGamma = input.backgroundGeoengineeringGamma();   // accommodation coefficient
+                    
+                    // Get background aerosol surface area (simplified: use default values)
+                    double defaultSAD = 1.0e-6;  // m²/cm³ (very small background)
+                    double area[NAERO];
+                    double radi[NAERO];
+                    for (int k = 0; k < NAERO; k++) {
+                        area[k] = defaultSAD;
+                        radi[k] = 1.0e-7;  // 100 nm default radius
+                    }
+                    
+                    // Set geoengineering aerosol SAD
+                    double geoRadius_cm = geoRadius * 100.0;  // Convert m to cm
+                    geoSAD = input.backgroundGeoengineeringNumber() * 4.0 * PI * geoRadius_cm * geoRadius_cm;  // cm²/cm³
+                    
+                    // Other aerosol SADs (set to zero for now - could be passed as parameter)
+                    double naclSAD = 0.0, caco3SAD = 0.0, al2o3SAD = 0.0, dustSAD = 0.0, diamondSAD = 0.0;
+                    double naclRad = 1.0e-7, caco3Rad = 1.0e-7, al2o3Rad = 1.0e-7, dustRad = 1.0e-7, diamondRad = 1.0e-7;
+                    
+                    // Sticking coefficients (default values)
+                    double kheti_sla[11] = {0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8};
+                    
+                    // Call GC_SETHET to compute heterogeneous reaction rates
+                    PerCell::callHetRates(
+                        T, P * 101325.0,  // Convert Pa to atm
+                        airDens,
+                        humidity[j * nx + i],
+                        0,  // STATE_PSC: not in PSC
+                        cellSpecies,
+                        area, radi,
+                        0.0,  // IWC
+                        kheti_sla,
+                        0.0,  // tropopause pressure (not used)
+                        geoSAD,
+                        geoRadius,
+                        geoGamma,
+                        naclSAD, caco3SAD, al2o3SAD, dustSAD, diamondSAD,
+                        naclRad, caco3Rad, al2o3Rad, dustRad, diamondRad
+                    );
+                }
                 
                 // Run KPP integration
                 int ierr = INTEGRATE(cellSpecies, fix, t, nextT, atol, rtol, 0.0);
