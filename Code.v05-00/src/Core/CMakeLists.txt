@@ -2,6 +2,7 @@
 set(SRCS
     Aircraft.cpp
     BoxModel.cpp
+    BoxModel_PerCell.cpp
     BoxModel_PerCell_KPP.cpp
     Cluster.cpp
     Diag_Mod.cpp
