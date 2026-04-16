@@ -93,6 +93,7 @@ This document describes the per-grid-cell box model option (mode=2) added to APC
 - **Chemistry timestep**: 10 minutes (default) is good for typical 3-6 hour simulations
 - **Thread count**: Match available cores, typically 4-8 for HPC
 - **Output frequency**: Every 10 transport timesteps is reasonable
+- **Heterogeneous chemistry**: Enable with `Perform hetero. chem. (T/F): true` in input.yaml - this adds geoengineering particle effects to the chemistry
 
 ### 4. Memory Requirements
 - **Per simulation**: ~1 MB for species array at typical grid sizes
