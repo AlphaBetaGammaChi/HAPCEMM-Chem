@@ -156,6 +156,28 @@ namespace YamlInputReader{
             input.SIMULATION_BOXMODEL_COUPLING = false;  // Default: false
         }
 
+        // Box model mode: 0=off, 1=whole domain, 2=per-cell
+        // If new integer mode flag is present, use it; otherwise fall back to old T/F for backward compatibility
+        if (boxModelSubmenu["Box model mode (int)"]) {
+            input.SIMULATION_BOXMODEL_MODE = boxModelSubmenu["Box model mode (int)"].as<int>();
+        } else {
+            // Fallback: use old T/F flag for backward compatibility
+            bool useBoxModel = parseBoolString(boxModelSubmenu["Run box model (T/F)"].as<string>(), "Run box model (T/F)");
+            input.SIMULATION_BOXMODEL_MODE = useBoxModel ? 1 : 0;
+        }
+
+        // Chemistry timestep for mode=2 (per-cell)
+        if (boxModelSubmenu["Chemistry timestep [min] (double)"]) {
+            input.CHEMISTRY_TIMESTEP = boxModelSubmenu["Chemistry timestep [min] (double)"].as<double>();
+        }
+
+        // OpenMP threads for mode=2
+        if (boxModelSubmenu["OpenMP threads (int)"]) {
+            input.SIMULATION_BOXMODEL_THREADS = boxModelSubmenu["OpenMP threads (int)"].as<int>();
+        } else {
+            input.SIMULATION_BOXMODEL_THREADS = 1;  // Default: single-threaded
+        }
+
         if (simNode["RANDOM NUMBER GENERATION SUBMENU"]){
             YAML::Node seedSubmenu = simNode["RANDOM NUMBER GENERATION SUBMENU"];
             input.SIMULATION_FORCE_SEED = parseBoolString(seedSubmenu["Force seed value (T/F)"].as<string>(), "Force seed value (T/F)");

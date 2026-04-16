@@ -47,6 +47,8 @@ struct OptInput
     bool         SIMULATION_BOXMODEL;
     std::string  SIMULATION_BOX_FILENAME;
     bool         SIMULATION_BOXMODEL_COUPLING;
+    int          SIMULATION_BOXMODEL_MODE;      // 0=off, 1=whole domain, 2=per-cell
+    int          SIMULATION_BOXMODEL_THREADS;   // Threads for mode=2
     bool         SIMULATION_FORCE_SEED;
     int          SIMULATION_SEED_VALUE;
     epm_type     SIMULATION_EPM_TYPE;
