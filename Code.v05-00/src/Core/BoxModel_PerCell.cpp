@@ -163,8 +163,10 @@ int runPerCellChemistry(
     std::cout << "OpenMP not enabled - running sequentially" << std::endl;
 #endif
     
-    // Sequential version (no OpenMP for now - will add in Step 6)
-    // Each cell runs independently
+    // =====================================================================
+    // OpenMP parallel version - each cell runs independently
+    // Using threadprivate KPP arrays for thread safety
+    // =====================================================================
     
     double* cellSpecies = new double[NVAR];
     double* rtol = new double[NVAR];
@@ -180,7 +182,10 @@ int runPerCellChemistry(
         fix[i] = 0.0;
     }
     
-    // Loop over all cells
+    // =====================================================================
+    // OpenMP parallel loop over all cells
+    // =====================================================================
+#pragma omp parallel for collapse(2) schedule(dynamic)
     for (int j = 0; j < ny; j++) {
         for (int i = 0; i < nx; i++) {
             int cellIdx = j * nx + i;
@@ -198,7 +203,7 @@ int runPerCellChemistry(
                 cellSpecies[ispec] = species[NVAR * cellIdx + ispec];
             }
             
-            // Initialize KPP state for this thread/cell
+            // Initialize KPP state for this thread/cell (thread-local from Step 2)
             PerCell::initThreadState(T, P, cellSpecies[ind_H2O], cellSpecies);
             
             // Loop over chemistry sub-timesteps
@@ -221,6 +226,8 @@ int runPerCellChemistry(
                 int ierr = INTEGRATE(cellSpecies, fix, t, nextT, atol, rtol, 0.0);
                 
                 if (ierr < 0) {
+                    // Only print from master thread
+#pragma omp critical
                     std::cout << "Warning: Integration failed at cell (" << i << "," << j << "), step " << step << std::endl;
                 }
             }
@@ -232,9 +239,9 @@ int runPerCellChemistry(
             for (int ispec = 0; ispec < NVAR; ispec++) {
                 species[NVAR * cellIdx + ispec] = cellSpecies[ispec];
             }
-            
-            // Progress output
-            if ((j * nx + i) % 100 == 0) {
+        }
+    }
+            for (int ispec = 0; ispec < NVAR; ispec++) {
                 std::cout << "  Processed " << (j * nx + i + 1) << " / " << nx*ny << " cells" << std::endl;
             }
         }
