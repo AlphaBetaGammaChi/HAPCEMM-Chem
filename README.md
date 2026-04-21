@@ -3,8 +3,13 @@
 # README for the HAPCEMM source code repository
 
 HAPCEMM is the [Hypothetical Aircraft Plume Chemistry, Emissions, and Microphysics Model a fork of the APCEMM model](https://github.com/mit-lae/APCEMM). It simulates the aerosol microphysics and chemistry in an aircraft exhaust plume in 2D for up to 24 hours, with a focus on accurate simulation of the ice - providing an intermediate-fidelity representation of an aircraft contrail. Originally described in [Fritz et al. (2020)](https://acp.copernicus.org/articles/20/5697/2020/), the model has since been heavily modified and the focus shifted from chemistry towards a flexible and efficient contrail simulation. APCEMM is a community-developed code and we strongly encourage users to contribute to the code base, whether through new features, improvements, or bug fixes. We use semantic versioning, and (as of v1.1.0) users can expect that the API will only change with new major versions.
+HAPCEMM is a fork of the APCEMM model developed to study the impact of alternative fuels and entrained species. HAPCEMM has focussed on reintroducing aspects of chemistry from the original model and developing on this.
 
 The latest stable release of APCEMM is [__v1.2.1__](https://github.com/MIT-LAE/APCEMM/releases/tag/v1.2.1).
+
+
+
+Some say HAPCEMM stands for Altius Petimus Caelum Et Majora Meremur or Hirrundo Ala Praepes Caelum Evolare Machina.
 
 ## APCEMM development
 
