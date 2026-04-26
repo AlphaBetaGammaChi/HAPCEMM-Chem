@@ -1,3 +1,4 @@
+#include "Util/JuliaBridge.hpp"
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /*                                                                  */
 /*     Aircraft Plume Chemistry, Emission and Microphysics Model    */
@@ -51,6 +52,7 @@ void Solution::Initialize(std::string fileName,
 
     /* Read input background conditions */
     readInputBackgroundConditions(input, amb_Value, aer_Value, fileName);
+    setAmbientConcentrations(input, amb_Value);
 
     const double AMBIENT_VALID_TIME = 8.0; //hours
     SpinUp(amb_Value, input, Input_Opt, airDens, AMBIENT_VALID_TIME, varSpeciesArray);
@@ -201,6 +203,7 @@ const std::string default_ambient =
 ;
 
 void Solution::readInputBackgroundConditions(const Input& input, Vector_1D& amb_Value, Vector_2D& aer_Value, std::string fileName){
+    setAmbientConcentrations(input, amb_Value);
     if (fileName == "=DEFAULT=") {
         // Use default ambient conditions.
         std::istringstream iss(default_ambient);
@@ -414,6 +417,14 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 
     if ( DBG )
         std::cout << "\n Running spin-up from " << curr_Time_s / 3600.0 << " to " << RunUntil / 3600.0 << " [hr]\n";
+    if ( Input_Opt.ADV_USE_JULIA_CHEMISTRY ) {
+        JuliaBridge::SpinUp(varSpeciesArray, airDens, input.temperature_K(), input.pressure_Pa(), RunUntil - curr_Time_s);
+    // Populate geoengineering vars from input for SAI spinup
+    double spinup_GEO_SAD = input.backgroundGeoengineeringNumber() * 4.0 * physConst::PI * pow(input.backgroundGeoengineeringRadius() * 100.0, 2.0);
+    double spinup_GEO_RADIUS = input.backgroundGeoengineeringRadius();
+    double spinup_GEO_GAMMA = input.backgroundGeoengineeringGamma();
+if (false) {
+    } else 
 
     while ( curr_Time_s < RunUntil ) {
 
@@ -424,7 +435,7 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
             PHOTOL[iPhotol] = 0.0E+00;
 
         if ( sun.CSZA > 0.0E+00 )
-            Update_JRates( PHOTOL, sun.CSZA );
+            Update_JRates( PHOTOL, sun.CSZA, Input_Opt.ADV_SOLAR_DIMMING_FACTOR );
 
         if ( DBG ) {
             std::cout << "\n DEBUG : (In SpinUp)\n";
@@ -439,6 +450,7 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
         Update_RCONST( input.temperature_K(), input.pressure_Pa(), airDens, varSpeciesArray[ind_H2O] );
 
         
+if (false) {
         if ( Input_Opt.CHEMISTRY_HETCHEM) {
 
         double spinup_NACL_SAD = 0.0; double spinup_NACL_RAD = 1.0e-7;
@@ -567,6 +579,7 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
          spinup_DUST_RAD,
          spinup_DIAMOND_RAD
       );
+}
     }
 
 
@@ -599,6 +612,7 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
 
             // return KPP_FAIL;
         }
+}
 
         curr_Time_s += DT_CHEM;
 

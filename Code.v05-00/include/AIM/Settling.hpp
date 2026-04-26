@@ -20,6 +20,7 @@ namespace AIM
 {
 
     Vector_1D SettlingVelocity( const Vector_1D binCenters, const double T, const double P );
+    Vector_1D GeoSettlingVelocity( const double radius, const double rho, const double T, const double P );
 
 }
 

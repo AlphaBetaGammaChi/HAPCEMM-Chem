@@ -12,7 +12,7 @@
 #include "KPP/KPP_Global.h"
 #include "KPP/KPP.hpp"
 
-void Update_JRates ( double JRates[], const double CSZA )
+void Update_JRates ( double JRates[], const double CSZA, double dimmingFactor )
 {
 
     /* Use noon-time photolysis rates read from ReadJRates */
@@ -267,4 +267,5 @@ void Update_JRates ( double JRates[], const double CSZA )
         JRates[113] = 1.6E-01 * CSZA;       
     }
 
+    for (int i = 0; i < NPHOTOL; i++) JRates[i] *= (1.0 - dimmingFactor);
 } /* End of Update_JRates */

@@ -14,4 +14,4 @@ set(SRCS
 add_library(EPM STATIC ${SRCS})
 
 # This command defines the dependencies of libEPM.a
-target_link_libraries(EPM AIM Core Util)
+target_link_libraries(EPM PUBLIC netCDF::netcdf-cxx4  AIM Core Util)

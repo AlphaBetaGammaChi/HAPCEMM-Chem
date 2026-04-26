@@ -43,7 +43,7 @@ namespace Diag {
                     const AIM::Grid_Aerosol& iceAer, const Vector_2D& H2O,
                     const Vector_1D& xCoord, const Vector_1D& yCoord,
                     const Vector_1D& xEdges, const Vector_1D& yEdges,
-                    const Meteorology &met);
+                    const Meteorology &met, const Vector_3D& species);
     
     void add0DVar(NcFile& currFile, const float toSave, const NcDim& dim, const string& name, const string& desc, const string& units);
     void add1DVar(NcFile& currFile, const Vector_1D& toSave, const NcDim& dim, const string& name, const string& desc, const string& units);

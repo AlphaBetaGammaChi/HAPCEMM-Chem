@@ -127,7 +127,7 @@ namespace YamlInputReader{
         if ( outputFolder.back() != '/' ) {outputFolder = outputFolder + "/";}
         input.SIMULATION_OUTPUT_FOLDER = outputFolder;
         input.SIMULATION_OVERWRITE = parseBoolString(outputSubmenu["Overwrite if folder exists (T/F)"].as<string>(), "Overwrite if folder exists (T/F)");
-        input.SIMULATION_THREADED_FFT = parseBoolString(simNode["Use threaded FFT (T/F)"].as<string>(), "Use threaded FFT (T/F)");
+        input.SIMULATION_THREADED_FFT = simNode["Use threaded FFT (T/F)"] ? parseBoolString(simNode["Use threaded FFT (T/F)"].as<string>(), "Use threaded FFT (T/F)") : false;
 
         YAML::Node fftwWisdomSubmenu = simNode["FFTW WISDOM SUBMENU"];
         input.SIMULATION_USE_FFTW_WISDOM = parseBoolString(fftwWisdomSubmenu["Use FFTW WISDOM (T/F)"].as<string>(), "Use FFTW WISDOM (T/F)");
@@ -146,6 +146,10 @@ namespace YamlInputReader{
         YAML::Node boxModelSubmenu = simNode["BOX MODEL SUBMENU"];
         input.SIMULATION_BOXMODEL = parseBoolString(boxModelSubmenu["Run box model (T/F)"].as<string>(), "Run box model (T/F)");
         input.SIMULATION_BOX_FILENAME = boxModelSubmenu["netCDF filename format (string)"].as<string>();
+        input.SIMULATION_BOXMODEL_MODE = boxModelSubmenu["Box model mode (int)"] ? boxModelSubmenu["Box model mode (int)"].as<int>() : 1;
+        input.SIMULATION_BOXMODEL_THREADS = boxModelSubmenu["Box model threads (int)"] ? boxModelSubmenu["Box model threads (int)"].as<int>() : 1;
+        // Reverted temporarily
+        input.SIMULATION_FUEL = (boxModelSubmenu && boxModelSubmenu["Fuel"]) ? boxModelSubmenu["Fuel"].as<std::string>() : "C12H24";
         
         // Box model coupling flag - only relevant if box model is enabled
         if (boxModelSubmenu["Box model coupling (T/F)"]) {
@@ -184,7 +188,7 @@ namespace YamlInputReader{
             throw std::invalid_argument("Invalid EPM type specified in SIMULATION MENU: " + epm);
         }
 
-        input.SIMULATION_EXTERNAL_EPM_NETCDF_FILENAME = simNode["External EPM NetCDF file"].as<string>();
+        if (simNode["External EPM NetCDF file"]) { input.SIMULATION_EXTERNAL_EPM_NETCDF_FILENAME = simNode["External EPM NetCDF file"].as<string>(); }
     }
     void readParamMenu(OptInput& input, const YAML::Node& paramNode){
 
@@ -214,6 +218,11 @@ namespace YamlInputReader{
         input.PARAMETER_PARAM_MAP["EI_NOX"] = parseParamSweepInput(eiSubmenu["NOx [g(NO2)/kg_fuel] (double)"].as<string>(), "NOx [g(NO2)/kg_fuel] (double)");
         input.PARAMETER_PARAM_MAP["EI_CO"] = parseParamSweepInput(eiSubmenu["CO [g/kg_fuel] (double)"].as<string>(), "CO [g/kg_fuel] (double)");
         input.PARAMETER_PARAM_MAP["EI_UHC"] = parseParamSweepInput(eiSubmenu["UHC [g/kg_fuel] (double)"].as<string>(), "UHC [g/kg_fuel] (double)");
+        input.PARAMETER_PARAM_MAP["EI_H2"] = parseParamSweepInput(eiSubmenu["H2 [g/kg_fuel] (double)"].as<string>(), "H2 [g/kg_fuel] (double)");
+        input.PARAMETER_PARAM_MAP["EI_H2O2"] = parseParamSweepInput(eiSubmenu["H2O2 [g/kg_fuel] (double)"].as<string>(), "H2O2 [g/kg_fuel] (double)");
+        input.PARAMETER_PARAM_MAP["EI_NH3"] = parseParamSweepInput(eiSubmenu["NH3 [g/kg_fuel] (double)"].as<string>(), "NH3 [g/kg_fuel] (double)");
+        input.PARAMETER_PARAM_MAP["EI_N2O"] = parseParamSweepInput(eiSubmenu["N2O [g/kg_fuel] (double)"].as<string>(), "N2O [g/kg_fuel] (double)");
+        input.PARAMETER_PARAM_MAP["EI_LUB"] = parseParamSweepInput(eiSubmenu["Lube oil [g/kg_fuel] (double)"].as<string>(), "Lube oil [g/kg_fuel] (double)");
         input.PARAMETER_PARAM_MAP["EI_SO2"] = parseParamSweepInput(eiSubmenu["SO2 [g/kg_fuel] (double)"].as<string>(), "SO2 [g/kg_fuel] (double)");
         input.PARAMETER_PARAM_MAP["EI_SO2TOSO4"] =  parseParamSweepInput(eiSubmenu["SO2 to SO4 conv [%] (double)"].as<string>(), "SO2 to SO4 conv [%] (double)");
         input.PARAMETER_PARAM_MAP["EI_SOOT"] = parseParamSweepInput(eiSubmenu["Soot [g/kg_fuel] (double)"].as<string>(), "Soot [g/kg_fuel] (double)");
@@ -261,6 +270,8 @@ namespace YamlInputReader{
         input.AEROSOL_ICE_GROWTH_TIMESTEP = parseDoubleString(aeroNode["Ice growth timestep [min] (double)"].as<string>(), "Ice growth timestep [min] (double)");
     }
     void readMetMenu(OptInput& input, const YAML::Node& metNode){
+        input.MET_TEMP = (metNode["METEOROLOGICAL PARAMETERS SUBMENU"] && metNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Temperature [K] (double)"]) ? metNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Temperature [K] (double)"].as<double>() : 223.0;
+        input.MET_RHW = (metNode["METEOROLOGICAL PARAMETERS SUBMENU"] && metNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Relative Humidity [%] (double)"]) ? metNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Relative Humidity [%] (double)"].as<double>() : 50.0;
         YAML::Node metInputSubmenu = metNode["METEOROLOGICAL INPUT SUBMENU"];
         input.MET_LOADMET = parseBoolString(metInputSubmenu["Use met. input (T/F)"].as<string>(), "Use met. input (T/F)");
         input.MET_FILENAME = parseFileSystemPath(metInputSubmenu["Met input file path (string)"].as<string>());
@@ -351,6 +362,8 @@ namespace YamlInputReader{
             input.ADV_SAVE_PSD_GRID = parseBoolString(advancedNode["Save gridded particle size distribution (T/F)"].as<string>(), "Save gridded particle size distribution (T/F)");
         } else {
             input.ADV_SAVE_PSD_GRID = false;
+        input.ADV_SOLAR_DIMMING_FACTOR = 0.0;
+        input.ADV_USE_JULIA_CHEMISTRY = false;
         }
     }
 

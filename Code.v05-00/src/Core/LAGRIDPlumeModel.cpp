@@ -1,3 +1,5 @@
+
+#include "Core/BoxModel.hpp"
 #include <chrono>
 #include <filesystem>
 #include <memory>
@@ -16,17 +18,18 @@ In the LAGRID Plume Model (no plume chemistry), the KPP is used only when
 spinning up the background ambient conditions during the initialization
 step of the EPM. For now declare these variables at the top level.
 */
-double RCONST[NREACT];       /* Rate constants (global) */
-double NOON_JRATES[NPHOTOL]; /* Noon-time photolysis rates (global) */
-double PHOTOL[NPHOTOL];      /* Photolysis rates (global) */
-double HET[NSPEC][3];        /* Heterogeneous chemistry rates (global) */
-double TIME;                 /* Current integration time (global) */
-double SZA_CST[3];           /* Require this for adjoint integration */
+#include "KPP/KPP_Global.h"
+// double RCONST[NREACT];       /* Rate constants (global) */
+// double NOON_JRATES[NPHOTOL]; /* Noon-time photolysis rates (global) */
+// double PHOTOL[NPHOTOL];      /* Photolysis rates (global) */
+// double HET[NSPEC][3];        /* Heterogeneous chemistry rates (global) */
+// double TIME;                 /* Current integration time (global) */
+// double SZA_CST[3];           /* Require this for adjoint integration */
 
 LAGRIDPlumeModel::LAGRIDPlumeModel(const OptInput &optInput, Input &input) :
     optInput_(optInput), input_(input),
     numThreads_(optInput.SIMULATION_OMP_NUM_THREADS),
-    jetA_(Fuel("C12H24")),
+    jetA_(Fuel(optInput.SIMULATION_FUEL.c_str())),
     yCoords_(optInput_.ADV_GRID_NY),
     yEdges_(optInput_.ADV_GRID_NY + 1)
 {
@@ -44,16 +47,18 @@ LAGRIDPlumeModel::LAGRIDPlumeModel(const OptInput &optInput, Input &input) :
                   [dy, y0, j = 0]() mutable { return y0 + dy * (0.5 + j++); });
 
     met_ = Meteorology(optInput_, input.pressure_Pa(), yCoords_, yEdges_);
-    std::cout << "Temperature      = " << met_.tempRef() << " K" << std::endl;
-    std::cout << "RHw              = " << met_.rhwRef() << " %" << std::endl;
-    std::cout << "RHi              = " << met_.rhiRef() << " %" << std::endl;
+    double final_T = optInput.MET_LOADTEMP ? met_.tempRef() : optInput.MET_TEMP;
+    double final_RHw = optInput.MET_LOADRH ? met_.rhwRef() : optInput.MET_RHW;
+    double final_RHi = final_RHw * physFunc::pSat_H2Ol(final_T) / physFunc::pSat_H2Os(final_T);
+
+    std::cout << "Temperature      = " << final_T << " K" << std::endl;
+    std::cout << "RHw              = " << final_RHw << " %" << std::endl;
+    std::cout << "RHi              = " << final_RHi << " %" << std::endl;
     std::cout << "Saturation depth = " << met_.satdepthEstimate() << " m" << std::endl;
-    
-    // Set the met variables in the input object
-    input.set_temperature_K(met_.tempRef());
-    input.set_relHumidity_w(met_.rhwRef());
-    input.set_relHumidity_i(met_.rhiRef());
-    input_ = input;
+
+    input.set_temperature_K(final_T);
+    input.set_relHumidity_w(final_RHw);
+    input.set_relHumidity_i(final_RHi);
 
     simVars_ = MPMSimVarsWrapper(input_, optInput_, met_.satdepthEstimate());
     timestepVars_ = TimestepVarsWrapper(input_, optInput_);
@@ -194,6 +199,7 @@ SimStatus LAGRIDPlumeModel::runFullModel() {
             for (std::size_t i=0; i<xCoords_.size(); i++){
                 Contrail_[j][i] = Contrail_[j][i] / localND; // parts per trillion
                 H2O_[j][i] = H2O_[j][i] / localND; // parts per trillion
+                BackgroundGeo_field_[j][i] = BackgroundGeo_field_[j][i] / localND;
                 for(UInt n = 0; n < iceAerosol_.getNBin(); n++) {
                     pdfRef[n][j][i] = pdfRef[n][j][i] / localND;
                 }
@@ -252,6 +258,44 @@ SimStatus LAGRIDPlumeModel::runFullModel() {
         timestepVars_.nTime++;
 
         #ifdef ENABLE_TIMING
+// Per-cell chemistry option
+        if (optInput_.SIMULATION_BOXMODEL_MODE == 2) {
+            std::cout << " [LAGRID] Running high-fidelity per-cell chemistry..." << std::endl;
+            Vector_2D temp = met_.Temperature_field();
+            Vector_2D press = met_.Pressure_field();
+            // Flattened call to the parallel solver
+            BoxModel::runPerCellChemistry(
+                optInput_, input_,
+                xCoords_.size(), yCoords_.size(),
+                nullptr, // Species grid placeholder
+                &temp[0][0], &press[0][0], &H2O_[0][0], nullptr,
+                timestepVars_.TRANSPORT_DT * 60.0
+            );
+        }
+        if (optInput_.SIMULATION_BOXMODEL_MODE == 2) {
+            std::cout << "Running per-cell chemistry..." << std::endl;
+            size_t nx = xCoords_.size();
+            size_t ny = yCoords_.size();
+            #pragma omp parallel for collapse(2)
+            for (size_t j = 0; j < ny; j++) {
+                for (size_t i = 0; i < nx; i++) {
+                    double T = met_.Temperature(i, j);
+                    double P = met_.Pressure(i, j);
+                    double airDens = P / (physConst::kB * T) * 1.0e-6;
+                    double fix[NFIX] = {0.0};
+                    std::vector<double> cell_spec(NVAR);
+                    for (int n=0; n<NVAR; n++) cell_spec[n] = Species_[n][j][i];
+                    if (optInput_.ADV_USE_JULIA_CHEMISTRY) {
+                        JuliaBridge::Integrate(cell_spec.data(), fix, 0.0, timestepVars_.TRANSPORT_DT * 60.0, T, P, airDens);
+                    } else {
+                        double rtol[NVAR], atol[NVAR];
+                        for (int n=0; n<NVAR; n++) { rtol[n]=1e-4; atol[n]=1e-6; }
+                        INTEGRATE(cell_spec.data(), fix, 0.0, timestepVars_.TRANSPORT_DT * 60.0, atol, rtol, 0.0);
+                    }
+                    for (int n=0; n<NVAR; n++) Species_[n][j][i] = cell_spec[n];
+                }
+            }
+        }
         auto save_start = std::chrono::high_resolution_clock::now();
         #endif
 
@@ -382,6 +426,8 @@ void LAGRIDPlumeModel::initializeGrid(const EPM::Output &epmOut) {
 void LAGRIDPlumeModel::initH2O() {
     Contrail_ = Vector_2D(yCoords_.size(), Vector_1D(xCoords_.size()));
     H2O_ = met_.H2O_field();
+    BackgroundGeo_field_ = Vector_2D(yCoords_.size(), Vector_1D(xCoords_.size(), input_.backgroundGeoengineeringNumber()));
+    if (optInput_.SIMULATION_BOXMODEL_MODE == 2) { Species_ = Vector_3D(NVAR, Vector_2D(yCoords_.size(), Vector_1D(xCoords_.size(), 0.0))); }
 
     //Add emitted plume H2O. This function is called after releasing the initial crystals into the grid,
     //so we can use that as a "mask" for where to emit the H2O.
@@ -743,6 +789,8 @@ void LAGRIDPlumeModel::remapAllVars(double remapTimestep, const std::vector<std:
 
     //Remap H2O
     H2O_ = applyWeights(remapWeights, nx_old,  ny_old,  nx_new,  ny_new, H2O_);
+    BackgroundGeo_field_ = applyWeights(remapWeights, nx_old,  ny_old,  nx_new,  ny_new, BackgroundGeo_field_);
+    if (optInput_.SIMULATION_BOXMODEL_MODE == 2) { Species_ = Vector_3D(NVAR, Vector_2D(yCoords_.size(), Vector_1D(xCoords_.size(), 0.0))); }
 
     //Need to update bottom-of-domain altitude before updating coordinates
     xCoords_ = std::move(xCoordsNew);
@@ -770,6 +818,7 @@ void LAGRIDPlumeModel::remapAllVars(double remapTimestep, const std::vector<std:
         for (std::size_t i=0; i<xCoords_.size(); i++){
             Contrail_[j][i] = Contrail_[j][i] * localND;
             H2O_[j][i] = H2O_[j][i] * localND;
+            BackgroundGeo_field_[j][i] = BackgroundGeo_field_[j][i] * localND;
             for(UInt n = 0; n < iceAerosol_.getNBin(); n++) {
                 pdfRef[n][j][i] = pdfRef[n][j][i] * localND;
             }
@@ -977,8 +1026,38 @@ void LAGRIDPlumeModel::saveTSAerosol() {
         int ss = (int) (timestepVars_.curr_Time_s - timestepVars_.timeArray[0])      - 60 * ( mm + 60 * hh );
 
         Diag::Diag_TS_Phys( simVars_.TS_AERO_FILEPATH.c_str(), hh, mm, ss, \
-                        iceAerosol_, H2O_, xCoords_, yCoords_, xEdges_, yEdges_, met_);
+                        iceAerosol_, H2O_, xCoords_, yCoords_, xEdges_, yEdges_, met_, Species_);
         std::cout << "Save Complete" << std::endl;    
     }
 
+}
+
+BoxModel::EPMCouplingData LAGRIDPlumeModel::getCouplingData() {
+    double totalArea = 0.0; // [m2/cm3]
+    double totalIWC = 0.0;  // [kg/cm3]
+    double totalRadius = 0.0; // [m]
+    
+    // Get fields from microphysics
+    Vector_2D areaField = iceAerosol_.TotalArea(); // [m2/cm3]
+    Vector_2D iwcField = iceAerosol_.IWC();       // [kg/cm3]
+    Vector_2D radiusField = iceAerosol_.Radius(); // [m]
+    
+    // Average over the grid cells that have contrail
+    int count = 0;
+    for (std::size_t j = 0; j < yCoords_.size(); j++) {
+        for (std::size_t i = 0; i < xCoords_.size(); i++) {
+            if (areaField[j][i] > 1e-15) { // Only count plume cells
+                totalArea += areaField[j][i];
+                totalIWC += iwcField[j][i];
+                totalRadius += radiusField[j][i];
+                count++;
+            }
+        }
+    }
+    
+    if (count > 0) {
+        // epmCoupling uses index 0 for NAT/Ice in runBoxModel
+        return BoxModel::EPMCouplingData(totalArea/count, 0.0, totalIWC/count, 0.0, totalRadius/count);
+    }
+    return BoxModel::EPMCouplingData(); // Returns invalid data if no plume
 }

@@ -16,6 +16,9 @@
 #include "Core/Status.hpp"
 #include "Util/VectorUtils.hpp"
 
+// Forward declaration
+namespace BoxModel { struct EPMCouplingData; }
+
 class LAGRIDPlumeModel {
     public:
         static constexpr double NUM_FILTER_RATIO = 1e-5;
@@ -27,6 +30,10 @@ class LAGRIDPlumeModel {
         LAGRIDPlumeModel() = delete;
         LAGRIDPlumeModel(const OptInput &Input_Opt, Input &input);
         SimStatus runFullModel();
+        
+        // Use the forward declared struct here
+        BoxModel::EPMCouplingData getCouplingData();
+
         std::variant<EPM::Output, SimStatus> runEPM();
         struct BufferInfo {
             double leftBuffer;
@@ -54,6 +61,8 @@ class LAGRIDPlumeModel {
         Vector_1D xEdges_;
         Vector_2D H2O_;
         Vector_2D Contrail_;
+        Vector_2D BackgroundGeo_field_;
+        Vector_3D Species_;
         Vector_1D vFall_;
         double initNumParts_;
         double simTime_h_;

@@ -99,8 +99,8 @@ namespace EPM::Models::OriginalImpl {
 
     /* Compute sulfate - soot coagulation rate */
         double CoagRate = 0;
-        Vector_1D pdf = nPDF_SO4.getPDF();
-        Vector_1D binCenters = nPDF_SO4.getBinCenters();
+        const Vector_1D &pdf = nPDF_SO4.getPDF();
+        const Vector_1D &binCenters = nPDF_SO4.getBinCenters();
         for ( unsigned int iBin = 0; iBin < nPDF_SO4.getNBin(); iBin++ ) {
             CoagRate += ( KernelSO4Soot[iBin] * pdf[iBin] * PI * binCenters[iBin] * binCenters[iBin] ) * ( 1.0 - x[EPM_ind_the1] - x[EPM_ind_the2] );
             /* Unit check:

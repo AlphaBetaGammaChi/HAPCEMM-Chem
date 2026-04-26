@@ -32,7 +32,7 @@
 #include "Core/LAGRIDPlumeModel.hpp"
 #include "Core/Status.hpp"
 #include "Core/Diag_Mod.hpp"
-//#include "Core/BoxModel.hpp"  // Disabled - requires netCDF
+#include "Core/BoxModel.hpp"  // Disabled - requires netCDF
 #include "Util/MC_Rand.hpp"
 
 void CreateREADME( const std::string folder, const std::string fileName, \
@@ -243,10 +243,9 @@ int main( int argc, char* argv[])
                     case_status = LAGRID_Model.runFullModel();
                     
                     // If box model is enabled, run it to get evolved background for LAGRID
-                    #if 0  // BoxModel disabled - requires netCDF which is not available
                     if (Input_Opt.SIMULATION_BOXMODEL) {
                         // Run box model to get evolved species at EPM end time
-                        BoxModel::EPMCouplingData epmData;  // Default ambient values
+                        BoxModel::EPMCouplingData epmData = LAGRID_Model.getCouplingData();  // Default ambient values
                         
                         // If coupling enabled, pass EPM data to box model for heterogeneous chemistry
                         if (Input_Opt.SIMULATION_BOXMODEL_COUPLING) {
@@ -255,7 +254,7 @@ int main( int argc, char* argv[])
                             std::cout << "Running box model (standalone)..." << std::endl;
                         }
                         
-                        int boxStatus = BoxModel::runBoxModel(Input_Opt, inputCase, epmData);
+                        int boxStatus = BoxModel::runBoxModel(Input_Opt, inputCase, epmData, iCase);
                         if (boxStatus != 0) {
                             std::cout << "Warning: Box model failed with status " << boxStatus << std::endl;
                         } else {
@@ -282,8 +281,6 @@ int main( int argc, char* argv[])
                             }
                         }
                     }
-#endif
-                    
                     // iERR = PlumeModel( Input_Opt, inputCase );
                     break;
                     

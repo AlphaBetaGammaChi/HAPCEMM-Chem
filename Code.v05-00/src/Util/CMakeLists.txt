@@ -7,6 +7,7 @@ set(SRCS
     PlumeModelUtils.cpp
     VectorUtils.cpp
     YamlUtils.cpp
+    JuliaBridge.cpp
 )
 
 # This command ensures the static library gets build

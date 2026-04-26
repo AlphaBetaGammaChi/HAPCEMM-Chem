@@ -56,7 +56,7 @@ void GC_SETHET( const double TEMP, const double PATM, const double AIRDENS, \
                 const double AL2O3_RADIUS,
                 const double DUST_RADIUS,
                 const double DIAMOND_RADIUS);
-void Update_JRates ( double JRates[], const double CSZA );
+void Update_JRates ( double JRates[], const double CSZA, double dimmingFactor = 0.0 );
 void ComputeFamilies( const double V[], const double F[], const double RCT[], \
                       double familyRates[] );
 

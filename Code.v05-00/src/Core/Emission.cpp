@@ -147,7 +147,7 @@ Emission::Emission( const Emission &e )
     SO2 = e.SO2;
     CO  = e.CO;
     HC  = e.HC;
-    H2  = e.HC;
+    H2  = e.H2;
     H2O2  = e.H2O2;
     NH3  = e.NH3;
     N2O  = e.N2O;

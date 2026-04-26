@@ -133,7 +133,7 @@ namespace Diag {
                     const AIM::Grid_Aerosol& iceAer, const Vector_2D& H2O,
                     const Vector_1D& xCoord, const Vector_1D& yCoord,
                     const Vector_1D& xEdges, const Vector_1D& yEdges,
-                    const Meteorology &met)
+                    const Meteorology &met, const Vector_3D& species)
     {   
         long unsigned int nBin = iceAer.getNBin();
         long unsigned int nx = xCoord.size();
@@ -261,6 +261,10 @@ namespace Diag {
         add0DVar(currFile, iceAer.extinctionWidth(xCoord), tDim, "width", "Contrail Extinction-Defined Width", "m");
         add0DVar(currFile, iceAer.extinctionDepth(yCoord), tDim, "depth", "Contrail Extinction-Defined Depth", "m");
         add0DVar(currFile, iceAer.intYOD(dx_vec, dy_vec), tDim, "intOD", "Integrated Vertical Optical Depth", "m");
+        /* Saving Ozone spatial field */
+        if (species.size() > 119) {
+            add2DVar(currFile, species[119], xyDims, "O3", "Ozone spatial distribution", "ppb");
+        }
 
         if (storePSD)
         {

@@ -50,6 +50,7 @@ struct OptInput
     bool         SIMULATION_FORCE_SEED;
     int          SIMULATION_SEED_VALUE;
     epm_type     SIMULATION_EPM_TYPE;
+    std::string  SIMULATION_FUEL;
     std::string  SIMULATION_EXTERNAL_EPM_NETCDF_FILENAME;
 
     /* ========================================== */
@@ -159,6 +160,12 @@ struct OptInput
     bool ADV_EP_N_POSTJET_OVERRIDE;
     double ADV_EP_N_POSTJET;
     bool ADV_SAVE_PSD_GRID;
+    double ADV_SOLAR_DIMMING_FACTOR;
+    bool ADV_USE_JULIA_CHEMISTRY;
+    int SIMULATION_BOXMODEL_MODE;
+    int SIMULATION_BOXMODEL_THREADS;
+    double MET_TEMP;
+    double MET_RHW;
 
 };
 

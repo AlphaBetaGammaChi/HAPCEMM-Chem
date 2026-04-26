@@ -116,6 +116,12 @@ namespace AIM
 
     }
 
+    Vector_1D GeoSettlingVelocity( const double radius, const double rho, const double T, const double P ) {
+        Vector_1D vFall( 1, 0.0E+00 );
+        vFall[0] = 2.0E+00 * physConst::g * ( rho - physFunc::rhoAir( T, P ) ) * radius * radius / ( 9.0E+00 * physFunc::dynVisc( T ) ) * physFunc::slip_flowCorrection( physFunc::Kn( radius, T, P ) );
+        return vFall;
+    }
+
 }
 
 

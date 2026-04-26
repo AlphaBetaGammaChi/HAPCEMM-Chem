@@ -1,6 +1,7 @@
 # Source files that need to be compiled
 set(SRCS
     KPP_Function.cpp
+    KPP_Global.cpp
     KPP_Hessian.cpp
     KPP_HessianSP.cpp
     KPP_HetRates.cpp
@@ -22,4 +23,4 @@ set(SRCS
 add_library(KPP STATIC ${SRCS})
 
 # This command defines the dependencies of libKPP.a
-target_link_libraries(KPP PRIVATE ${NETCDF_LIBRARIES} OpenMP::OpenMP_CXX)
+target_link_libraries(KPP PUBLIC netCDF::netcdf-cxx4 OpenMP::OpenMP_CXX)
