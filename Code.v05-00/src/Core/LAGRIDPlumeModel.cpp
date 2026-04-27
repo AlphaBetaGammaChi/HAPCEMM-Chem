@@ -790,7 +790,7 @@ void LAGRIDPlumeModel::remapAllVars(double remapTimestep, const std::vector<std:
     //Remap H2O
     H2O_ = applyWeights(remapWeights, nx_old,  ny_old,  nx_new,  ny_new, H2O_);
     BackgroundGeo_field_ = applyWeights(remapWeights, nx_old,  ny_old,  nx_new,  ny_new, BackgroundGeo_field_);
-    if (optInput_.SIMULATION_BOXMODEL_MODE == 2) { Species_ = Vector_3D(NVAR, Vector_2D(yCoords_.size(), Vector_1D(xCoords_.size(), 0.0))); }
+    if (optInput_.SIMULATION_BOXMODEL_MODE == 2) { for (int n=0; n<NVAR; n++) { Species_[n] = applyWeights(remapWeights, nx_old, ny_old, nx_new, ny_new, Species_[n]); } }
 
     //Need to update bottom-of-domain altitude before updating coordinates
     xCoords_ = std::move(xCoordsNew);

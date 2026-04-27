@@ -26,7 +26,6 @@
 namespace BoxModel {
 
 static LAGRIDCouplingData g_finalSpecies;
-
 LAGRIDCouplingData getFinalSpecies() { return g_finalSpecies; }
 
 std::vector<double> buildTimeArray(double tStart, double tEnd, double sunRise, double sunSet, double dt) {
@@ -54,7 +53,7 @@ void writeBoxModelOutput(const std::string& outputFile, const std::vector<double
         std::vector<float> specData(nTime * nVar);
         for (size_t j = 0; j < nTime; j++) {
             for (int i = 0; i < nVar; i++) {
-                specData[j * nVar + i] = static_cast<float>((speciesHistory[i][j] / airDens) * 1.0e9);
+                specData[j * nVar + i] = static_cast<float>(speciesHistory[i][j] * 1.0e9);
             }
         }
         specVar.putVar(specData.data());
@@ -66,46 +65,57 @@ int runBoxModel(const OptInput& Input_Opt, const Input& input, const EPMCoupling
     if (dt <= 0.0) dt = 60.0;
     double temperature_K = input.temperature_K();
     double pressure_Pa = input.pressure_Pa();
-    double airDens = pressure_Pa / (physConst::kB * temperature_K) * 1.0e-6;
+    double airDens = pressure_Pa / (physConst::kB * temperature_K) * 1.0e-6; // air density in molec/cm3
     SZA sun(input.latitude_deg(), input.emissionDOY());
     std::vector<double> timeArray = buildTimeArray(input.emissionTime()*3600.0, (input.emissionTime()+input.simulationTime())*3600.0, sun.sunRise*3600.0, sun.sunSet*3600.0, dt);
     
-    for (int i = 0; i < NVAR; i++) VAR[i] = 1.230e-21 * airDens;
-    VAR[ind_NO] = input.backgNOx() * 0.5 * 1e-9 * airDens;
+    // SCIENTIFIC INITIALIZATION
+    for (int i = 0; i < NVAR; i++) VAR[i] = 1.0e-15 * airDens; // Scientific floor
+
+    // Load major species directly from input [ppb to molec/cm3]
+    VAR[ind_NO]  = input.backgNOx() * 0.5 * 1e-9 * airDens;
     VAR[ind_NO2] = input.backgNOx() * 0.5 * 1e-9 * airDens;
-    VAR[ind_O3] = input.backgO3() * 1e-9 * airDens;
-    VAR[ind_SO2] = input.backgSO2() * 1e-12 * airDens;
+    VAR[ind_O3]  = input.backgO3()  * 1e-9 * airDens;
+    VAR[ind_SO2] = input.backgSO2() * 1e-12 * airDens; // SO2 usually in ppt in template
+    VAR[ind_CO]  = input.backgCO()  * 1e-9 * airDens;
+    VAR[ind_CH4] = input.backgCH4() * 1e-6 * airDens; // CH4 in ppm
     VAR[ind_H2O] = airDens * (input.relHumidity_w() / 100.0) * physFunc::pSat_H2Ol(temperature_K) / pressure_Pa;
 
     std::vector<std::vector<double>> speciesHistory(NVAR, std::vector<double>(timeArray.size()));
     std::vector<double> cosSZASeries(timeArray.size());
     double RTOL[NVAR], ATOL[NVAR];
-    for (int i=0; i<NVAR; i++) { RTOL[i] = 1.0e-4; ATOL[i] = 1.0e-2; }
+    for (int i=0; i<NVAR; i++) { RTOL[i] = 1.0e-4; ATOL[i] = 1.0e+6; }
 
+    std::cout << "Starting chemistry integration. O3 Baseline: " << input.backgO3() << " ppb" << std::endl;
     for (size_t iTime = 0; iTime < timeArray.size(); iTime++) {
         double t = timeArray[iTime];
         sun.Update(t / 3600.0);
         cosSZASeries[iTime] = sun.CSZA;
+
         for (int i = 0; i < NPHOTOL; i++) PHOTOL[i] = 0.0;
         if (sun.CSZA > 0.0) Update_JRates(PHOTOL, sun.CSZA);
         Update_RCONST(temperature_K, pressure_Pa, airDens, VAR[ind_H2O]);
+
         if (epmCoupling.isValid) {
             double AREA[NAERO] = {epmCoupling.LA_SAD, 0, 0, 0};
             double RADI[NAERO] = {epmCoupling.MeanRadius, 0, 0, 0};
-            double KHETI_SLA[11] = {0.0};
+            double KHETI_SLA[11]; for(int k=0; k<11; k++) KHETI_SLA[k] = 0.1;
             GC_SETHET(temperature_K, pressure_Pa, airDens, 1.4, 0, VAR, AREA, RADI, epmCoupling.LA_LWC, KHETI_SLA, 20000.0, 
                       input.backgroundGeoengineeringNumber(), input.backgroundGeoengineeringRadius(), 0.02, 0,0,0,0,0,0,0,0,0,0);
         }
+
         if (iTime < timeArray.size() - 1) INTEGRATE(VAR, FIX, t, timeArray[iTime+1], ATOL, RTOL, 0.0);
         for (int i = 0; i < NVAR; i++) speciesHistory[i][iTime] = VAR[i];
     }
+
     std::string outFile = Input_Opt.SIMULATION_BOX_FILENAME;
     size_t pos = outFile.find("*");
     if (pos != std::string::npos) outFile.replace(pos, 1, std::to_string(jCase));
     if (outFile.find(".nc") == std::string::npos) outFile += ".nc";
     writeBoxModelOutput(outFile, timeArray, speciesHistory, cosSZASeries, airDens, 1.4, NVAR);
+
     g_finalSpecies.isValid = true;
     g_finalSpecies.O3 = VAR[ind_O3] / airDens * 1e9;
     return 0;
 }
-}
+} // namespace BoxModel

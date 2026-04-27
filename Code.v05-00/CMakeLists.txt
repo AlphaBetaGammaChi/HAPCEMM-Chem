@@ -96,10 +96,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
 find_package(PkgConfig REQUIRED)
 
 # Use pkg-config for netCDF C++4 (more reliable than CMake's find_package)
-pkg_check_modules(NETCDF REQUIRED netcdf-cxx4)
+find_package(netCDFCxx CONFIG REQUIRED)
 
 # Link using the pkg-config variables (C++ lib first for proper symbol resolution)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${NETCDF_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE netCDF::netcdf-cxx4)
 
 # Remove old broken netCDF config that used hardcoded paths
 # find_package(netCDF CONFIG REQUIRED)
