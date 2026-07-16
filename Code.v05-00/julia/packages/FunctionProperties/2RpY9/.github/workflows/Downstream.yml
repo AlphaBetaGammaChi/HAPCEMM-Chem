@@ -1,0 +1,22 @@
+name: IntegrationTest
+on:
+  push:
+    branches: [main]
+    tags: [v*]
+  pull_request:
+
+jobs:
+  downstream:
+    name: "Downstream"
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - { user: SciML, repo: SciMLSensitivity.jl, group: Core1 }
+    uses: "SciML/.github/.github/workflows/downstream.yml@v1"
+    with:
+      julia-version: "1"
+      owner: "${{ matrix.package.user }}"
+      repo: "${{ matrix.package.repo }}"
+      group: "${{ matrix.package.group }}"
+    secrets: "inherit"

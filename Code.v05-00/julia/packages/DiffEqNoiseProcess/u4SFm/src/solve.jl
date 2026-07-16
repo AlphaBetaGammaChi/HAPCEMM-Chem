@@ -1,0 +1,74 @@
+"""
+    solve(prob::AbstractNoiseProblem; dt, kwargs...)
+
+Solve a noise problem by simulating the noise process over the specified time span.
+
+## Arguments
+- `prob`: An `AbstractNoiseProblem` containing the noise process and time span
+- `dt`: The time step size (required, no default)
+
+## Keyword Arguments
+- `seed`: Random seed for reproducible results
+- Additional keyword arguments are passed to the underlying solver
+
+## Returns
+A `NoiseProcess` object containing the simulated noise trajectory.
+
+## Example
+```julia
+W = WienerProcess(0.0, 0.0, 1.0)
+prob = NoiseProblem(W, (0.0, 1.0))
+sol = solve(prob; dt = 0.01)
+```
+"""
+function DiffEqBase.__solve(
+        prob::AbstractNoiseProblem,
+        args::Union{Nothing, SciMLBase.AbstractDEAlgorithm}...; dt = 0.0,
+        kwargs...
+    )
+    if dt == 0.0 || dt == nothing
+        error("dt must be provided to simulate a noise process. Please pass dt=...")
+    end
+    W = copy(prob.noise)
+    if W isa Union{NoiseProcess, NoiseTransport}
+        if prob.seed != 0
+            Random.seed!(W.rng, prob.seed)
+        elseif W.reseed
+            Random.seed!(W.rng)
+        end
+    end
+    if W.reset
+        reinit!(W, dt, t0 = prob.tspan[1])
+    end
+
+    setup_next_step!(W, nothing, nothing)
+    tType = typeof(W.curt)
+    while W.curt < prob.tspan[2]
+        # Tolerance scaled by the magnitude of the time values rather than by `dt`:
+        # the floating point drift accumulated over many steps is on the order of
+        # `eps(tspan[2])`, which can be far larger than `eps(dt)` when `dt` is small.
+        # The previous `100 * eps(dt)` tolerance was therefore essentially never hit,
+        # so the solve took a full extra step and stopped past `tspan[2]`.
+        endtol = tType <: AbstractFloat ?
+            100 * eps(tType(max(abs(prob.tspan[2]), abs(W.curt)))) : zero(W.curt)
+        if tType <: AbstractFloat && abs(prob.tspan[2] - (W.curt + W.dt)) <= endtol
+            # The prepared step lands on `tspan[2]` up to floating point drift. Take it as
+            # usual but snap the recorded endpoint exactly onto `tspan[2]` so the solution
+            # neither overshoots nor stops just short of the requested final time.
+            accept_step!(W, dt, nothing, nothing)
+            W.curt = prob.tspan[2]
+            W.save_everystep && (W.t[end] = prob.tspan[2])
+        elseif tType <: AbstractFloat && W.curt + W.dt > prob.tspan[2] + endtol
+            # The prepared step would overshoot `tspan[2]` by more than rounding. Recompute
+            # it at exactly the remaining width so the solution ends on `tspan[2]`.
+            dtcorrect = prob.tspan[2] - W.curt
+            calculate_step!(W, dtcorrect, nothing, nothing)
+            accept_step!(W, dtcorrect, nothing, nothing)
+            W.curt = prob.tspan[2]
+            W.save_everystep && (W.t[end] = prob.tspan[2])
+        else
+            accept_step!(W, dt, nothing, nothing)
+        end
+    end
+    return W
+end

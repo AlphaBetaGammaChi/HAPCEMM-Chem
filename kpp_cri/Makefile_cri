@@ -1,0 +1,103 @@
+# Set here the desired C compiler and its optimization options
+CC   = gcc
+COPT = -O -Wall  
+
+# To create Matlab gateway routines
+# Note: use $(CC) as the mex C compiler
+MEX  = mex
+
+HEADERS = cri_Global.h  cri_Parameters.h  cri_Sparse.h
+
+SPSRC = cri_JacobianSP.c \
+	cri_HessianSP.c  \
+	cri_StoichiomSP.c
+
+SPOBJ = cri_JacobianSP.o \
+	cri_HessianSP.o  \
+	cri_StoichiomSP.o
+
+
+SRC =   cri_Main.c      cri_Integrator.c   \
+	cri_Function.c  cri_Initialize.c   \
+	cri_Jacobian.c  cri_LinearAlgebra.c\
+	cri_Rates.c     cri_Hessian.c      \
+	cri_Stoichiom.c cri_Util.c         \
+	cri_Monitor.c
+
+OBJ =   cri_Main.o      cri_Integrator.o   \
+	cri_Function.o  cri_Initialize.o   \
+	cri_Jacobian.o  cri_LinearAlgebra.o\
+	cri_Rates.o     cri_Hessian.o      \
+	cri_Stoichiom.o cri_Util.o         \
+	cri_Monitor.o
+
+STOCHSRC = cri_Stochastic.c 
+STOCHOBJ = cri_Stochastic.o 
+
+all:    exe
+
+exe:	$(HEADERS) $(SPOBJ) $(OBJ)
+	$(CC) $(COPT) $(SPOBJ) $(OBJ) -lm -o cri.exe	
+
+stochastic:$(HEADERS) $(SPOBJ) $(OBJ) $(STOCHOBJ)
+	$(CC) $(COPT) $(SPOBJ) $(OBJ) $(STOCHOBJ) -lm \
+	-o cri_stochastic.exe	
+
+mex:    $(HEADERS) $(SPOBJ) $(OBJ)
+	$(MEX) CC#$(CC) -O cri_mex_Fun.c     -lm $(SPOBJ) $(OBJ)
+	$(MEX) CC#$(CC) -O cri_mex_Jac_SP.c  -lm $(SPOBJ) $(OBJ)
+	$(MEX) CC#$(CC) -O cri_mex_Hessian.c -lm $(SPOBJ) $(OBJ)
+
+
+clean:
+	rm -f $(SPOBJ) $(OBJ) cri.exe cri_*.mexglx cri*.dat
+
+distclean:
+	rm -f $(SPOBJ) $(OBJ) cri.exe cri*.dat \
+	cri_*.c cri_*.h cri_*.map cri_*.mexglx
+
+cri_Monitor.o: cri_Monitor.c $(HEADERS)
+	$(CC) $(COPT) -c $<
+
+cri_JacobianSP.o: cri_JacobianSP.c $(HEADERS)
+	$(CC) $(COPT) -c $<
+
+cri_HessianSP.o: cri_HessianSP.c  $(HEADERS)
+	$(CC) $(COPT) -c $<
+
+cri_StoichiomSP.o: cri_StoichiomSP.c $(HEADERS)
+	$(CC) $(COPT) -c $<
+
+cri_Main.o: cri_Main.c cri_Initialize.o $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_Integrator.o: cri_Integrator.c  $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_Initialize.o: cri_Initialize.c  $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_Function.o: cri_Function.c  $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_Stochastic.o: cri_Stochastic.c  $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_Jacobian.o: cri_Jacobian.c  $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_LinearAlgebra.o: cri_LinearAlgebra.c  $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_Rates.o: cri_Rates.c  $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_Hessian.o:  cri_Hessian.c $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_Stoichiom.o: cri_Stoichiom.c  $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+
+cri_Util.o: cri_Util.c  $(HEADERS) $(SPOBJ)
+	$(CC) $(COPT) -c $<
+

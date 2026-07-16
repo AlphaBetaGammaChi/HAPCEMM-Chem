@@ -1,0 +1,300 @@
+#### Pattern matching
+### Matching procedures
+# A matcher is a function which takes 3 arguments
+# 1. Expression
+# 2. Dictionary
+# 3. Callback: takes arguments Dictionary × Number of elements matched
+#
+
+function matcher(val::Any, acSets)
+    val = unwrap_const(val)
+    # if val is a call (like an operation) creates a term matcher or term matcher with defslot
+    if iscall(val)
+        # if has two arguments and one of them is a DefSlot, create a term matcher with defslot
+        # just two arguments bc defslot is only supported with operations with two args: *, ^, +
+        if any(x -> isa(unwrap_const(x), DefSlot), parent(arguments(val)))
+            return defslot_term_matcher_constructor(val, acSets)
+        end
+        # else return a normal term matcher
+        return term_matcher_constructor(val, acSets)
+    end
+
+    function literal_matcher(next, data, bindings)
+        # car data is the first element of data
+        islist(data) && isequal(unwrap_const(car(data)), val) ? next(bindings, 1) : nothing
+    end
+end
+
+# acSets is not used but needs to be there in case matcher(::Slot) is directly called from the macro
+function matcher(slot::Slot, acSets)
+    function slot_matcher(next, data, bindings)
+        !islist(data) && return nothing
+        cd = unwrap_const(car(data))
+        val = get(bindings, slot.name, nothing)
+        # if slot name already is in bindings, check if it matches
+        if val !== nothing
+            if isequal(val, cd)::Bool
+                return next(bindings, 1)
+            end
+        # elseif the first element of data matches the slot predicate, add it to bindings and call next
+        elseif slot.predicate(cd)::Bool
+            binds = assoc(bindings, slot.name, cd)
+            next(binds, 1)
+        end
+    end
+end
+
+# this is called only when defslot_term_matcher finds the operation and tries
+# to match it, so no default value used. So the same function as slot_matcher
+# can be used
+function matcher(defslot::DefSlot, acSets)
+    matcher(Slot(defslot.name, defslot.predicate), nothing) # slot matcher doesnt use acsets
+end
+
+# returns n == offset, 0 if failed
+function trymatchexpr(data, value, n)
+    if !islist(value)
+        return n
+    elseif islist(value) && islist(data)
+        if !islist(data)
+            # didn't fully match
+            return nothing
+        end
+
+        while isequal(car(value), car(data))
+            n += 1
+            value = cdr(value)
+            data = cdr(data)
+
+            if !islist(value)
+                return n
+            elseif !islist(data)
+                return nothing
+            end
+        end
+
+        return !islist(value) ? n : nothing
+    elseif isequal(unwrap_const(value), unwrap_const(data))
+        return n + 1
+    end
+end
+
+function matcher(segment::Segment, acSets)
+    function segment_matcher(success, data, bindings)
+        val = get(bindings, segment.name, nothing)
+
+        if val !== nothing
+            n = trymatchexpr(data, val, 0)
+            if n !== nothing
+                success(bindings, n)
+            end
+        else
+            res = nothing
+
+            for i=length(data):-1:0
+                subexpr = take_n(data, i)
+
+                !segment.predicate(unwrap_const(subexpr)) && continue
+                res = success(assoc(bindings, segment.name, subexpr), i)
+                res !== nothing && break
+            end
+
+            return res
+        end
+    end
+end
+
+function term_matcher_constructor(term, acSets)
+    matchers = vcat([matcher(operation(term), acSets)], map(x -> matcher(unwrap_const(x), acSets), parent(arguments(term))))
+
+    function loop(term, bindings′, matchers′) # Get it to compile faster
+        if !islist(matchers′)
+            if  !islist(term)
+                return bindings′
+            end
+            return nothing
+        end
+        car(matchers′)(term, bindings′) do b, n
+            loop(drop_n(term, n), b, cdr(matchers′))
+        end
+        # explanation of above 3 lines:
+        # car(matchers′)(b,n -> loop(drop_n(term, n), b, cdr(matchers′)), term, bindings′)
+        #                <------ next(b,n) ---------------------------->
+        # car = first element of list, cdr = rest of the list, drop_n = drop first n elements of list
+        # Calls the first matcher, with the "next" function being loop again but with n terms dropepd from term
+        # Term is a linked list (a list and a index). drop n advances the index. when the index sorpasses
+        # the length of the list, is considered empty
+    end
+
+    # if the operation is a pow, we have to match also 1/(...)^(...) with negative exponent
+    if operation(term) === ^
+        function pow_term_matcher(success, data, bindings)
+            !islist(data) && return nothing # if data is not a list, return nothing
+            data = car(data) # from (..., ) to ...
+            !iscall(data) && return nothing # if first element is not a call, return nothing
+
+            result = loop(data, bindings, matchers)
+            result !== nothing && return success(result, 1)
+
+            frankestein = nothing
+            if (operation(data) === ^) && iscall(arguments(data)[1]) && (operation(arguments(data)[1]) === /) && _isone(arguments(arguments(data)[1])[1])
+                # if data is of the alternative form (1/...)^(...)
+                one_over_smth = arguments(data)[1]
+                T = vartype(one_over_smth)
+                frankestein = Term{T}(^, [arguments(one_over_smth)[2], -arguments(data)[2]])
+            elseif (operation(data) === /) && _isone(arguments(data)[1]) && iscall(arguments(data)[2]) && (operation(arguments(data)[2]) === ^)
+                # if data is of the alternative form 1/(...)^(...)
+                denominator = arguments(data)[2]
+                T = vartype(denominator)
+                frankestein = Term{T}(^, [arguments(denominator)[1], -arguments(denominator)[2]])
+            elseif (operation(data) === /) && _isone(arguments(data)[1])
+                # if data is of the alternative form 1/(...), it might match with exponent = -1
+                denominator = arguments(data)[2]
+                T = vartype(denominator)
+                frankestein = Term{T}(^, [denominator, -1])
+            elseif operation(data)===exp
+                # if data is a exp call, it might match with base e
+                T = vartype(arguments(data)[1])
+                frankestein = Term{T}(^,[ℯ, arguments(data)[1]])
+            elseif operation(data)===sqrt
+                # if data is a sqrt call, it might match with exponent 1//2
+                T = vartype(arguments(data)[1])
+                frankestein = Term{T}(^,[arguments(data)[1], 1//2])
+            end
+
+            if frankestein !==nothing
+                result = loop(frankestein, bindings, matchers)
+                result !== nothing && return success(result, 1)
+            end
+
+            return nothing
+        end
+        return pow_term_matcher
+    # if we want to do commutative checks, i.e. call matcher with different order of the arguments
+    elseif acSets!==nothing && (operation(term) === (+) || operation(term) === (*))
+        has_segment = any([isa(unwrap_const(a),Segment) for a in arguments(term)])
+        op = operation(term)
+        function commutative_term_matcher(success, data, bindings)
+            !islist(data) && return nothing # if data is not a list, return nothing
+            data = car(data)
+            !iscall(data) && return nothing # if first element is not a call, return nothing
+            f = operation(data)
+            op !== f && return nothing # if the operation of data is not the correct one, don't even try
+            data_args = arguments(data)
+            # if the number of arguments is different, and the rule doesnt have a segment, return nothing
+            !has_segment && length(matchers)-1 !== length(data_args) && return nothing
+
+            T = vartype(data)
+            ST = symtype(data)
+            if ST <: Number && length(data_args)<COMM_CHECKS_LIMIT[]
+                for inds in acSets(eachindex(data_args), length(data_args))
+                    candidate = Term{T}(f, @views data_args[inds]; type = ST)
+
+                    result = loop(candidate, bindings, matchers)
+                    result !== nothing && return success(result,1)
+                end
+            # if data does not subtype to number, it might not be commutative
+            else
+                # call the normal matcher
+                result = loop(data, bindings, matchers)
+                result !== nothing && return success(result, 1)
+            end
+            return nothing
+        end
+        return commutative_term_matcher
+    # if the operation is sqrt, we have to match also ^(1//2)
+    elseif operation(term)==sqrt
+        function sqrt_matcher(success, data, bindings)
+            !islist(data) && return nothing # if data is not a list, return nothing
+            data = car(data)
+            !iscall(data) && return nothing # if first element is not a call, return nothing
+
+            # do the normal matcher
+            result = loop(data, bindings, matchers)
+            result !== nothing && return success(result, 1)
+
+            if (operation(data) === ^) && (unwrap_const(arguments(data)[2]) === 1//2)
+                T = vartype(arguments(data)[1])
+                frankestein = Term{T}(sqrt,[arguments(data)[1]])
+                result = loop(frankestein, bindings, matchers)
+                result !== nothing && return success(result, 1)
+            end
+            return nothing
+        end
+        return sqrt_matcher
+    # if the operation is exp, we have to match also ℯ^
+    elseif operation(term)==exp
+        function exp_matcher(success, data, bindings)
+            !islist(data) && return nothing # if data is not a list, return nothing
+            data = car(data)
+            !iscall(data) && return nothing # if first element is not a call, return nothing
+
+            # do the normal matcher
+            result = loop(data, bindings, matchers)
+            result !== nothing && return success(result, 1)
+
+            if (operation(data) === ^) && (unwrap_const(arguments(data)[1]) === ℯ)
+                T = vartype(arguments(data)[2])
+                frankestein = Term{T}(exp,[arguments(data)[2]])
+                result = loop(frankestein, bindings, matchers)
+                result !== nothing && return success(result, 1)
+            end
+            return nothing
+        end
+        return exp_matcher
+    else
+        function term_matcher(success, data, bindings)
+            !islist(data) && return nothing # if data is not a list, return nothing
+            !iscall(car(data)) && return nothing # if first element is not a call, return nothing
+
+            result = loop(car(data), bindings, matchers)
+            result !== nothing && return success(result, 1)
+            return nothing
+        end
+        return term_matcher
+    end
+end
+
+# creates a matcher for a term containing a defslot, such as:
+# (~x + ...complicated pattern...)     *          ~!y
+#    normal part (can bee a tree)   operation     defslot part
+
+# Note: there is a bit of a waste here bc the matcher get created twice, both
+# in the normal_matcher and in defslot_matcher and other_part_matcher
+function defslot_term_matcher_constructor(term, acSets)
+    a = parent(arguments(term))
+    defslot_index = findfirst(x -> isa(unwrap_const(x), DefSlot), a) # find the defslot in the term
+    defslot = unwrap_const(a[defslot_index])
+    defslot_matcher = matcher(defslot, acSets)
+    if length(a) == 2
+        other_part_matcher = matcher(unwrap_const(a[defslot_index == 1 ? 2 : 1]), acSets)
+    else
+        # if we hare here the operation is a multiplication or sum of n>2 terms
+        # (because ^ cannot have more than 2 terms).
+        # creates the term matcher of the multiplication or sum of n-1 terms
+        others = [a[i] for i in eachindex(a) if i != defslot_index]
+        T = vartype(term)
+        f = operation(term)
+        other_part_matcher = term_matcher_constructor(Term{T}(f, others), acSets)
+    end
+
+    normal_matcher = term_matcher_constructor(term, acSets)
+
+    function defslot_term_matcher(success, data, bindings)
+        !islist(data) && return nothing # if data is not a list, return nothing
+        # call the normal matcher, with success function that returns the bindings (foo1)
+        #                       <-foo1->
+        result = normal_matcher((b,n)->b, data, bindings)
+        result !== nothing && return success(result, 1)
+        # if no match, try to match with a defslot.
+        # checks whether it matches the normal part if yes executes foo2
+        # foo2: adds the pair (default value name, default value) to the found bindings
+        #       after checking predicate and presence in the bindings. If added
+        #       successfully returns the bindings (foo3), otherwise return nothing
+        #                           <-------------------foo2----------------------------------->
+        #                                                  <-foo3->
+        result = other_part_matcher((b,n)->defslot_matcher((b,n)->b, (defslot.defaultValue,), b), data, bindings)
+        result !== nothing && return success(result, 1)
+        nothing
+    end
+end

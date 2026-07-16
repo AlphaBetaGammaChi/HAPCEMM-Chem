@@ -1,0 +1,121 @@
+steps:
+  - label: "CUDA.jl"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1.11"
+      - JuliaCI/julia-coverage#v1:
+          codecov: true
+    command: |
+      unset LD_LIBRARY_PATH
+      julia -e 'println("--- :julia: Instantiating project")
+                using Pkg
+                Pkg.develop(; path=pwd())
+                Pkg.develop(; name="CUDA")' || exit 3
+
+      julia -e 'println("+++ :julia: Running tests")
+                using Pkg
+                Pkg.test("CUDA"; coverage=true)'
+    agents:
+      queue: "cuda"
+    if: build.message !~ /\[skip tests\]/ && !build.pull_request.draft
+    timeout_in_minutes: 120
+    soft_fail:
+      - exit_status: 3
+
+  - label: "oneAPI.jl"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1.11"
+      - JuliaCI/julia-coverage#v1:
+          codecov: true
+    command: |
+      julia -e 'using Pkg;
+
+                println("--- :julia: Instantiating project")
+                Pkg.develop(; path=pwd())
+                Pkg.develop(; name="oneAPI")
+
+                println("+++ :julia: Building support library")
+                include(joinpath(Pkg.devdir(), "oneAPI", "deps", "build_ci.jl"))' || exit 3
+
+      julia -e 'println("+++ :julia: Running tests")
+                using Pkg
+                Pkg.test("oneAPI"; coverage=true)'
+    agents:
+      queue: "oneapi"
+    if: build.message !~ /\[skip tests\]/ && !build.pull_request.draft
+    timeout_in_minutes: 60
+    soft_fail:
+      - exit_status: 3
+
+  - label: "AMDGPU.jl"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1.11"
+      - JuliaCI/julia-coverage#v1:
+          codecov: true
+    command: |
+       julia -e 'println("--- :julia: Instantiating project")
+                 using Pkg
+                 Pkg.develop(; path=pwd())
+                 Pkg.develop(; name="AMDGPU")' || exit 3
+
+       julia -e 'println("+++ :julia: Running tests")
+                 using Pkg
+                 Pkg.test("AMDGPU"; coverage=true)'
+    agents:
+      queue: "rocm"
+    if: build.message !~ /\[skip tests\]/ && !build.pull_request.draft
+    timeout_in_minutes: 60
+    soft_fail:
+      - exit_status: 3
+
+  - label: "Metal.jl"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1.11"
+      - JuliaCI/julia-coverage#v1:
+          codecov: true
+    command: |
+      julia -e 'println("--- :julia: Instantiating project")
+                using Pkg
+                Pkg.develop(; path=pwd())
+                Pkg.develop(; name="Metal")' || exit 3
+
+      julia -e 'println("+++ :julia: Running tests")
+                using Pkg
+                Pkg.test("Metal"; coverage=true)'
+    agents:
+      queue: "metal"
+    if: build.message !~ /\[skip tests\]/ && !build.pull_request.draft
+    timeout_in_minutes: 120
+    soft_fail:
+      - exit_status: 3
+
+  - label: "OpenCL.jl"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1.10"
+      - JuliaCI/julia-coverage#v1:
+          codecov: true
+    command: |
+      julia -e 'println("--- :julia: Instantiating project")
+                using Pkg
+                Pkg.develop(; path=pwd())
+                Pkg.develop(; name="OpenCL")
+                Pkg.develop(; name="SPIRVIntrinsics")' || exit 3
+
+       julia -e 'println("+++ :julia: Running tests")
+                using Pkg
+                Pkg.test("OpenCL"; coverage=true)'
+    agents:
+      # XXX: not on "juliaecosystem" because those workers don't have libc-dev
+      #      see JuliaGPU/OpenCL.jl#303
+      queue: "cuda"
+    if: build.message !~ /\[skip tests\]/ && !build.pull_request.draft
+    timeout_in_minutes: 120
+    soft_fail:
+      - exit_status: 3
+
+env:
+  JULIA_PKG_SERVER: "" # it often struggles with our large artifacts

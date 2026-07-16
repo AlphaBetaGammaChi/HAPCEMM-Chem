@@ -32,10 +32,15 @@ struct LAGRIDCouplingData {
     double CH4;    
     double SO2;    
     double HNO3;   
-    double H2O;    
+    double H2O;
+    double H2;
+    double NH3;
+    double N2O;
+    double Lub;
+    double Custom;    
     bool isValid;  
     
-    LAGRIDCouplingData() : NO(0.0), NO2(0.0), O3(0.0), CO(0.0), CH4(0.0), SO2(0.0), HNO3(0.0), H2O(0.0), isValid(false) {}
+    LAGRIDCouplingData() : NO(0.0), NO2(0.0), O3(0.0), CO(0.0), CH4(0.0), SO2(0.0), HNO3(0.0), H2O(0.0), H2(0.0), NH3(0.0), N2O(0.0), Lub(0.0), Custom(0.0), isValid(false) {}
 };
 
 LAGRIDCouplingData getFinalSpecies();

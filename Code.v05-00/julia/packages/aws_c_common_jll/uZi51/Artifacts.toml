@@ -1,0 +1,152 @@
+[[aws_c_common]]
+arch = "aarch64"
+git-tree-sha1 = "70a5a16f433f1826a425e58656a6b9ddb217466b"
+os = "macos"
+
+    [[aws_c_common.download]]
+    sha256 = "60c20f7664e0ef01ff0e207ad22bc7edc094e2dbf6c94568ccfa21a30d140605"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.aarch64-apple-darwin.tar.gz"
+[[aws_c_common]]
+arch = "aarch64"
+git-tree-sha1 = "e50b1d65b1a2970f8592557244ac6765edb85dff"
+libc = "glibc"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "e8a2fac819150e2a177bcd71a14045d41599ff3108225d4f56d5646dd2f64a72"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.aarch64-linux-gnu.tar.gz"
+[[aws_c_common]]
+arch = "aarch64"
+git-tree-sha1 = "19b0840c15addaaf60da5f8e06f1d9715d0a9d43"
+libc = "musl"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "3849f8d731a262c97add8ccad1e26ec5b518f1d204f83a6c35eee78128232ab8"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.aarch64-linux-musl.tar.gz"
+[[aws_c_common]]
+arch = "aarch64"
+git-tree-sha1 = "54164f7131a505a71ec8812bb776eb12a9800323"
+os = "freebsd"
+
+    [[aws_c_common.download]]
+    sha256 = "1569a9a9f9f4f22b280b3cd7cc2b1f2bae623569b2686a4165a501bd115a772b"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.aarch64-unknown-freebsd.tar.gz"
+[[aws_c_common]]
+arch = "armv6l"
+call_abi = "eabihf"
+git-tree-sha1 = "6360d7cb6ebaf154ef7d7e1f5f4e7766b8856075"
+libc = "glibc"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "17bf041c7cb90f7824b271fe34c4234af97961cf5c011eb13462e2b8419b2934"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.armv6l-linux-gnueabihf.tar.gz"
+[[aws_c_common]]
+arch = "armv6l"
+call_abi = "eabihf"
+git-tree-sha1 = "6e3f6413e63bf8d85939134584a7960abeb7ccd5"
+libc = "musl"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "7ef78e0000265777d23ff7e5ad698ce1530a503990a746c6f3e456760933655c"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.armv6l-linux-musleabihf.tar.gz"
+[[aws_c_common]]
+arch = "armv7l"
+call_abi = "eabihf"
+git-tree-sha1 = "fc61f504c066f006412ec6b6f5daacc202f511c1"
+libc = "glibc"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "267c089953e36666ff939d2b72649e7dab938cc4d3c8f96bd9732f54d692316e"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.armv7l-linux-gnueabihf.tar.gz"
+[[aws_c_common]]
+arch = "armv7l"
+call_abi = "eabihf"
+git-tree-sha1 = "66610b695f80ea56692f7e8553f2f68c3e000775"
+libc = "musl"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "6446697f8c4d6c1cfc0b18e1120fa1d86748c67962a00584428637b6677348f7"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.armv7l-linux-musleabihf.tar.gz"
+[[aws_c_common]]
+arch = "i686"
+git-tree-sha1 = "c1fe326293654db18d073aceda80f76318650f81"
+libc = "glibc"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "4eb4af7c1f3dffce928e197027313397458ce8b1032ae54bcc677ae0eb220e64"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.i686-linux-gnu.tar.gz"
+[[aws_c_common]]
+arch = "i686"
+git-tree-sha1 = "9afa452a64eb6b3c2af3baddc0373d3dd7ce51f7"
+libc = "musl"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "fa5f05e24ebcfc639e30b30877a77ff541e51a6b0d2568f7b2968954e5c6df61"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.i686-linux-musl.tar.gz"
+[[aws_c_common]]
+arch = "powerpc64le"
+git-tree-sha1 = "8efb9f7b1078fea26fc5d4d138d5ef451b3450b1"
+libc = "glibc"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "78d7cc3d87b52c77e70301b6dfb775dfc4e84af56ae3a3a6d971681e764a0f14"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.powerpc64le-linux-gnu.tar.gz"
+[[aws_c_common]]
+arch = "riscv64"
+git-tree-sha1 = "97dbc93f442013d74c250e971fe67f5fcd2a7073"
+libc = "glibc"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "c6bcd17f17ab56e521f5324ff58d5d2ad10e1ca421ce15f93a71d8abb68e2ae0"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.riscv64-linux-gnu.tar.gz"
+[[aws_c_common]]
+arch = "x86_64"
+git-tree-sha1 = "115b7c876f2d5d88bfb6eb6e16ad201f49db01ca"
+os = "macos"
+
+    [[aws_c_common.download]]
+    sha256 = "3d449339c4184ab0e1c7be1c0ecd929f8e30c3f5a646c6bd13d2e23bba92fd20"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.x86_64-apple-darwin.tar.gz"
+[[aws_c_common]]
+arch = "x86_64"
+git-tree-sha1 = "de7bee89c1c1ca5b0a0f58d69e62cf91b39b3567"
+libc = "glibc"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "caec7f117da6c4aad74c3ee817197202d2429642bc9acd9b42588002360001c5"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.x86_64-linux-gnu.tar.gz"
+[[aws_c_common]]
+arch = "x86_64"
+git-tree-sha1 = "9c030c8f2e0f42895153c58aca48621dc01416fe"
+libc = "musl"
+os = "linux"
+
+    [[aws_c_common.download]]
+    sha256 = "9cd24f047bd3aef83e6e4f96bbec0d809c310c4c4af50516b77ca10bbdb9276a"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.x86_64-linux-musl.tar.gz"
+[[aws_c_common]]
+arch = "x86_64"
+git-tree-sha1 = "8d067cc2e9af7d0aa4a389bfd4a05834207828c4"
+os = "freebsd"
+
+    [[aws_c_common.download]]
+    sha256 = "7bbe242e7b29812e0f192da2574775b9f469d9bf5bda332c156b7a60a624c531"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.x86_64-unknown-freebsd.tar.gz"
+[[aws_c_common]]
+arch = "x86_64"
+git-tree-sha1 = "b4d5cf5709b2afeb22b240c4db5948eabc8cdaba"
+os = "windows"
+
+    [[aws_c_common.download]]
+    sha256 = "b6e23cba47ed065c13b8db2d057c0b92786b65c60719befea8bcd8858ae1bb07"
+    url = "https://github.com/JuliaBinaryWrappers/aws_c_common_jll.jl/releases/download/aws_c_common-v0.12.6+0/aws_c_common.v0.12.6.x86_64-w64-mingw32.tar.gz"

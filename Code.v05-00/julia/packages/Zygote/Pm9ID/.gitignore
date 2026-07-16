@@ -1,0 +1,13 @@
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+docs/build
+docs/Manifest.toml
+Manifest.toml
+dev/
+.vscode/
+/test.jl
+.CondaPkg
+
+CLAUDE.md
+.claude/

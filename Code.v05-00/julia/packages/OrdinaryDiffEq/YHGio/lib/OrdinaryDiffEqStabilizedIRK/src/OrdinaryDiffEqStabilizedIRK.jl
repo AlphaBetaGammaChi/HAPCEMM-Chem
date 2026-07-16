@@ -1,0 +1,37 @@
+module OrdinaryDiffEqStabilizedIRK
+
+import OrdinaryDiffEqCore: alg_order, alg_maximum_order,
+    calculate_residuals!, default_controller, IController,
+    beta2_default, beta1_default, gamma_default, issplit,
+    initialize!, perform_step!, unwrap_alg,
+    calculate_residuals, fac_default_gamma,
+    OrdinaryDiffEqAlgorithm, OrdinaryDiffEqNewtonAdaptiveAlgorithm,
+    OrdinaryDiffEqMutableCache, OrdinaryDiffEqConstantCache,
+    OrdinaryDiffEqAdaptiveAlgorithm,
+    OrdinaryDiffEqAdaptiveImplicitAlgorithm,
+    alg_cache, _unwrap_val, @cache,
+    _reshape, _vec, full_cache, get_fsalfirstlast,
+    generic_solver_docstring, _ad_chunksize_int, _ad_fdtype, _fixup_ad
+
+using OrdinaryDiffEqDifferentiation: dolinsolve, update_W!
+using OrdinaryDiffEqNonlinearSolve: NLNewton, nlsolve!, isnewton, build_nlsolver,
+    markfirststage!, du_alias_or_new, get_W
+
+using OrdinaryDiffEqStabilizedRK: ESERK4, ESERK5, RKC, SERK2
+
+using FastBroadcast, MuladdMacro, RecursiveArrayTools
+import OrdinaryDiffEqCore
+import ADTypes: AutoForwardDiff, AbstractADType
+
+using Reexport
+@reexport using SciMLBase
+
+include("algorithms.jl")
+include("alg_utils.jl")
+include("irkc_utils.jl")
+include("irkc_caches.jl")
+include("irkc_perform_step.jl")
+
+export IRKC
+
+end

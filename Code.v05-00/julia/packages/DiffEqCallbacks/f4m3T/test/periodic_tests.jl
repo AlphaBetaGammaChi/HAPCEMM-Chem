@@ -1,0 +1,202 @@
+using Test, OrdinaryDiffEqTsit5, DiffEqCallbacks
+using SciMLBase: EnsembleProblem, EnsembleThreads, remake, ReturnCode
+
+tmin = 0.1
+tmax = 5.2
+
+for tmax_problem in [tmax; Inf]
+    # Test with both a finite and an infinite tspan for the ODEProblem.
+    #
+    # Having support for infinite tspans is one of the main reasons for implementing PeriodicCallback
+    # using add_tstop!, instead of just passing in a linspace as the tstops solve argument.
+    # (the other being that the length of the internal tstops collection would otherwise become
+    # linear in the length of the integration time interval.
+    #
+    # Testing a finite tspan is necessary because a naive implementation could add tstops after
+    # tmax and thus integrate for too long (or even indefinitely).
+
+    # Dynamics: two independent single integrators:
+    local du = [0; 0]
+    local u0 = [0.0; 0.0]
+    dynamics = (u, p, t) -> eltype(u).(du)
+    local prob = ODEProblem(dynamics, u0, (tmin, tmax_problem))
+
+    # Callbacks periodically increase the input to the integrators:
+    Δt1 = 0.5
+    increase_du_1 = integrator -> du[1] += 1
+    periodic1_initialized = Ref(false)
+    initialize1 = (c, u, t, integrator) -> periodic1_initialized[] = true
+    periodic1 = PeriodicCallback(increase_du_1, Δt1; initialize = initialize1)
+
+    Δt2 = 1.0
+    increase_du_2 = integrator -> du[2] += 1
+    periodic2 = PeriodicCallback(increase_du_2, Δt2)
+
+    # Terminate at tmax (regardless of whether the tspan of the ODE problem is infinite).
+    terminator = DiscreteCallback((u, t, integrator) -> t == tmax, terminate!)
+
+    # Solve.
+    local sol = solve(
+        prob, Tsit5(); callback = CallbackSet(terminator, periodic1, periodic2),
+        tstops = [tmax]
+    )
+
+    # Ensure that initialize1 has been called
+    @test periodic1_initialized[]
+
+    # Make sure we haven't integrated past tmax:
+    @test sol.t[end] == tmax
+
+    # Make sure that the components of du have been incremented the appropriate number of times.
+    Δts = [Δt1, Δt2]
+    expected_num_calls = map(Δts) do Δt
+        floor(Int, (tmax - tmin) / Δt)
+    end
+    @test du == expected_num_calls
+
+    # Make sure that the final state matches manual integration of the piecewise linear function
+    foreach(Δts, sol.u[end], du) do Δt, u_i, du_i
+        @test u_i ≈ Δt * sum(1:(du_i - 1)) + rem(tmax - tmin, Δt) * du_i atol = 1.0e-5
+    end
+end
+
+function fff(du, u, p, t)
+    du[1] = -u[1]
+    return du[2] = 0
+end
+
+u0 = [2.0, 0.0]
+function periodic(integrator)
+    return integrator.u[2] = integrator.u[1]
+end
+cb = PeriodicCallback(periodic, 0.1, initial_affect = true, save_positions = (true, true))
+tspan = (0.0, 10.0)
+p = nothing
+
+prob = ODEProblem(fff, u0, tspan, p)
+sol = solve(prob, Tsit5(), callback = cb)
+@test sol.u[2] == [2.0, 2.0]
+@test sol.u[end][1] != sol.u[end][2] # `final_affect = false` by default
+
+# Test that the callback is applied again when the simulation finished.
+cb = PeriodicCallback(
+    periodic, 3.0, initial_affect = true, final_affect = true,
+    save_positions = (true, true)
+)
+sol = solve(prob, Tsit5(), callback = cb)
+@test sol.u[end][1] == sol.u[end][2]
+
+# Test a PeriodicCallback that stops the simulation with terminate!(integrator)
+periodic_terminate2 = integrator -> if integrator.t >= tmax
+    terminate!(integrator)
+end
+cb = PeriodicCallback(
+    periodic_terminate2, 0.1, initial_affect = true, final_affect = true,
+    save_positions = (true, true)
+)
+sol = solve(prob, Tsit5(), callback = cb)
+@test sol.retcode == ReturnCode.Terminated
+@test sol.t[end] == tmax
+
+# Test that `Δt > tspan[2]` does not extend the simulation beyond `tspan[2]`
+# when `initial_affect = false`.
+cb = PeriodicCallback(periodic, 11.0, initial_affect = false)
+prob = ODEProblem(fff, u0, tspan, p)
+sol = solve(prob, Tsit5(), callback = cb)
+@test sol.t[end] == tspan[2]
+
+# Fix indexing repeats
+# https://github.com/SciML/ModelingToolkit.jl/issues/2528
+
+function lineardecay(du, u, p, t)
+    return du[1] = -u[1]
+end
+
+function bumpaffect!(integ)
+    return integ.u[1] += 10
+end
+
+cb = PeriodicCallback(bumpaffect!, 24.0)
+prob = ODEProblem(lineardecay, [0.0], (0.0, 130.0))
+sol1 = solve(prob, Tsit5(), callback = cb)
+
+@test sol1(0.0) == [0.0]
+@test sol1(24.0 + eps(24.0)) ≈ [10.0]
+@test sol1(48.0 + eps(48.0)) ≈ [10.0]
+@test sol1(72.0 + eps(72.0)) ≈ [10.0]
+@test sol1(96.0 + eps(96.0)) ≈ [10.0]
+@test sol1(120.0 + eps(120.0)) ≈ [10.0]
+sol2 = solve(prob, Tsit5(), callback = cb)
+@test sol2(0.0) == [0.0]
+@test sol2(24.0 + eps(24.0)) ≈ [10.0]
+@test sol2(48.0 + eps(48.0)) ≈ [10.0]
+@test sol2(72.0 + eps(72.0)) ≈ [10.0]
+@test sol2(96.0 + eps(96.0)) ≈ [10.0]
+@test sol2(120.0 + eps(120.0)) ≈ [10.0]
+
+# Test phase offset
+approxin(needle, haystack) = any(isapprox(needle), haystack)
+
+function integ(du, u, p, t)
+    du[1] = 1
+    return du[2] = 0
+end
+
+function nullaffect!(integ)
+    return integ.u[2] += 1
+end
+
+cb = PeriodicCallback(nullaffect!, 1.0; phase = 0.1)
+prob = ODEProblem(integ, [0.0, 0], (0.0, 10.0))
+sol = solve(prob, Tsit5(), callback = cb)
+@test sol.u[end][2] == 10 # Test expected number of calls to affect
+for t in 0.1:1:10
+    @test approxin(t, sol.t) # Test that the integrator stopped at all expected points
+end
+sol.t[end] ≈ 10 # test that we did not step over end
+
+# With negative phase
+@test_throws ArgumentError PeriodicCallback(nullaffect!, 1.0; phase = -0.1)
+
+# Phase offset larger than period
+cb = PeriodicCallback(nullaffect!, 1.0; phase = 1.1)
+prob = ODEProblem(integ, [0.0, 0], (0.0, 10.0))
+sol = solve(prob, Tsit5(), callback = cb)
+@test sol.u[end][2] == 9 # Test expected number of calls to affect
+for t in 1.1:1:10
+    @test approxin(t, sol.t) # Test that the integrator stopped at all expected points
+end
+sol.t[end] ≈ 10 # test that we did not step over end
+
+# Re-initialization resets the cache: re-using the same callback on a new
+# problem must start from a fresh index/t0, since `initialize_periodic`
+# allocates new Refs. Regression test for #99.
+@testset "PeriodicCallback re-initializes cache" begin
+    cb_reinit = PeriodicCallback(integ -> nothing, 0.5)
+    prob_reinit = ODEProblem((u, p, t) -> u, [1.0], (0.0, 2.0))
+    sol_a = solve(prob_reinit, Tsit5(), callback = cb_reinit)
+    sol_b = solve(prob_reinit, Tsit5(), callback = cb_reinit)
+    @test sol_a.t == sol_b.t
+end
+
+# Thread safety: because the cache lives in `task_local_storage`, a single
+# callback object shared across `EnsembleThreads` trajectories must not leak
+# state between Tasks. Regression test for #99.
+@testset "PeriodicCallback is EnsembleThreads-safe" begin
+    thread_dynamics = (du, u, p, t) -> (du[1] = 1; nothing)
+    prob_thread = ODEProblem(thread_dynamics, [0.0], (0.0, 10.0))
+    cb_thread = PeriodicCallback(integ -> nothing, 0.1)
+    ensemble = EnsembleProblem(
+        prob_thread,
+        prob_func = (prob, i, repeat) -> remake(prob; u0 = [Float64(i)])
+    )
+    for _ in 1:10
+        sol_thread = solve(
+            ensemble, Tsit5(), EnsembleThreads();
+            trajectories = 16, callback = cb_thread
+        )
+        @test length(sol_thread.u) == 16
+        @test all(s -> s.retcode == ReturnCode.Success, sol_thread.u)
+        @test all(s -> s.t[end] == 10.0, sol_thread.u)
+    end
+end

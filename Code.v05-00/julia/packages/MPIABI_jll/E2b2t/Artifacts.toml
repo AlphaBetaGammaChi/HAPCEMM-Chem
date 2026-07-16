@@ -1,0 +1,176 @@
+[[MPIABI]]
+arch = "aarch64"
+git-tree-sha1 = "39820c5db8cd5912551c8e2705c7e7f20365db4f"
+lazy = true
+mpi = "mpiabi"
+os = "macos"
+
+    [[MPIABI.download]]
+    sha256 = "8d3c8a00ce870b9e01b35c854758570b775e3d5654ed0cede2b911d3f5811583"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.aarch64-apple-darwin-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "aarch64"
+git-tree-sha1 = "dea8b2ce4de2da83b00570ec76ca00bb38ba0491"
+lazy = true
+libc = "glibc"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "b38373c472bdcaf3080eafea0349a7440dbc8f301eedb7f17197a19cae419220"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.aarch64-linux-gnu-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "aarch64"
+git-tree-sha1 = "9f8c49f86b52244ffa0c07e058c31dd2427ae6f1"
+lazy = true
+libc = "musl"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "c810b7a3d5a65a5a7b3d9c8c34d3ecae6b8473c8202b05fd1044a9cc017c778f"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.aarch64-linux-musl-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "aarch64"
+git-tree-sha1 = "44abcc01dbc577267f7e45819cae41ec10306fca"
+lazy = true
+mpi = "mpiabi"
+os = "freebsd"
+
+    [[MPIABI.download]]
+    sha256 = "c964faabe47e9b168e9c260bc62febdf27abb96f8cf21474515c6528471fbfdd"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.aarch64-unknown-freebsd-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "armv6l"
+call_abi = "eabihf"
+git-tree-sha1 = "7721fd78eded193f1b6532e492af2d064e1e0166"
+lazy = true
+libc = "glibc"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "07819477b68aa8a3198279d51eec7290385c2dfc3c8dc210e6827f7f66477630"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.armv6l-linux-gnueabihf-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "armv6l"
+call_abi = "eabihf"
+git-tree-sha1 = "792e66e2aaf825048224c1da1e71bd40d255eb89"
+lazy = true
+libc = "musl"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "bcb681b8fb439485fbf5adcedc2f323634e595e0b4164dae95aadd916958f089"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.armv6l-linux-musleabihf-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "armv7l"
+call_abi = "eabihf"
+git-tree-sha1 = "95f748af3a8f056ffba09a7d56052e8af9ea9dd1"
+lazy = true
+libc = "glibc"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "ed0c55fe5c75bd580626fbd73d7951e2980ae769d88f73f9cbd54753fdd6a639"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.armv7l-linux-gnueabihf-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "armv7l"
+call_abi = "eabihf"
+git-tree-sha1 = "17c91f57fff90e688a1f8e8a7e7036652415359a"
+lazy = true
+libc = "musl"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "58eb2475887ba333f2e9bc03c41445b41475148fbf6d0f73349574d37c1b212e"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.armv7l-linux-musleabihf-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "i686"
+git-tree-sha1 = "43a75905c8579c12bf9661bc31eecd6884a52090"
+lazy = true
+libc = "glibc"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "7df107d5a9ea5b49a9cf59913dd64bd29334d0efc26f97576b93b1c0dc31dbbc"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.i686-linux-gnu-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "i686"
+git-tree-sha1 = "4e6ea4e0a74ba8f23fb23462e8393f1002d826d6"
+lazy = true
+libc = "musl"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "65fa7243d67aa01a5d207d73aa83792055680d821707eb37b4a2eb67a6fb987c"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.i686-linux-musl-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "powerpc64le"
+git-tree-sha1 = "0fdb4276cdee541d9bd29558a1480c65104dc5f3"
+lazy = true
+libc = "glibc"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "93086ce6bc03aeff9a9d72f1a19d1fd1f89c6ecfff43c824599848c006ca948a"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.powerpc64le-linux-gnu-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "riscv64"
+git-tree-sha1 = "79a11bb14edd08c9dff1b0ae107d70ad9f4ce604"
+lazy = true
+libc = "glibc"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "53d077cfcc0235d7cdd1ede4af6209f939ac7705e38f61a2b19d0124b2d60dac"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.riscv64-linux-gnu-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "x86_64"
+git-tree-sha1 = "0cac49ecc212302554d27ef2f12e62867d7abcc0"
+lazy = true
+mpi = "mpiabi"
+os = "macos"
+
+    [[MPIABI.download]]
+    sha256 = "10ad5fcccd30942a93446bcd43d023074a89b9781bdc56b1d86c1a6029e81e3b"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.x86_64-apple-darwin-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "x86_64"
+git-tree-sha1 = "a836166fd4d3581ffa12306de60278a4dfad229c"
+lazy = true
+libc = "glibc"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "e210a9313bc27e87118a1a9606c05dd92059830068436a716f30b4b38c865e9b"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.x86_64-linux-gnu-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "x86_64"
+git-tree-sha1 = "2e653253033c107d6eab948b126bd7f2438208bd"
+lazy = true
+libc = "musl"
+mpi = "mpiabi"
+os = "linux"
+
+    [[MPIABI.download]]
+    sha256 = "4c954fb06fe43d3bb5ec20f3ebb243cd563d752aff4a72935462a3a8b49e7c93"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.x86_64-linux-musl-mpi+mpiabi.tar.gz"
+[[MPIABI]]
+arch = "x86_64"
+git-tree-sha1 = "080d37bfaf296814c3d3fd17a2f329912c637fb3"
+lazy = true
+mpi = "mpiabi"
+os = "freebsd"
+
+    [[MPIABI.download]]
+    sha256 = "600a80446d37a64184227287de339dca4c0ca3875d312275262277157e24642c"
+    url = "https://github.com/JuliaBinaryWrappers/MPIABI_jll.jl/releases/download/MPIABI-v0.1.5+0/MPIABI.v0.1.5.x86_64-unknown-freebsd-mpi+mpiabi.tar.gz"

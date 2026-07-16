@@ -1,0 +1,2750 @@
+[
+  {
+    "name": "/* {548} NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "/*{517} IO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "2.000ClO {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "A3O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ACET",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ACTA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "AG",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "AGI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "AL2O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ALD2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ALK4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ATO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ATOOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "B3O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "BI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "BII3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "Br2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "BrCl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "BrNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "BrNO2 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "BrNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "BrNO3 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "BrO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "C",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "C2H4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "C2H6",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "C3H8",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CACL2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CACO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CACl2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CANO32",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CARB3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CASO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CH2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CH2OO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CH3CHOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CH3CN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CH3O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CH4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CLNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CLONO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "CS2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "Cl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "Cl2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "Cl2O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "Cl2O2 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ClNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ClNO3 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ClO {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ClOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ClOO {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "DHMOB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "DIBOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "DMC",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "DMS",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "DMSO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "DUST",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "EOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ETHLN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ETO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ETP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "F",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "F2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "FO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "GAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "GLYC",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "GLYX",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "H",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "H2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "H2NO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "H2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "H2O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "H2S",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "H2SO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HAC",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HC5",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HC5OO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HCL",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HCN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HCOOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HCl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HF",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HNO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HNO2 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HNO3 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HNO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HNO4 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HO2 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HOBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HOCl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HOI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "HONO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "I",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "IAP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "IEPOX",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "IEPOXOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "INO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "INPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "IO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "IO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISN1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISNOHOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISNOOA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISNOOB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISNP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISOP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISOPNB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISOPNBO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISOPND",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ISOPNDO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "KO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "LI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "LIOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "LUB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MACR",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MACRN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MACRNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MACROO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MAN2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MAO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MAOP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MAOPO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MAP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MEK",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MGLOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MGLY",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MGLYOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MGO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MOBA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MOBAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MPN {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MRO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MRP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MSA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MVK",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MVKN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "MVKOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "M}",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "N",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "N2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "N2H4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "N2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "N2O5",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "N2O5 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NACL",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NACl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NANO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NAOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NH2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NH3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NH4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NH42SO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NH4NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NO2 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "NO3 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "O {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "O2 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "O3 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "OCS",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "OClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "OH {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "OIO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PAN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PMN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PMNN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "POF3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PRN1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PROPNN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PRPE",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "PRPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "R4N1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "R4N2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "R4O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "R4P",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RA3P",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RB3P",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RCHO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RCOOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RIO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RIP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ROH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RONO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "RP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "S",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "SIH4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "SIO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "SO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "SO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "SO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "SOA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "VRO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "VRP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "ZNOH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "hv",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{101} MRO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{103} B3O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{104} INO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{105} PRN1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{106} MEK",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{108} MEK",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{10} HO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{11} HO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{122} EOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{123} ROH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{124} ETO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{125} ETO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{126} HO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{127} A3O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{128} PO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{12} CO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{132} PRPE",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{134} PMN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{135} PMN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{137} GLYC",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{138} PRPE",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{139} GLYX",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{13} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{140} MGLY",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{141} GLYX",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{142} MGLY",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{143} MVK",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{144} MACR",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{145} HAC",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{147} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{148} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{149} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{14} MO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{154} MACR",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{155} MACR",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{156} RCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{157} MAO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{158} RCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{159} MAO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{15} MO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{160} INPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{167} RP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{16} MO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{170} RIP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{171} IEPOX",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{176} MRP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{177} MRP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{178} MAOP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{179} MAOP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{17} MO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{181} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{184} MAOPO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{185} MAOPO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{186} MAOPO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{187} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{188} C2H6",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{18} MP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{190} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{191} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{192} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{194} ATO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{195} KO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{19} MP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{1} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{200} B3O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{204} PRN1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{205} R4O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{206} ATO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{207} KO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{208} RIO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{209} HC5OO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{20} ATOOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{210} VRO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{211} MRO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{212} R4N1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{213} MAN2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{214} INO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{215} PRN1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{216} B3O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{217} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{218} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{219} RCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{21} ATOOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{220} MAO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{221} NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{222} MO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{223} MPN {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{226} HO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{227} NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{228} NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{229} N2O5",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{22} CH2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{230} SO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{231} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{232} BrO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{233} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{234} HBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{235} BrO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{236} BrO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{237} BrO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{238} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{239} Br2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{23} NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{240} HOBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{241} HBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{242} BrO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{243} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{244} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{245} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{246} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{247} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{248} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{249} Br",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{24} HNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{250} BrO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{251} BrNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{252} HOBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{253} HBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{254} HOBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{255} HBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{256} HC5",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{258} HC5OO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{25} NO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{260} ISOPND",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{261} ISOPNB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{263} ISOPNDO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{266} ISOPNBO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{269} MACRN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{26} HNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{272} MACRNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{273} PMNN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{276} DIBOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{278} MOBA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{279} MOBAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{27} HO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{280} MOBAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{282} MOBA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{283} ETHLN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{284} PROPNN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{285} CH2OO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{286} CH2OO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{287} CH2OO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{288} CH2OO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{289} CH2OO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{28} HNO4 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{290} MACROO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{291} MACROO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{292} MACROO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{293} MACROO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{294} MACROO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{295} MACROO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{296} MVKOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{297} MVKOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{298} MVKOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{299} MVKOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{29} HNO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{2} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{300} MVKOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{301} MGLYOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{302} MGLYOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{303} MGLYOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{304} MGLYOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{305} MGLYOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{306} MGLOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{307} MGLOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{308} MGLOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{309} MGLOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{30} HO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{310} MGLOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{311} MGLOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{312} CH3CHOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{313} CH3CHOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{314} CH3CHOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{315} CH3CHOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{316} CH3CHOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{317} CH3CHOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{318} GAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{319} GAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{31} NO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{320} GAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{321} GAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{322} GAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{323} GAOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{324} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{325} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{326} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{327} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{328} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{329} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{32} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{330} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{331} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{332} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{333} O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{334} O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{335} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{336} O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{337} HO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{338} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{339} O1D",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{33} NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{340} NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{341} NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{342} NO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{343} NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{344} H2O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{345} H",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{346} H",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{347} H",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{348} H",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{349} H",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{34} N2O5 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{350} N",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{351} N",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{352} N",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{353} BrO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{354} CH2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{358} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{359} MO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{35} HCOOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{360} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{361} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{362} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{363} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{364} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{365} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{366} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{367} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{368} CH4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{369} CH2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{36} MOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{370} Cl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{371} Cl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{372} Cl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{373} Cl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{374} Cl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{375} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{376} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{377} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{378} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{379} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{37} NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{380} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{381} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{382} Cl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{383} ClOO {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{384} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{385} Cl2O2 {",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{386} ClOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{387} ClOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{388} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{389} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{38} NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{390} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{391} ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{392} ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{393} N2O5",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{394} ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{395} ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{396} ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{397} BrNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{398} HOCl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{399} HOCl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{3} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{400} HOBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{401} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{402} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{403} O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{404} NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{405} H2O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{406} MP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{407} CH2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{408} CH2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{409} HNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{40} ALD2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{410} HNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{411} HNO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{412} HNO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{413} NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{414} NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{415} N2O5",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{417} ALD2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{419} RCHO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{41} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{420} ACET",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{421} ACET",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{424} GLYX",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{425} GLYX",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{426} GLYX",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{427} MGLY",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{428} MVK",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{429} MVK",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{42} PAN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{430} MVK",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{431} MACR",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{432} HAC",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{433} INPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{434} PRPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{435} ETP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{436} RA3P",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{437} RB3P",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{438} R4P",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{439} PP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{43} MCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{440} RP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{443} ISNP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{446} MAOP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{448} MAP",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{44} C2H6",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{450} MVKN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{451} ISOPNB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{452} Br2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{453} BrO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{454} HOBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{455} BrNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{456} BrNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{457} BrNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{458} MPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{459} MPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{45} ETO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{460} ISOPND",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{461} PROPNN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{462} ATOOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{463} N2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{464} SO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{465} NO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{466} BrCl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{467} Cl2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{468} ClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{469} OClO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{46} C3H8",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{470} Cl2O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{471} ClNO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{472} ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{473} ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{474} HOCl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{475} ClOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{476} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{477} CARB3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{478} CARB3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{479} CH2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{47} C3H8",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{480} NH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{481} NH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{482} NH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{483} H2NO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{484} 2.000NH3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{485} NH3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{486} NH4NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{487} NH3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{488} NH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{489} NH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{48} A3O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{490} NO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{491} SO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{492} SO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{493} NACl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{494} NACl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{495} NACl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{496} NACl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{497} CACO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{498} CACO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{499} CACO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{49} PO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{4} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{500} H2S",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{501} CS2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{502} OCS",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{503} OCS",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{504} DMS",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{505} DMS",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{506} DMS",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{507} AGI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{508} BII3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{509} ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{50} ALK4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{510} ClNO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{511} N2O5",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{512} I",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{513} IO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{514} IO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{515} IO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{516} HOI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{517} OIO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{518} HOBr",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{519} BrCl",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{520} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{521} NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{522} N2O5",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{523} LUB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{524} RO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{525} RO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{526} RCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{527} PAN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{528} LUB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{529} LUB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{52} R4O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{530} RO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{531} RCOOH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{532} O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{533} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{534} NO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{535} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{536} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{537} NH2O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{538} HNO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{539} NO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{540} O",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{541} NO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{542} SCI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{543} HNO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{544} NH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{546} NH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{547} NH2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{548} 2NH3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{549} S",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{550} AG",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{551} BI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{552} SOA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{553} AL",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{554} LUB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{555} CASO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{556} CANO32",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{557} CACl2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{558} RONO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{559} MSA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{560} H2SO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{561} SOA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{562} NANO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{563} HOI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{564} IOI",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{565} IO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{566} NH42SO4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{567} NH4SO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{568} RHCO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{5} O3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{60} MRO2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{62} B3O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{66} ISNOOA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{67} ISNOOA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{68} ISNOOA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{6} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{70} ISNOOB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{72} ISNOOB",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{75} ISN1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{77} ISNOHOO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{7} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{80} PRN1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{81} ALK4",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{82} R4N2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{83} ACTA",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{84} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{85} RCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{86} PPN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{87} MAO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{88} PMN",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{89} RCO3",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{8} OH",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{91} RCHO",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{92} ACET",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{95} R4O2",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{96} R4N1",
+    "type": "CHEM_SPEC"
+  },
+  {
+    "name": "{9} OH",
+    "type": "CHEM_SPEC"
+  }
+]

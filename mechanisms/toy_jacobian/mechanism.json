@@ -1,0 +1,41 @@
+{
+  "camp-data": [
+    {
+      "name": "toy_jac",
+      "type": "MECHANISM",
+      "reactions": [
+        {
+          "type": "ARRHENIUS",
+          "reactants": {
+            "A": {
+              "qty": 1.0
+            }
+          },
+          "products": {
+            "B": {
+              "yield": 1.0
+            }
+          },
+          "A": 2.0
+        },
+        {
+          "type": "ARRHENIUS",
+          "reactants": {
+            "A": {
+              "qty": 1.0
+            },
+            "B": {
+              "qty": 1.0
+            }
+          },
+          "products": {
+            "C": {
+              "yield": 1.0
+            }
+          },
+          "A": 3.0
+        }
+      ]
+    }
+  ]
+}

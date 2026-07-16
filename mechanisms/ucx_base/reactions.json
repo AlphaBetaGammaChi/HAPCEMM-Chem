@@ -1,0 +1,7733 @@
+{
+  "reactions": [
+    {
+      "reactants": {
+        "{1} O3": {},
+        "NO": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.00E-12, 0.0E+00, -1500.0)"
+    },
+    {
+      "reactants": {
+        "{2} O3": {},
+        "OH": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.70E-12, 0.0E+00, -940.0)"
+    },
+    {
+      "reactants": {
+        "{3} O3": {},
+        "HO2": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-14, 0.0E+00, -490.0)"
+    },
+    {
+      "reactants": {
+        "{4} O3": {},
+        "NO2": {}
+      },
+      "products": {
+        "O2": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-13, 0.0E+00, -2450.0)"
+    },
+    {
+      "reactants": {
+        "{5} O3": {},
+        "MO2": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.90E-16, 0.0E+00, -1000.0)"
+    },
+    {
+      "reactants": {
+        "{6} OH": {},
+        "OH": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.80E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{7} OH": {},
+        "OH {": {},
+        "M}": {}
+      },
+      "products": {
+        "H2O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{8} OH": {},
+        "HO2": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.80E-11, 0.0E+00, 250.0)"
+    },
+    {
+      "reactants": {
+        "{9} OH": {},
+        "H2O2": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.80E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{10} HO2": {},
+        "NO": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.30E-12, 0.0E+00, 270.0)"
+    },
+    {
+      "reactants": {
+        "{11} HO2": {},
+        "HO2": {}
+      },
+      "products": {
+        "H2O2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_HO2NO3(3.00E-13, 0.0E+00, 460.0, 2.1E-33, 0.0, 920.0)"
+    },
+    {
+      "reactants": {
+        "{12} CO": {},
+        "OH": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_OHCO(1.50E-13, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{13} OH": {},
+        "CH4": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.45E-12, 0.0E+00, -1775.0)"
+    },
+    {
+      "reactants": {
+        "{14} MO2": {},
+        "NO": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.80E-12, 0.0E+00, 300.0)"
+    },
+    {
+      "reactants": {
+        "{15} MO2": {},
+        "HO2": {}
+      },
+      "products": {
+        "MP": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.10E-13, 0.0E+00, 750.0)"
+    },
+    {
+      "reactants": {
+        "{16} MO2": {},
+        "MO2": {}
+      },
+      "products": {
+        "MOH": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_TBrANCH(9.50E-14, 0.0E+00, 390.0, 2.62E1, 0.0, -1130.0)"
+    },
+    {
+      "reactants": {
+        "{17} MO2": {},
+        "MO2": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 2.0
+        },
+        "HO2": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_TBrANCH(9.50E-14, 0.0E+00, 390.0, 4.E-2, 0.0, 1130.0)"
+    },
+    {
+      "reactants": {
+        "{18} MP": {},
+        "OH": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.66E-12, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{19} MP": {},
+        "OH": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.14E-12, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{20} ATOOH": {},
+        "OH": {}
+      },
+      "products": {
+        "ATO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.66E-12, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{21} ATOOH": {},
+        "OH": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.14E-12, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{22} CH2O": {},
+        "OH": {}
+      },
+      "products": {
+        "CO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(5.50E-12, 0.0E+00, 125.0)"
+    },
+    {
+      "reactants": {
+        "{23} NO2": {},
+        "OH {": {},
+        "M}": {}
+      },
+      "products": {
+        "HNO3 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{24} HNO3": {},
+        "OH": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_OHHNO3(2.41E-14, 0.0E+00, 460.0, 2.69E-17, 0.E0, 2199., 6.51E-34, 0.E0, 1335.0)"
+    },
+    {
+      "reactants": {
+        "{25} NO": {},
+        "OH {": {},
+        "M}": {}
+      },
+      "products": {
+        "HNO2 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{26} HNO2": {},
+        "OH": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.80E-11, 0.0E+00, -390.0)"
+    },
+    {
+      "reactants": {
+        "{27} HO2": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "HNO4 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{28} HNO4 {": {},
+        "M}": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{29} HNO4": {},
+        "OH": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.30E-12, 0.0E+00, 380.0)"
+    },
+    {
+      "reactants": {
+        "{30} HO2": {},
+        "NO3": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.50E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{31} NO": {},
+        "NO3": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.50E-11, 0.0E+00, 170.0)"
+    },
+    {
+      "reactants": {
+        "{32} OH": {},
+        "NO3": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.20E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{33} NO2": {},
+        "NO3 {": {},
+        "M}": {}
+      },
+      "products": {
+        "N2O5 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{34} N2O5 {": {},
+        "M}": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{35} HCOOH": {},
+        "OH": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.00E-13, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{36} MOH": {},
+        "OH": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.90E-12, 0.0E+00, -345.0)"
+    },
+    {
+      "reactants": {
+        "{37} NO2": {},
+        "NO3": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.50E-14, 0.0E+00, -1260.0)"
+    },
+    {
+      "reactants": {
+        "{38} NO3": {},
+        "CH2O": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(5.80E-16, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{40} ALD2": {},
+        "NO3": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.40E-12, 0.0E+00, -1900.0)"
+    },
+    {
+      "reactants": {
+        "{41} MCO3": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "PAN": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{42} PAN": {}
+      },
+      "products": {
+        "MCO3": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{43} MCO3": {},
+        "NO": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(8.10E-12, 0.0E+00, 270.0)"
+    },
+    {
+      "reactants": {
+        "{44} C2H6": {},
+        "OH": {}
+      },
+      "products": {
+        "ETO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.66E-12, 0.0E+00, -1020.0)"
+    },
+    {
+      "reactants": {
+        "{45} ETO2": {},
+        "NO": {}
+      },
+      "products": {
+        "ALD2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.60E-12, 0.0E+00, 365.0)"
+    },
+    {
+      "reactants": {
+        "{46} C3H8": {},
+        "OH": {}
+      },
+      "products": {
+        "B3O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_TBrANCH(7.60E-12, 0.0E+00, -585.0, 5.87E0, 0.64E0, -816.0)"
+    },
+    {
+      "reactants": {
+        "{47} C3H8": {},
+        "OH": {}
+      },
+      "products": {
+        "A3O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_TBrANCH(7.60E-12, 0.0E+00, -585.0, 1.7E-1, -0.64E0, 816.0)"
+    },
+    {
+      "reactants": {
+        "{48} A3O2": {},
+        "NO": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "RCHO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.90E-12, 0.0E+00, 350.0)"
+    },
+    {
+      "reactants": {
+        "{49} PO2": {},
+        "NO": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.70E-12, 0.0E+00, 350.0)"
+    },
+    {
+      "reactants": {
+        "{50} ALK4": {},
+        "OH": {}
+      },
+      "products": {
+        "R4O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(9.10E-12, 0.0E+00, -405.0)"
+    },
+    {
+      "reactants": {
+        "{52} R4O2": {},
+        "NO": {}
+      },
+      "products": {
+        "R4N2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2NO('A', 2.70E-12, 0.0E+00, 350.0, 4.5E0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{60} MRO2": {}
+      },
+      "products": {
+        "CO": {
+          "yield": 1.0
+        },
+        "HAC": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.90E+07, 0.0E+00, -5297.0)"
+    },
+    {
+      "reactants": {
+        "{62} B3O2": {},
+        "NO": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "ACET": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.70E-12, 0.0E+00, 350.0)"
+    },
+    {
+      "reactants": {
+        "{66} ISNOOA": {},
+        "NO3": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "R4N2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.00E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{67} ISNOOA": {},
+        "NO": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "R4N2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.70E-12, 0.0E+00, 340.0)"
+    },
+    {
+      "reactants": {
+        "{68} ISNOOA": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "PMN": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{70} ISNOOB": {},
+        "NO3": {}
+      },
+      "products": {
+        "R4N2": {
+          "yield": 1.0
+        },
+        "GLYX": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.30E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{72} ISNOOB": {},
+        "HO2": {}
+      },
+      "products": {
+        "INPN": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.06E-13, 0.0E+00, 1300.0)"
+    },
+    {
+      "reactants": {
+        "{75} ISN1": {},
+        "OH": {}
+      },
+      "products": {
+        "ISNOOA": {
+          "yield": 0.345
+        },
+        "ISNOHOO": {
+          "yield": 0.655
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.48E-12, 0.0E+00, 410.0)"
+    },
+    {
+      "reactants": {
+        "{77} ISNOHOO": {},
+        "HO2": {}
+      },
+      "products": {
+        "INPN": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.06E-13, 0.0E+00, 1300.0)"
+    },
+    {
+      "reactants": {
+        "{80} PRN1": {},
+        "NO": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 2.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.70E-12, 0.0E+00, 350.0)"
+    },
+    {
+      "reactants": {
+        "{81} ALK4": {},
+        "NO3": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        },
+        "R4O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.80E-12, 0.0E+00, -3280.0)"
+    },
+    {
+      "reactants": {
+        "{82} R4N2": {},
+        "OH": {}
+      },
+      "products": {
+        "R4N1": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.60E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{83} ACTA": {},
+        "OH": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.15E-14, 0.0E+00, 920.0)"
+    },
+    {
+      "reactants": {
+        "{84} OH": {},
+        "RCHO": {}
+      },
+      "products": {
+        "RCO3": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-12, 0.0E+00, 410.0)"
+    },
+    {
+      "reactants": {
+        "{85} RCO3": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "PPN": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{86} PPN": {}
+      },
+      "products": {
+        "RCO3": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{87} MAO3": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "PMN": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{88} PMN": {}
+      },
+      "products": {
+        "MAO3": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{89} RCO3": {},
+        "NO": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "ETO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.70E-12, 0.0E+00, 340.0)"
+    },
+    {
+      "reactants": {
+        "{91} RCHO": {},
+        "NO3": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        },
+        "RCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.50E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{92} ACET": {},
+        "OH": {}
+      },
+      "products": {
+        "ATO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: 1.33E-13+3.82E-11*exp(-2000.0/TEMP); {E. Fischer"
+    },
+    {
+      "reactants": {
+        "{95} R4O2": {},
+        "HO2": {}
+      },
+      "products": {
+        "R4P": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.40E-13, 0.0E+00, 700.0)"
+    },
+    {
+      "reactants": {
+        "{96} R4N1": {},
+        "HO2": {}
+      },
+      "products": {
+        "R4N2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.40E-13, 0.0E+00, 700.0)"
+    },
+    {
+      "reactants": {
+        "{101} MRO2": {},
+        "HO2": {}
+      },
+      "products": {
+        "MRP": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2HO2(2.91E-13, 0.0E+00, 1300.0, 4.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{103} B3O2": {},
+        "HO2": {}
+      },
+      "products": {
+        "RB3P": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2HO2(2.91E-13, 0.0E+00, 1300.0, 3.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{104} INO2": {},
+        "HO2": {}
+      },
+      "products": {
+        "INPN": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2HO2(2.91E-13, 0.0E+00, 1300.0, 5.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{105} PRN1": {},
+        "HO2": {}
+      },
+      "products": {
+        "PRPN": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2HO2(2.91E-13, 0.0E+00, 1300.0, 3.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{106} MEK": {},
+        "OH": {}
+      },
+      "products": {
+        "KO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.30E-12, 0.0E+00, -25.0)"
+    },
+    {
+      "reactants": {
+        "{108} MEK": {},
+        "NO3": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        },
+        "KO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(8.00E-16, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{122} EOH": {},
+        "OH": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.35E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{123} ROH": {},
+        "OH": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "RCHO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.60E-12, 0.0E+00, 70.0)"
+    },
+    {
+      "reactants": {
+        "{124} ETO2": {},
+        "ETO2": {}
+      },
+      "products": {
+        "ALD2": {
+          "yield": 2.0
+        },
+        "HO2": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.10E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{125} ETO2": {},
+        "ETO2": {}
+      },
+      "products": {
+        "EOH": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.70E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{126} HO2": {},
+        "ETO2": {}
+      },
+      "products": {
+        "ETP": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.40E-13, 0.0E+00, 700.0)"
+    },
+    {
+      "reactants": {
+        "{127} A3O2": {},
+        "HO2": {}
+      },
+      "products": {
+        "RA3P": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2HO2(2.91E-13, 0.0E+00, 1300.0, 3.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{128} PO2": {},
+        "HO2": {}
+      },
+      "products": {
+        "PP": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2HO2(2.91E-13, 0.0E+00, 1300.0, 3.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{132} PRPE": {},
+        "OH {": {},
+        "M}": {}
+      },
+      "products": {
+        "PO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{134} PMN": {},
+        "OH": {}
+      },
+      "products": {
+        "HAC": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.90E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{135} PMN": {},
+        "O3": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(8.20E-18, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{137} GLYC": {},
+        "OH": {}
+      },
+      "products": {
+        "HCOOH": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_GLYCOHB(8.00E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{138} PRPE": {},
+        "NO3": {}
+      },
+      "products": {
+        "PRN1": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.59E-13, 0.0E+00, -1156.0)"
+    },
+    {
+      "reactants": {
+        "{139} GLYX": {},
+        "OH": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.10E-12, 0.0E+00, 340.0)"
+    },
+    {
+      "reactants": {
+        "{140} MGLY": {},
+        "OH": {}
+      },
+      "products": {
+        "MCO3": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.50E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{141} GLYX": {},
+        "NO3": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_GLYXNO3(1.40E-12, 0.0E+00, -1860.0)"
+    },
+    {
+      "reactants": {
+        "{142} MGLY": {},
+        "NO3": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.36E-12, 0.0E+00, -1860.0)"
+    },
+    {
+      "reactants": {
+        "{143} MVK": {},
+        "OH": {}
+      },
+      "products": {
+        "VRO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.60E-12, 0.0E+00, 610.0)"
+    },
+    {
+      "reactants": {
+        "{144} MACR": {},
+        "OH": {}
+      },
+      "products": {
+        "MAO3": {
+          "yield": 0.53
+        },
+        "MRO2": {
+          "yield": 0.47
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(8.00E-12, 0.0E+00, 380.0)"
+    },
+    {
+      "reactants": {
+        "{145} HAC": {},
+        "OH": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_HACOHA(2.15E-12, 0.0E+00, 305.0)"
+    },
+    {
+      "reactants": {
+        "{147} MCO3": {},
+        "A3O2": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "RCHO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.68E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{148} MCO3": {},
+        "PO2": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.68E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{149} MCO3": {},
+        "A3O2": {}
+      },
+      "products": {
+        "ACTA": {
+          "yield": 1.0
+        },
+        "RCHO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{154} MACR": {},
+        "NO3": {}
+      },
+      "products": {
+        "MAN2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.30E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{155} MACR": {},
+        "NO3": {}
+      },
+      "products": {
+        "MAO3": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.10E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{156} RCO3": {},
+        "MO2": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "ETO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.68E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{157} MAO3": {},
+        "MO2": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.68E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{158} RCO3": {},
+        "MO2": {}
+      },
+      "products": {
+        "RCOOH": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{159} MAO3": {},
+        "MO2": {}
+      },
+      "products": {
+        "RCOOH": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{160} INPN": {},
+        "OH": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "MEK": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.90E-11, 0.0E+00, 390.0)"
+    },
+    {
+      "reactants": {
+        "{167} RP": {},
+        "OH": {}
+      },
+      "products": {
+        "RCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.13E-13, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{170} RIP": {},
+        "OH": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "IEPOX": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.90E-11, 0.0E+00, 390.0)"
+    },
+    {
+      "reactants": {
+        "{171} IEPOX": {},
+        "OH": {}
+      },
+      "products": {
+        "IEPOXOO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(5.78E-11, 0.0E+00, -400.0)"
+    },
+    {
+      "reactants": {
+        "{176} MRP": {},
+        "OH": {}
+      },
+      "products": {
+        "MRO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.84E-12, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{177} MRP": {},
+        "OH": {}
+      },
+      "products": {
+        "CO2": {
+          "yield": 1.0
+        },
+        "HAC": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.40E-12, 0.0E+00, 380.0)"
+    },
+    {
+      "reactants": {
+        "{178} MAOP": {},
+        "OH": {}
+      },
+      "products": {
+        "MAO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.13E-13, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{179} MAOP": {},
+        "OH": {}
+      },
+      "products": {
+        "MAOPO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.60E-12, 0.0E+00, 380.0)"
+    },
+    {
+      "reactants": {
+        "{181} MCO3": {},
+        "MAOPO2": {}
+      },
+      "products": {
+        "ACTA": {
+          "yield": 1.0
+        },
+        "MEK": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{184} MAOPO2": {},
+        "HO2": {}
+      },
+      "products": {
+        "HAC": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2HO2(2.91E-13, 0.0E+00, 1300.0, 4.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{185} MAOPO2": {},
+        "NO": {}
+      },
+      "products": {
+        "HAC": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2NO('B', 2.70E-12, 0.0E+00, 350.0, 4.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{186} MAOPO2": {},
+        "NO": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2NO('A', 2.70E-12, 0.0E+00, 350.0, 4.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{187} OH": {},
+        "MAP": {}
+      },
+      "products": {
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.13E-13, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{188} C2H6": {},
+        "NO3": {}
+      },
+      "products": {
+        "ETO2": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.40E-18, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{190} MCO3": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.50E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{191} MCO3": {},
+        "MO2": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "MO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.80E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{192} MCO3": {},
+        "MO2": {}
+      },
+      "products": {
+        "ACTA": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.00E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{194} ATO2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.68E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{195} KO2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.68E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{200} B3O2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "ACET": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.68E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{204} PRN1": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.68E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{205} R4O2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MEK": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{206} ATO2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MEK": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{207} KO2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MEK": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{208} RIO2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MEK": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{209} HC5OO": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MEK": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{210} VRO2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MEK": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{211} MRO2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MEK": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{212} R4N1": {},
+        "MCO3": {}
+      },
+      "products": {
+        "RCHO": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{213} MAN2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "RCHO": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{214} INO2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "RCHO": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{215} PRN1": {},
+        "MCO3": {}
+      },
+      "products": {
+        "RCHO": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{216} B3O2": {},
+        "MCO3": {}
+      },
+      "products": {
+        "ACET": {
+          "yield": 1.0
+        },
+        "ACTA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{217} MCO3": {},
+        "ETO2": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.68E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{218} MCO3": {},
+        "ETO2": {}
+      },
+      "products": {
+        "ACTA": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.87E-13, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{219} RCO3": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "ETO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.50E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{220} MAO3": {},
+        "MCO3": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.50E-12, 0.0E+00, 500.0)"
+    },
+    {
+      "reactants": {
+        "{221} NO3": {},
+        "NO3": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 2.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(8.50E-13, 0.0E+00, -2450.0)"
+    },
+    {
+      "reactants": {
+        "{222} MO2": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "MPN {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{223} MPN {": {},
+        "M}": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{226} HO2": {}
+      },
+      "products": {
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HO2,1)"
+    },
+    {
+      "reactants": {
+        "{227} NO2": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 0.5
+        },
+        "HNO2": {
+          "yield": 0.5
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_NO2,1)"
+    },
+    {
+      "reactants": {
+        "{228} NO3": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_NO3,1)"
+    },
+    {
+      "reactants": {
+        "{229} N2O5": {},
+        "H2O": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_N2O5,1)"
+    },
+    {
+      "reactants": {
+        "{230} SO2": {},
+        "OH {": {},
+        "M}": {}
+      },
+      "products": {
+        "SO4": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{231} Br": {},
+        "O3": {}
+      },
+      "products": {
+        "BrO": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.60E-11, 0.0E+00, -780.0)"
+    },
+    {
+      "reactants": {
+        "{232} BrO": {},
+        "HO2": {}
+      },
+      "products": {
+        "HOBr": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.50E-12, 0.0E+00, 460.0)"
+    },
+    {
+      "reactants": {
+        "{233} Br": {},
+        "HO2": {}
+      },
+      "products": {
+        "HBr": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.80E-12, 0.0E+00, -310.0)"
+    },
+    {
+      "reactants": {
+        "{234} HBr": {},
+        "OH": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(5.50E-12, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{235} BrO": {},
+        "BrO": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 2.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.40E-12, 0.0E+00, 40.0)"
+    },
+    {
+      "reactants": {
+        "{236} BrO": {},
+        "BrO": {}
+      },
+      "products": {
+        "Br2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.80E-14, 0.0E+00, 860.0)"
+    },
+    {
+      "reactants": {
+        "{237} BrO": {},
+        "NO": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(8.80E-12, 0.0E+00, 260.0)"
+    },
+    {
+      "reactants": {
+        "{238} Br": {},
+        "BrNO3": {}
+      },
+      "products": {
+        "Br2": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.90E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{239} Br2": {},
+        "OH": {}
+      },
+      "products": {
+        "HOBr": {
+          "yield": 1.0
+        },
+        "Br": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.10E-11, 0.0E+00, 240.0)"
+    },
+    {
+      "reactants": {
+        "{240} HOBr": {},
+        "O": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "BrO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-10, 0.0E+00, -430.0)"
+    },
+    {
+      "reactants": {
+        "{241} HBr": {},
+        "O": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "Br": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(5.80E-12, 0.0E+00, -1500.0)"
+    },
+    {
+      "reactants": {
+        "{242} BrO": {},
+        "OH": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.70E-11, 0.0E+00, 250.0)"
+    },
+    {
+      "reactants": {
+        "{243} Br": {},
+        "NO3": {}
+      },
+      "products": {
+        "BrO": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.60E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{244} Br": {},
+        "CH2O": {}
+      },
+      "products": {
+        "HBr": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.70E-11, 0.0E+00, -800.0)"
+    },
+    {
+      "reactants": {
+        "{245} Br": {},
+        "ALD2": {}
+      },
+      "products": {
+        "HBr": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.30E-11, 0.0E+00, -360.0)"
+    },
+    {
+      "reactants": {
+        "{246} Br": {},
+        "ACET": {}
+      },
+      "products": {
+        "HBr": {
+          "yield": 1.0
+        },
+        "ATO2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.66E-10, 0.0E+00, -7000.0)"
+    },
+    {
+      "reactants": {
+        "{247} Br": {},
+        "C2H6": {}
+      },
+      "products": {
+        "HBr": {
+          "yield": 1.0
+        },
+        "ETO2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.36E-10, 0.0E+00, -6411.0)"
+    },
+    {
+      "reactants": {
+        "{248} Br": {},
+        "C3H8": {}
+      },
+      "products": {
+        "HBr": {
+          "yield": 1.0
+        },
+        "A3O2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(8.77E-11, 0.0E+00, -4330.0)"
+    },
+    {
+      "reactants": {
+        "{249} Br": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "BrNO2 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{250} BrO": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "BrNO3 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{251} BrNO3": {},
+        "H2O": {}
+      },
+      "products": {
+        "HOBr": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_BrNO3,1)"
+    },
+    {
+      "reactants": {
+        "{252} HOBr": {}
+      },
+      "products": {
+        "Br2": {
+          "yield": 0.5
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HOBr,1)"
+    },
+    {
+      "reactants": {
+        "{253} HBr": {}
+      },
+      "products": {
+        "Br2": {
+          "yield": 0.5
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HBr,1)"
+    },
+    {
+      "reactants": {
+        "{254} HOBr": {}
+      },
+      "products": {
+        "Br2": {
+          "yield": 0.5
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HOBr,2)"
+    },
+    {
+      "reactants": {
+        "{255} HBr": {}
+      },
+      "products": {
+        "Br2": {
+          "yield": 0.5
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HBr,2)"
+    },
+    {
+      "reactants": {
+        "{256} HC5": {},
+        "OH": {}
+      },
+      "products": {
+        "HC5OO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.35E-11, 0.0E+00, 380.0)"
+    },
+    {
+      "reactants": {
+        "{258} HC5OO": {},
+        "NO": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2NO('A', 2.70E-12, 0.0E+00, 350.0, 5.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{260} ISOPND": {},
+        "OH": {}
+      },
+      "products": {
+        "ISOPNDO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.64E-11, 0.0E+00, 380.0)"
+    },
+    {
+      "reactants": {
+        "{261} ISOPNB": {},
+        "OH": {}
+      },
+      "products": {
+        "ISOPNBO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.61E-12, 0.0E+00, 380.0)"
+    },
+    {
+      "reactants": {
+        "{263} ISOPNDO2": {},
+        "NO": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2NO('A', 2.70E-12, 0.0E+00, 350.0, 5.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{266} ISOPNBO2": {},
+        "NO": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2NO('A', 2.70E-12, 0.0E+00, 350.0, 5.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{269} MACRN": {},
+        "OH": {}
+      },
+      "products": {
+        "MACRNO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.39E-11, 0.0E+00, 380.0)"
+    },
+    {
+      "reactants": {
+        "{272} MACRNO2": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "PMNN": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{273} PMNN": {}
+      },
+      "products": {
+        "MACRNO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{276} DIBOO": {},
+        "NO": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2NO('A', 2.70E-12, 0.0E+00, 350.0, 5.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{278} MOBA": {},
+        "OH": {}
+      },
+      "products": {
+        "MOBAOO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.79E-11, 0.0E+00, 380.0)"
+    },
+    {
+      "reactants": {
+        "{279} MOBAOO": {},
+        "NO": {}
+      },
+      "products": {
+        "RCHO": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2NO('B', 2.70E-12, 0.0E+00, 350.0, 5.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{280} MOBAOO": {},
+        "NO": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GC_RO2NO('A', 2.70E-12, 0.0E+00, 350.0, 5.0, 0.0, 0.0)"
+    },
+    {
+      "reactants": {
+        "{282} MOBA": {},
+        "O3": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "MEK": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.00E-17, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{283} ETHLN": {},
+        "OH": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{284} PROPNN": {},
+        "OH": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "MGLY": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{285} CH2OO": {},
+        "NO": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{286} CH2OO": {},
+        "NO2": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{287} CH2OO": {},
+        "SO2": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{288} CH2OO": {},
+        "H2O": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "H2O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-18, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{289} CH2OO": {},
+        "H2O": {}
+      },
+      "products": {
+        "HCOOH": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-17, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{290} MACROO": {},
+        "CO": {}
+      },
+      "products": {
+        "MACR": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{291} MACROO": {},
+        "NO": {}
+      },
+      "products": {
+        "MACR": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{292} MACROO": {},
+        "NO2": {}
+      },
+      "products": {
+        "MACR": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{293} MACROO": {},
+        "SO2": {}
+      },
+      "products": {
+        "MACR": {
+          "yield": 1.0
+        },
+        "SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{294} MACROO": {},
+        "H2O": {}
+      },
+      "products": {
+        "MRP": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-17, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{295} MACROO": {},
+        "H2O": {}
+      },
+      "products": {
+        "MACR": {
+          "yield": 1.0
+        },
+        "H2O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-18, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{296} MVKOO": {},
+        "CO": {}
+      },
+      "products": {
+        "MVK": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{297} MVKOO": {},
+        "NO": {}
+      },
+      "products": {
+        "MVK": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{298} MVKOO": {},
+        "NO2": {}
+      },
+      "products": {
+        "MVK": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{299} MVKOO": {},
+        "SO2": {}
+      },
+      "products": {
+        "MVK": {
+          "yield": 1.0
+        },
+        "SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{300} MVKOO": {},
+        "H2O": {}
+      },
+      "products": {
+        "MVK": {
+          "yield": 1.0
+        },
+        "H2O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-18, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{301} MGLYOO": {},
+        "CO": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{302} MGLYOO": {},
+        "NO": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{303} MGLYOO": {},
+        "NO2": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{304} MGLYOO": {},
+        "SO2": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{305} MGLYOO": {},
+        "H2O": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "H2O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-18, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{306} MGLOO": {},
+        "CO": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{307} MGLOO": {},
+        "NO": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{308} MGLOO": {},
+        "NO2": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{309} MGLOO": {},
+        "SO2": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{310} MGLOO": {},
+        "H2O": {}
+      },
+      "products": {
+        "MCO3": {
+          "yield": 1.0
+        },
+        "MO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-17, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{311} MGLOO": {},
+        "H2O": {}
+      },
+      "products": {
+        "MGLY": {
+          "yield": 1.0
+        },
+        "H2O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-18, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{312} CH3CHOO": {},
+        "CO": {}
+      },
+      "products": {
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{313} CH3CHOO": {},
+        "NO": {}
+      },
+      "products": {
+        "ALD2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{314} CH3CHOO": {},
+        "NO2": {}
+      },
+      "products": {
+        "ALD2": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{315} CH3CHOO": {},
+        "SO2": {}
+      },
+      "products": {
+        "ALD2": {
+          "yield": 1.0
+        },
+        "SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{316} CH3CHOO": {},
+        "H2O": {}
+      },
+      "products": {
+        "ALD2": {
+          "yield": 1.0
+        },
+        "H2O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-18, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{317} CH3CHOO": {},
+        "H2O": {}
+      },
+      "products": {
+        "ACTA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-17, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{318} GAOO": {},
+        "CO": {}
+      },
+      "products": {
+        "GLYC": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{319} GAOO": {},
+        "NO": {}
+      },
+      "products": {
+        "GLYC": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{320} GAOO": {},
+        "NO2": {}
+      },
+      "products": {
+        "GLYC": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-15, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{321} GAOO": {},
+        "SO2": {}
+      },
+      "products": {
+        "GLYC": {
+          "yield": 1.0
+        },
+        "SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{322} GAOO": {},
+        "H2O": {}
+      },
+      "products": {
+        "GLYC": {
+          "yield": 1.0
+        },
+        "H2O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-18, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{323} GAOO": {},
+        "H2O": {}
+      },
+      "products": {
+        "HAC": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-17, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{324} O1D": {},
+        "H2O": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.63E-10, 0.0E+00, 60.0)"
+    },
+    {
+      "reactants": {
+        "{325} O1D": {},
+        "N2": {}
+      },
+      "products": {
+        "O": {
+          "yield": 1.0
+        },
+        "N2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.15E-11, 0.0E+00, 110.0)"
+    },
+    {
+      "reactants": {
+        "{326} O1D": {},
+        "O2": {}
+      },
+      "products": {
+        "O": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.30E-11, 0.0E+00, 55.0)"
+    },
+    {
+      "reactants": {
+        "{327} O1D": {},
+        "H2": {}
+      },
+      "products": {
+        "H": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-10, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{328} O1D": {},
+        "N2O": {}
+      },
+      "products": {
+        "N2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.63E-11, 0.0E+00, 20.0)"
+    },
+    {
+      "reactants": {
+        "{329} O1D": {},
+        "N2O": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.25E-11, 0.0E+00, 20.0)"
+    },
+    {
+      "reactants": {
+        "{330} O1D": {},
+        "CH4": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.31E-10, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{331} O1D": {},
+        "CH4": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "H2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(0.09E-10, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{332} O1D": {},
+        "CH4": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "H": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(0.35E-10, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{333} O": {},
+        "O2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "O3 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-34, 2.4E+00, 0.0)*CFACTOR"
+    },
+    {
+      "reactants": {
+        "{334} O": {},
+        "O3": {}
+      },
+      "products": {
+        "O2": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(8.00E-12, 0.0E+00, -2060.0)"
+    },
+    {
+      "reactants": {
+        "{335} OH": {},
+        "H2": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "H": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.80E-12, 0.0E+00, -1800.0)"
+    },
+    {
+      "reactants": {
+        "{336} O": {},
+        "OH": {}
+      },
+      "products": {
+        "O2": {
+          "yield": 1.0
+        },
+        "H": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.80E-11, 0.0E+00, 180.0)"
+    },
+    {
+      "reactants": {
+        "{337} HO2": {},
+        "O": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.00E-11, 0.0E+00, 200.0)"
+    },
+    {
+      "reactants": {
+        "{338} O1D": {},
+        "O3": {}
+      },
+      "products": {
+        "O2": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-10, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{339} O1D": {},
+        "O3": {}
+      },
+      "products": {
+        "O": {
+          "yield": 2.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-10, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{340} NO2": {},
+        "O": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(5.10E-12, 0.0E+00, 210.0)"
+    },
+    {
+      "reactants": {
+        "{341} NO3": {},
+        "O": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{342} NO": {},
+        "O {": {},
+        "M}": {}
+      },
+      "products": {
+        "NO2 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{343} NO2": {},
+        "O {": {},
+        "M}": {}
+      },
+      "products": {
+        "NO3 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{344} H2O2": {},
+        "O": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.40E-12, 0.0E+00, -2000.0)"
+    },
+    {
+      "reactants": {
+        "{345} H": {},
+        "O2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "HO2 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{346} H": {},
+        "O3": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.40E-10, 0.0E+00, -470.0)"
+    },
+    {
+      "reactants": {
+        "{347} H": {},
+        "HO2": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.20E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{348} H": {},
+        "HO2": {}
+      },
+      "products": {
+        "O": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.60E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{349} H": {},
+        "HO2": {}
+      },
+      "products": {
+        "H2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.90E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{350} N": {},
+        "O2": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 1.0
+        },
+        "O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.50E-11, 0.0E+00, -3600.0)"
+    },
+    {
+      "reactants": {
+        "{351} N": {},
+        "NO": {}
+      },
+      "products": {
+        "N2": {
+          "yield": 1.0
+        },
+        "O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.10E-11, 0.0E+00, 100.0)"
+    },
+    {
+      "reactants": {
+        "{352} N": {},
+        "NO2": {}
+      },
+      "products": {
+        "N2O": {
+          "yield": 1.0
+        },
+        "O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(5.80E-12, 0.0E+00, 220.0)"
+    },
+    {
+      "reactants": {
+        "{353} BrO": {},
+        "O": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.90E-11, 0.0E+00, 230.0)"
+    },
+    {
+      "reactants": {
+        "{354} CH2O": {},
+        "O": {}
+      },
+      "products": {
+        "CO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.40E-11, 0.0E+00, -1600.0)"
+    },
+    {
+      "reactants": {
+        "{358} OH": {},
+        "Cl2": {}
+      },
+      "products": {
+        "HOCl": {
+          "yield": 1.0
+        },
+        "Cl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.60E-12, 0.0E+00, -1100.0)"
+    },
+    {
+      "reactants": {
+        "{359} MO2": {},
+        "ClO": {}
+      },
+      "products": {
+        "ClOO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.30E-12, 0.0E+00, -115.0)"
+    },
+    {
+      "reactants": {
+        "{360} OH": {},
+        "ClO": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "Cl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.40E-12, 0.0E+00, 270.0)"
+    },
+    {
+      "reactants": {
+        "{361} OH": {},
+        "ClO": {}
+      },
+      "products": {
+        "HCl": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-13, 0.0E+00, 230.0)"
+    },
+    {
+      "reactants": {
+        "{362} OH": {},
+        "OClO": {}
+      },
+      "products": {
+        "HOCl": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.40E-12, 0.0E+00, 600.0)"
+    },
+    {
+      "reactants": {
+        "{363} OH": {},
+        "Cl2O2": {}
+      },
+      "products": {
+        "HOCl": {
+          "yield": 1.0
+        },
+        "ClOO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-13, 0.0E+00, 670.0)"
+    },
+    {
+      "reactants": {
+        "{364} OH": {},
+        "HCl": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "Cl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.80E-12, 0.0E+00, -250.0)"
+    },
+    {
+      "reactants": {
+        "{365} OH": {},
+        "HOCl": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "ClO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.00E-12, 0.0E+00, -500.0)"
+    },
+    {
+      "reactants": {
+        "{366} OH": {},
+        "ClNO2": {}
+      },
+      "products": {
+        "HOCl": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.40E-12, 0.0E+00, -1250.0)"
+    },
+    {
+      "reactants": {
+        "{367} OH": {},
+        "ClNO3": {}
+      },
+      "products": {
+        "HOCl": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-12, 0.0E+00, -330.0)"
+    },
+    {
+      "reactants": {
+        "{368} CH4": {},
+        "Cl": {}
+      },
+      "products": {
+        "HCl": {
+          "yield": 1.0
+        },
+        "MO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.30E-12, 0.0E+00, -1280.0)"
+    },
+    {
+      "reactants": {
+        "{369} CH2O": {},
+        "Cl": {}
+      },
+      "products": {
+        "CO": {
+          "yield": 1.0
+        },
+        "HCl": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(8.10E-11, 0.0E+00, -30.0)"
+    },
+    {
+      "reactants": {
+        "{370} Cl": {},
+        "O3": {}
+      },
+      "products": {
+        "ClO": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.30E-11, 0.0E+00, -200.0)"
+    },
+    {
+      "reactants": {
+        "{371} Cl": {},
+        "H2": {}
+      },
+      "products": {
+        "H": {
+          "yield": 1.0
+        },
+        "HCl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.05E-11, 0.0E+00, -2270.0)"
+    },
+    {
+      "reactants": {
+        "{372} Cl": {},
+        "H2O2": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "HCl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.10E-11, 0.0E+00, -980.0)"
+    },
+    {
+      "reactants": {
+        "{373} Cl": {},
+        "HO2": {}
+      },
+      "products": {
+        "O2": {
+          "yield": 1.0
+        },
+        "HCl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.40E-11, 0.0E+00, 270.0)"
+    },
+    {
+      "reactants": {
+        "{374} Cl": {},
+        "HO2": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "ClO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.60E-11, 0.0E+00, -375.0)"
+    },
+    {
+      "reactants": {
+        "{375} ClO": {},
+        "O": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.80E-11, 0.0E+00, 85.0)"
+    },
+    {
+      "reactants": {
+        "{376} ClO": {},
+        "HO2": {}
+      },
+      "products": {
+        "O2": {
+          "yield": 1.0
+        },
+        "HOCl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.60E-12, 0.0E+00, 290.0)"
+    },
+    {
+      "reactants": {
+        "{377} ClO": {},
+        "NO": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.40E-12, 0.0E+00, 290.0)"
+    },
+    {
+      "reactants": {
+        "{378} ClO": {},
+        "NO2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "ClNO3 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{379} ClO": {},
+        "ClO": {}
+      },
+      "products": {
+        "Cl2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-12, 0.0E+00, -1590.0)"
+    },
+    {
+      "reactants": {
+        "{380} ClO": {},
+        "ClO": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "ClOO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.00E-11, 0.0E+00, -2450.0)"
+    },
+    {
+      "reactants": {
+        "{381} ClO": {},
+        "ClO": {}
+      },
+      "products": {
+        "OClO": {
+          "yield": 1.0
+        },
+        "Cl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.50E-13, 0.0E+00, -1370.0)"
+    },
+    {
+      "reactants": {
+        "{382} Cl": {},
+        "O2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "ClOO {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{383} ClOO {": {},
+        "M}": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "O2 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{384} ClO": {},
+        "ClO {": {},
+        "M}": {}
+      },
+      "products": {
+        "Cl2O2 {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{385} Cl2O2 {": {},
+        "M}": {}
+      },
+      "products": {
+        "2.000ClO {": {
+          "yield": 1.0
+        },
+        "M}": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{386} ClOO": {},
+        "Cl": {}
+      },
+      "products": {
+        "Cl2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.30E-10, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{387} ClOO": {},
+        "Cl": {}
+      },
+      "products": {
+        "ClO": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{388} ClO": {},
+        "BrO": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "OClO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(9.50E-13, 0.0E+00, 550.0)"
+    },
+    {
+      "reactants": {
+        "{389} ClO": {},
+        "BrO": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "ClOO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.30E-12, 0.0E+00, 260.0)"
+    },
+    {
+      "reactants": {
+        "{390} ClO": {},
+        "BrO": {}
+      },
+      "products": {
+        "BrCl": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.10E-13, 0.0E+00, 290.0)"
+    },
+    {
+      "reactants": {
+        "{391} ClNO3": {},
+        "O": {}
+      },
+      "products": {
+        "ClO": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.60E-12, 0.0E+00, -840.0)"
+    },
+    {
+      "reactants": {
+        "{392} ClNO3": {},
+        "Cl": {}
+      },
+      "products": {
+        "Cl2": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.50E-12, 0.0E+00, 135.0)"
+    },
+    {
+      "reactants": {
+        "{393} N2O5": {},
+        "HCl": {}
+      },
+      "products": {
+        "ClNO2": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_N2O5,2)"
+    },
+    {
+      "reactants": {
+        "{394} ClNO3": {},
+        "H2O": {}
+      },
+      "products": {
+        "HOCl": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_ClNO3,1)"
+    },
+    {
+      "reactants": {
+        "{395} ClNO3": {},
+        "HCl": {}
+      },
+      "products": {
+        "Cl2": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_ClNO3,2)"
+    },
+    {
+      "reactants": {
+        "{396} ClNO3": {},
+        "HBr": {}
+      },
+      "products": {
+        "BrCl": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_ClNO3,3)"
+    },
+    {
+      "reactants": {
+        "{397} BrNO3": {},
+        "HCl": {}
+      },
+      "products": {
+        "BrCl": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_BrNO3,2)"
+    },
+    {
+      "reactants": {
+        "{398} HOCl": {},
+        "HCl": {}
+      },
+      "products": {
+        "Cl2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HOCl,1)"
+    },
+    {
+      "reactants": {
+        "{399} HOCl": {},
+        "HBr": {}
+      },
+      "products": {
+        "BrCl": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HOCl,2)"
+    },
+    {
+      "reactants": {
+        "{400} HOBr": {},
+        "HCl": {}
+      },
+      "products": {
+        "BrCl": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HOBr,3)"
+    },
+    {
+      "reactants": {
+        "{401} O3": {},
+        "hv": {}
+      },
+      "products": {
+        "O": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{402} O3": {},
+        "hv": {}
+      },
+      "products": {
+        "O1D": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{403} O2": {},
+        "hv": {}
+      },
+      "products": {
+        "O": {
+          "yield": 2.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{404} NO2": {},
+        "hv": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 1.0
+        },
+        "O": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{405} H2O2": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{406} MP": {},
+        "hv": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{407} CH2O": {},
+        "hv": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "H": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{408} CH2O": {},
+        "hv": {}
+      },
+      "products": {
+        "H2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{409} HNO3": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{410} HNO2": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "NO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{411} HNO4": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{412} HNO4": {},
+        "hv": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{413} NO3": {},
+        "hv": {}
+      },
+      "products": {
+        "NO2": {
+          "yield": 1.0
+        },
+        "O": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{414} NO3": {},
+        "hv": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{415} N2O5": {},
+        "hv": {}
+      },
+      "products": {
+        "NO3": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{417} ALD2": {},
+        "hv": {}
+      },
+      "products": {
+        "CH4": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{419} RCHO": {},
+        "hv": {}
+      },
+      "products": {
+        "ETO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{420} ACET": {},
+        "hv": {}
+      },
+      "products": {
+        "MCO3": {
+          "yield": 1.0
+        },
+        "MO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{421} ACET": {},
+        "hv": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 2.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{424} GLYX": {},
+        "hv": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 2.0
+        },
+        "CO": {
+          "yield": 2.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{425} GLYX": {},
+        "hv": {}
+      },
+      "products": {
+        "H2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 2.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{426} GLYX": {},
+        "hv": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{427} MGLY": {},
+        "hv": {}
+      },
+      "products": {
+        "MCO3": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{428} MVK": {},
+        "hv": {}
+      },
+      "products": {
+        "PRPE": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{429} MVK": {},
+        "hv": {}
+      },
+      "products": {
+        "MCO3": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{430} MVK": {},
+        "hv": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "RCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{431} MACR": {},
+        "hv": {}
+      },
+      "products": {
+        "CO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{432} HAC": {},
+        "hv": {}
+      },
+      "products": {
+        "MCO3": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{433} INPN": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "RCHO": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{434} PRPN": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "RCHO": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{435} ETP": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{436} RA3P": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "RCHO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{437} RB3P": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "ACET": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{438} R4P": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "RCHO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{439} PP": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{440} RP": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{443} ISNP": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        },
+        "RCHO": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{446} MAOP": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{448} MAP": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "MO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{450} MVKN": {},
+        "hv": {}
+      },
+      "products": {
+        "GLYC": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{451} ISOPNB": {},
+        "hv": {}
+      },
+      "products": {
+        "HC5": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{452} Br2": {},
+        "hv": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 2.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{453} BrO": {},
+        "hv": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "O": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{454} HOBr": {},
+        "hv": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{455} BrNO3": {},
+        "hv": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{456} BrNO3": {},
+        "hv": {}
+      },
+      "products": {
+        "BrO": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{457} BrNO2": {},
+        "hv": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{458} MPN": {},
+        "hv": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{459} MPN": {},
+        "hv": {}
+      },
+      "products": {
+        "MO2": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{460} ISOPND": {},
+        "hv": {}
+      },
+      "products": {
+        "HC5": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{461} PROPNN": {},
+        "hv": {}
+      },
+      "products": {
+        "CH2O": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        },
+        "MO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{462} ATOOH": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "CH2O": {
+          "yield": 1.0
+        },
+        "MCO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{463} N2O": {},
+        "hv": {}
+      },
+      "products": {
+        "N2": {
+          "yield": 1.0
+        },
+        "O1D": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{464} SO4": {},
+        "hv": {}
+      },
+      "products": {
+        "SO2": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 2.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{465} NO": {},
+        "hv": {}
+      },
+      "products": {
+        "O": {
+          "yield": 1.0
+        },
+        "N": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{466} BrCl": {},
+        "hv": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "Cl": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{467} Cl2": {},
+        "hv": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 2.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{468} ClO": {},
+        "hv": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "O": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{469} OClO": {},
+        "hv": {}
+      },
+      "products": {
+        "ClO": {
+          "yield": 1.0
+        },
+        "O": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{470} Cl2O2": {},
+        "hv": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "ClOO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{471} ClNO2": {},
+        "hv": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{472} ClNO3": {},
+        "hv": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{473} ClNO3": {},
+        "hv": {}
+      },
+      "products": {
+        "ClO": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{474} HOCl": {},
+        "hv": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "OH": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{475} ClOO": {},
+        "hv": {}
+      },
+      "products": {
+        "Cl": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{476} OH": {},
+        "H2": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "H": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{477} CARB3": {},
+        "hv": {}
+      },
+      "products": {
+        "CO": {
+          "yield": 1.0
+        },
+        "H2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{478} CARB3": {},
+        "hv": {}
+      },
+      "products": {
+        "HO2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{479} CH2O": {},
+        "hv": {}
+      },
+      "products": {
+        "H2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{480} NH2": {},
+        "NO": {}
+      },
+      "products": {
+        "N2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.60E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{481} NH2": {},
+        "NO2": {}
+      },
+      "products": {
+        "N2O": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{482} NH2": {},
+        "NO2": {}
+      },
+      "products": {
+        "H2NO": {
+          "yield": 1.0
+        },
+        "NO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(9.00E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{483} H2NO": {},
+        "O2": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.00E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{484} 2.000NH3": {},
+        "H2SO4": {}
+      },
+      "products": {
+        "NH42SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_H2SO4, 2)"
+    },
+    {
+      "reactants": {
+        "{485} NH3": {},
+        "HNO3": {}
+      },
+      "products": {
+        "NH4NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HNO3, 3);  /*Preferentially Het if not GCARR(2.5E-14, 0.0E+00, 0) */"
+    },
+    {
+      "reactants": {
+        "{485} NH3": {},
+        "HNO3": {}
+      },
+      "products": {
+        "NH4NO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HNO3, 4);  /*Het onto soot and ICE */"
+    },
+    {
+      "reactants": {
+        "{486} NH4NO3": {}
+      },
+      "products": {
+        "NH3": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: ((2.50E-14) / 2.80E-04 * EXP(118.87 - (24804.0/TEMP) - 6.025*LOG(TEMP))) ; /* can add NH3 + HNO3 = 4.4H2O ?"
+    },
+    {
+      "reactants": {
+        "{487} NH3": {},
+        "OH": {}
+      },
+      "products": {
+        "NH2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{488} NH2": {},
+        "HO2": {}
+      },
+      "products": {
+        "NH3": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.90E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{489} NH2": {},
+        "O2": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.00E-20, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{490} NO": {},
+        "NO2": {},
+        "H2O": {}
+      },
+      "products": {
+        "HNO2": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_NO2, 2); /* Het preferably if not GCARR(2.0E-39, 0.0E+00, 3000.0)"
+    },
+    {
+      "reactants": {
+        "{491} SO2": {},
+        "OH": {}
+      },
+      "products": {
+        "SO3": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.50E-12, 0.0E+00, -700.0)"
+    },
+    {
+      "reactants": {
+        "{492} SO3": {},
+        "H2O": {}
+      },
+      "products": {
+        "H2SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.20E-15, 0.0E+00, 0)"
+    },
+    {
+      "reactants": {
+        "{493} NACl": {},
+        "HNO3": {}
+      },
+      "products": {
+        "NANO3": {
+          "yield": 1.0
+        },
+        "HCl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HNO3, 1)"
+    },
+    {
+      "reactants": {
+        "{494} NACl": {},
+        "N2O5": {}
+      },
+      "products": {
+        "ClNO2": {
+          "yield": 1.0
+        },
+        "NANO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_N2O5, 3)"
+    },
+    {
+      "reactants": {
+        "{495} NACl": {},
+        "ClNO3": {}
+      },
+      "products": {
+        "Cl2": {
+          "yield": 1.0
+        },
+        "NANO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_ClNO3, 4)"
+    },
+    {
+      "reactants": {
+        "{496} NACl": {},
+        "HOCl": {}
+      },
+      "products": {
+        "Cl2": {
+          "yield": 1.0
+        },
+        "NAOH": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HOCl, 3)"
+    },
+    {
+      "reactants": {
+        "{497} CACO3": {},
+        "H2SO4": {}
+      },
+      "products": {
+        "CASO4": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_H2SO4, 1)"
+    },
+    {
+      "reactants": {
+        "{498} CACO3": {},
+        "HNO3": {}
+      },
+      "products": {
+        "CANO32": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HNO3, 2)"
+    },
+    {
+      "reactants": {
+        "{499} CACO3": {},
+        "HCl": {}
+      },
+      "products": {
+        "CACl2": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HCl, 1)"
+    },
+    {
+      "reactants": {
+        "{500} H2S": {},
+        "OH": {}
+      },
+      "products": {
+        "SO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.3E-12, 0.0E+00, -80)"
+    },
+    {
+      "reactants": {
+        "{501} CS2": {},
+        "OH": {}
+      },
+      "products": {
+        "OCS": {
+          "yield": 1.0
+        },
+        "SO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.0E-12, 0.0E+00, -400)"
+    },
+    {
+      "reactants": {
+        "{502} OCS": {},
+        "OH": {}
+      },
+      "products": {
+        "SO2": {
+          "yield": 1.0
+        },
+        "CO2": {
+          "yield": 1.0
+        },
+        "H": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.1E-14, 0.0E+00, -1200)"
+    },
+    {
+      "reactants": {
+        "{503} OCS": {},
+        "hv": {}
+      },
+      "products": {
+        "CO": {
+          "yield": 1.0
+        },
+        "S": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{504} DMS": {},
+        "OH": {}
+      },
+      "products": {
+        "SO2": {
+          "yield": 1.0
+        },
+        "CH3O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(9.6E-12, 0.0E+00, -234)"
+    },
+    {
+      "reactants": {
+        "{505} DMS": {},
+        "OH": {}
+      },
+      "products": {
+        "MSA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.0E-12, 0.0E+00, 0)"
+    },
+    {
+      "reactants": {
+        "{506} DMS": {},
+        "NO3": {}
+      },
+      "products": {
+        "SO2": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.9E-13, 0.0E+00, 500)"
+    },
+    {
+      "reactants": {
+        "{507} AGI": {},
+        "hv": {}
+      },
+      "products": {
+        "AG": {
+          "yield": 1.0
+        },
+        "I": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{508} BII3": {},
+        "hv": {}
+      },
+      "products": {
+        "BI": {
+          "yield": 1.0
+        },
+        "I": {
+          "yield": 3.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{509} ClNO3": {},
+        "HCl": {}
+      },
+      "products": {
+        "Cl2": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_ClNO3, 5)"
+    },
+    {
+      "reactants": {
+        "{510} ClNO3": {},
+        "H2O": {}
+      },
+      "products": {
+        "HOCl": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_ClNO3, 6)"
+    },
+    {
+      "reactants": {
+        "{511} N2O5": {},
+        "H2O": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_N2O5, 4)"
+    },
+    {
+      "reactants": {
+        "{512} I": {},
+        "O3": {}
+      },
+      "products": {
+        "IO": {
+          "yield": 1.0
+        },
+        "IO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.10E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{513} IO": {},
+        "NO": {}
+      },
+      "products": {
+        "I": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.15E-12, 0.0E+00, 260.0)"
+    },
+    {
+      "reactants": {
+        "{514} IO": {},
+        "HO2": {}
+      },
+      "products": {
+        "HOI": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.00E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{515} IO": {},
+        "IO": {}
+      },
+      "products": {
+        "OIO": {
+          "yield": 1.0
+        },
+        "I": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(7.00E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{516} HOI": {},
+        "hv": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "I": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{517} OIO": {},
+        "hv": {}
+      },
+      "products": {
+        "I": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "/*{517} IO2": {},
+        "hv": {}
+      },
+      "products": {
+        "I": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{518} HOBr": {},
+        "NACl": {}
+      },
+      "products": {
+        "BrCl": {
+          "yield": 1.0
+        },
+        "NAOH": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_HOBr, 4)"
+    },
+    {
+      "reactants": {
+        "{519} BrCl": {},
+        "hv": {}
+      },
+      "products": {
+        "Br": {
+          "yield": 1.0
+        },
+        "Cl": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    },
+    {
+      "reactants": {
+        "{520} O3": {}
+      },
+      "products": {
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_O3, 1)"
+    },
+    {
+      "reactants": {
+        "{521} NO3": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_NO3, 2)"
+    },
+    {
+      "reactants": {
+        "{522} N2O5": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_N2O5, 5)"
+    },
+    {
+      "reactants": {
+        "{523} LUB": {},
+        "OH": {}
+      },
+      "products": {
+        "RO2": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.30E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{524} RO2": {},
+        "NO": {}
+      },
+      "products": {
+        "RO": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.60E-12, 0.0E+00, 365.0)"
+    },
+    {
+      "reactants": {
+        "{525} RO2": {},
+        "NO": {}
+      },
+      "products": {
+        "RONO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.00E-14, 0.0E+00, 365.0)"
+    },
+    {
+      "reactants": {
+        "{526} RCO3": {},
+        "NO2": {}
+      },
+      "products": {
+        "PAN": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.80E-12, 0.0E+00, 180.0)"
+    },
+    {
+      "reactants": {
+        "{527} PAN": {}
+      },
+      "products": {
+        "RCO3": {
+          "yield": 1.0
+        },
+        "NO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.00E+16, 0.0E+00, -13600.0)"
+    },
+    {
+      "reactants": {
+        "{528} LUB": {},
+        "NO3": {}
+      },
+      "products": {
+        "RO2": {
+          "yield": 1.0
+        },
+        "HNO3": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-16, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{529} LUB": {},
+        "Cl": {}
+      },
+      "products": {
+        "RO2": {
+          "yield": 1.0
+        },
+        "HCl": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.00E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{530} RO2": {},
+        "HO2": {}
+      },
+      "products": {
+        "RCOOH": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{531} RCOOH": {},
+        "NH3": {}
+      },
+      "products": {
+        "SOA": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(5.00E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{532} O": {},
+        "NH3": {}
+      },
+      "products": {
+        "OH": {
+          "yield": 1.0
+        },
+        "NH2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.50E-10, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{533} OH": {},
+        "NH3": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "NH2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.70E-12, 0.0E+00, -710.0)"
+    },
+    {
+      "reactants": {
+        "{534} NO2": {},
+        "NH2": {}
+      },
+      "products": {
+        "NH2O": {
+          "yield": 1.0
+        },
+        "NO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.50E-12, 0.0E+00, 761.0)"
+    },
+    {
+      "reactants": {
+        "{535} O3": {},
+        "NH2": {}
+      },
+      "products": {
+        "NH2O": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.50E-13, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{536} O3": {},
+        "NH2O": {}
+      },
+      "products": {
+        "NH2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 2.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.00E-14, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{537} NH2O": {},
+        "OH": {}
+      },
+      "products": {
+        "HNO": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.80E-10, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{538} HNO": {},
+        "OH": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(5.00E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{539} NO": {},
+        "NH2": {}
+      },
+      "products": {
+        "H2O": {
+          "yield": 1.0
+        },
+        "N2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.00E-12, 0.0E+00, 450.0)"
+    },
+    {
+      "reactants": {
+        "{540} O": {},
+        "N2O": {}
+      },
+      "products": {
+        "N2": {
+          "yield": 1.0
+        },
+        "O2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(4.90E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{541} NO3": {},
+        "NH3": {}
+      },
+      "products": {
+        "HNO3": {
+          "yield": 1.0
+        },
+        "NH2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.00E-14, 0.0E+00, -1839.0)"
+    },
+    {
+      "reactants": {
+        "{542} SCI": {},
+        "NH3": {}
+      },
+      "products": {
+        "HNO": {
+          "yield": 1.0
+        },
+        "H2O": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(3.10E-20, 2.0E+00, 1011.0)"
+    },
+    {
+      "reactants": {
+        "{543} HNO": {},
+        "O2": {}
+      },
+      "products": {
+        "NO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(1.00E-19, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{544} NH2": {},
+        "O2": {}
+      },
+      "products": {
+        "HNO": {
+          "yield": 1.0
+        },
+        "HO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.90E-12, 3.76E+00, -9150.0); /* GCARR(1.70E-12, 0.0E+00, 0.0); for upper limit Tyndall (1991) , GCARR(2.90E-12, 3.76E+00, -9150.0) high temperature combustion plumes */"
+    },
+    {
+      "reactants": {
+        "{546} NH2": {},
+        "O": {}
+      },
+      "products": {
+        "HNO": {
+          "yield": 1.0
+        },
+        "H": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.60E-11, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{547} NH2": {},
+        "NO2": {}
+      },
+      "products": {
+        "HNO": {
+          "yield": 1.0
+        },
+        "NO": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(6.50E-13, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "/* {548} NO2": {}
+      },
+      "products": {
+        "HNO2": {
+          "yield": 0.5
+        },
+        "NO3": {
+          "yield": 0.5
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_NO2, 3);  luBricant?*/"
+    },
+    {
+      "reactants": {
+        "{548} 2NH3": {},
+        "H2SO4": {}
+      },
+      "products": {
+        "NH42SO4": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: HET(ind_H2SO4, 3)"
+    },
+    {
+      "reactants": {
+        "{549} S": {},
+        "O2": {}
+      },
+      "products": {
+        "SO2": {
+          "yield": 1.0
+        }
+      },
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: GCARR(2.30E-12, 0.0E+00, 0.0)"
+    },
+    {
+      "reactants": {
+        "{550} AG": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_AG, 0) /* GCARR(1.00E-06, 0.0E+00, 0.0); */ /* Depositional loss would like to add to Het reactions when possible, determined by v = 2/9 (r*r*g(rho particle-rho air)/viscosity stokes equation */"
+    },
+    {
+      "reactants": {
+        "{551} BI": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_BI, 0); /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{552} SOA": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_SOA, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0);  */"
+    },
+    {
+      "reactants": {
+        "{553} AL": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_AL, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{554} LUB": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_LUB, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{555} CASO4": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_CASO4, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{556} CANO32": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_CANO32, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{557} CACl2": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_CACL2, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{558} RONO2": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_RONO2, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{559} MSA": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_MSA, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{560} H2SO4": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_H2SO4, 3) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{561} SOA": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_SOA, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{562} NANO3": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_NANO3, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{563} HOI": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_HOI, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{564} IOI": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_IOI, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{565} IO": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_IO, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{566} NH42SO4": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_NH42SO4, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{567} NH4SO3": {}
+      },
+      "products": {},
+      "type": "CONSTANT",
+      "k": 0.0,
+      "comment": "Unparsed KPP rate: Het(ind_NH4SO3, 0) ; /* GCARR(1.00E-06, 0.0E+00, 0.0); */"
+    },
+    {
+      "reactants": {
+        "{568} RHCO": {},
+        "hv": {}
+      },
+      "products": {
+        "H2": {
+          "yield": 1.0
+        },
+        "CO": {
+          "yield": 1.0
+        },
+        "ALD2": {
+          "yield": 1.0
+        }
+      },
+      "type": "PHOTOLYSIS",
+      "scaling_factor": 1.0
+    }
+  ]
+}

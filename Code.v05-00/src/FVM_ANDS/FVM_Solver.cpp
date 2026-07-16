@@ -28,7 +28,22 @@ namespace FVM_ANDS{
         auto mat = advDiffSys_.getCoefMatrix();
         auto b = advDiffSys_.getRHS();
         solver_.compute(mat);
-        Eigen::VectorXd solution = solver_.solveWithGuess(b, advDiffSys_.phi());
+        const Eigen::VectorXd& guess = advDiffSys_.phi();
+        double b_norm = b.norm();
+        Eigen::VectorXd solution;
+        if (b_norm > 0) {
+            double res_norm = (b - mat * guess).norm();
+            if (res_norm / b_norm < solver_.tolerance()) {
+                solution = guess;
+            } else {
+                solution = solver_.solveWithGuess(b, guess);
+                if (solution.hasNaN()) {
+                    solution = solver_.solve(b);
+                }
+            }
+        } else {
+            solution = guess;
+        }
         advDiffSys_.updatePhi(std::move(solution));
         return advDiffSys_.phi();
     }
@@ -40,7 +55,22 @@ namespace FVM_ANDS{
         auto mat = advDiffSys_.getCoefMatrix();
         auto b = advDiffSys_.getRHS();
         solver_.compute(mat);
-        Eigen::VectorXd solution = solver_.solveWithGuess(b, advDiffSys_.phi());
+        const Eigen::VectorXd& guess = advDiffSys_.phi();
+        double b_norm = b.norm();
+        Eigen::VectorXd solution;
+        if (b_norm > 0) {
+            double res_norm = (b - mat * guess).norm();
+            if (res_norm / b_norm < solver_.tolerance()) {
+                solution = guess;
+            } else {
+                solution = solver_.solveWithGuess(b, guess);
+                if (solution.hasNaN()) {
+                    solution = solver_.solve(b);
+                }
+            }
+        } else {
+            solution = guess;
+        }
         advDiffSys_.updatePhi(std::move(solution));
         return advDiffSys_.phi();
     }

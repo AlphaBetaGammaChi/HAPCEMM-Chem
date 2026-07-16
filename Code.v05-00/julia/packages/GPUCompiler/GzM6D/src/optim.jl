@@ -1,0 +1,668 @@
+# LLVM IR optimization
+
+"""
+    apply_fastmath!(mod::LLVM.Module)
+
+Apply fast-math semantics to every function definition in `mod` — as if every
+floating-point operation were wrapped in `@fastmath`. Sets `unsafe-fp-math="true"`
+as a function attribute and turns on all fast-math flags on eligible FP
+instructions.
+
+Back-ends should call this from `finish_linked_module!` when their target has
+fast math enabled. Set both the function attribute and the per-instruction
+flags: not every codegen hook reads both (e.g. LLVM 18's NVPTX
+`usePrecSqrtF32` only consults `TargetMachine.Options.UnsafeFPMath`, which
+isn't reachable through LLVM.jl, so flagging the instructions is the
+portable path), and flagging both leaves no path that silently keeps the
+slow lowering.
+"""
+function apply_fastmath!(mod::LLVM.Module)
+    for f in functions(mod)
+        isdeclaration(f) && continue
+        push!(function_attributes(f), StringAttribute("unsafe-fp-math", "true"))
+        for bb in blocks(f), inst in instructions(bb)
+            if Bool(LLVM.API.LLVMCanValueUseFastMathFlags(inst))
+                fast_math!(inst; all=true)
+            end
+        end
+    end
+    return
+end
+
+# Pick the peephole pass according to `optimization_options(job).instcombine`. Defaults to
+# `InstCombinePass` to match LLVM's standard pipeline; `InstSimplifyPass` is the fallback
+# for back-ends that need only the simplification subset.
+function instcombine_pass(@nospecialize(job::CompilerJob))
+    if get(optimization_options(job), :instcombine, true)
+        InstCombinePass()
+    else
+        InstSimplifyPass()
+    end
+end
+
+# Pick the peephole pass according to `optimization_options(job).aggressiveinstcombine`.
+function aggressiveinstcombine_pass(@nospecialize(job::CompilerJob))
+    if get(optimization_options(job), :aggressiveinstcombine, true)
+        AggressiveInstCombinePass()
+    else
+        InstSimplifyPass()
+    end
+end
+
+# A crash in an optimization pass is a compiler bug, and the only reliable way to debug one
+# that reproduces only in CI is to get the offending module off the machine. On a failure we
+# write out the IR *entering* `optimize!` -- a faithful, re-optimizable reproducer (parse it
+# and call `optimize!` again), unlike a module recovered later via `optimize=false`, which has
+# already been through back-end IR finalization -- and, on a CI agent, publish it:
+#  - Buildkite: `buildkite-agent artifact upload`, plus an error annotation pointing to it.
+#  - GitHub Actions: drop it in `$RUNNER_TEMP` for an `actions/upload-artifact` step and
+#    surface it as a workflow notice.
+# Snapshotting costs a `string(mod)` per compile, so it is gated to CI (auto-detected) or an
+# explicit `JULIA_GPUCOMPILER_DUMP_IR`; everything else pays nothing.
+function dump_failing_ir_enabled()
+    if haskey(ENV, "JULIA_GPUCOMPILER_DUMP_IR")
+        return parse(Bool, ENV["JULIA_GPUCOMPILER_DUMP_IR"])
+    end
+    return haskey(ENV, "BUILDKITE") || get(ENV, "GITHUB_ACTIONS", "false") == "true"
+end
+
+function dump_failing_ir(ir::AbstractString, @nospecialize(err))
+    path = tempname() * ".ll"
+    try
+        write(path, ir)
+    catch e
+        @error "GPUCompiler: could not write failing IR" exception=(e, catch_backtrace())
+        return nothing
+    end
+    name = basename(path)
+
+    if parse(Bool, get(ENV, "BUILDKITE", "false"))
+        try
+            run(`buildkite-agent artifact upload $path`)
+            annotation = "GPUCompiler optimization failed: `$(sprint(showerror, err))`. " *
+                "Un-optimized IR uploaded as artifact `$name` (download with " *
+                "`buildkite-agent artifact download $name .` and re-run the optimizer on it " *
+                "to reproduce)."
+            run(pipeline(`buildkite-agent annotate --style error --context gpucompiler-optimization`;
+                         stdin=IOBuffer(annotation)))
+        catch e
+            @error "GPUCompiler: failed to upload failing IR via buildkite-agent" exception=(e, catch_backtrace())
+        end
+    elseif get(ENV, "GITHUB_ACTIONS", "false") == "true"
+        try
+            dir = mkpath(joinpath(get(ENV, "RUNNER_TEMP", tempdir()), "gpucompiler-dumps"))
+            cp(path, joinpath(dir, name); force=true)
+            println("::notice title=GPUCompiler optimization failure::wrote $name to $dir")
+        catch e
+            @error "GPUCompiler: failed to stage failing IR for upload" exception=(e, catch_backtrace())
+        end
+    end
+
+    @info "GPUCompiler: wrote failing module to $path"
+    return path
+end
+
+function optimize!(@nospecialize(job::CompilerJob), mod::LLVM.Module; opt_level=2)
+    tm = llvm_machine(job.config.target)
+    tti = llvm_targetinfo(job.config.target)
+
+    global current_job
+    current_job = job
+
+    # snapshot the (re-optimizable) input so a pass crash can surface a reproducer
+    input_ir = dump_failing_ir_enabled() ? string(mod) : nothing
+
+    try
+        @dispose pb=NewPMPassBuilder() begin
+            tti === nothing || LLVM.target_transform_info!(pb, tti)
+
+            register!(pb, GPULowerCPUFeaturesPass())
+            register!(pb, GPULowerPTLSPass())
+            register!(pb, GPULowerGCFramePass())
+            register!(pb, GPULinkRuntimePass())
+            register!(pb, GPULinkLibrariesPass())
+            register!(pb, GPUFinishRuntimeIntrinsicsPass())
+            register!(pb, AddKernelStatePass())
+            register!(pb, LowerKernelStatePass())
+            register!(pb, CleanupKernelStatePass())
+
+            add!(pb, NewPMModulePassManager()) do mpm
+                buildNewPMPipeline!(mpm, job, opt_level)
+            end
+            run!(pb, mod, tm)
+        end
+        optimize_module!(job, mod)
+        run!(DeadArgumentEliminationPass(), mod, tm)
+    catch err
+        input_ir === nothing || dump_failing_ir(input_ir, err)
+        rethrow()
+    end
+    return
+end
+
+function buildNewPMPipeline!(mpm, @nospecialize(job::CompilerJob), opt_level)
+    buildEarlySimplificationPipeline(mpm, job, opt_level)
+    add!(mpm, AlwaysInlinerPass())
+    buildEarlyOptimizerPipeline(mpm, job, opt_level)
+    add!(mpm, NewPMFunctionPassManager()) do fpm
+        buildLoopOptimizerPipeline(fpm, job, opt_level)
+        buildScalarOptimizerPipeline(fpm, job, opt_level)
+        if (can_vectorize(job)) && opt_level >= 2
+            buildVectorPipeline(fpm, job, opt_level)
+        end
+        if isdebug(:optim)
+            add!(fpm, WarnMissedTransformationsPass())
+        end
+    end
+    buildIntrinsicLoweringPipeline(mpm, job, opt_level)
+    buildCleanupPipeline(mpm, job, opt_level)
+end
+
+const BasicSimplifyCFGOptions =
+    (; switch_range_to_icmp=true,
+       switch_to_lookup=true,
+       forward_switch_cond=true,
+    )
+const AggressiveSimplifyCFGOptions =
+    (; switch_range_to_icmp=true,
+       switch_to_lookup=true,
+       forward_switch_cond=true,
+       # These mess with loop rotation, so only do them after that
+       hoist_common_insts=true,
+       # Causes an SRET assertion error in late-gc-lowering
+       #sink_common_insts=true
+    )
+
+function buildEarlySimplificationPipeline(mpm, @nospecialize(job::CompilerJob), opt_level)
+    if should_verify()
+        add!(mpm, NewPMFunctionPassManager()) do fpm
+            add!(fpm, GCInvariantVerifierPass())
+        end
+        add!(mpm, VerifierPass())
+    end
+    add!(mpm, ForceFunctionAttrsPass())
+    if LLVM.version() >= v"17"
+        add!(mpm, PipelineStartCallbacks(; opt_level))
+    end
+    add!(mpm, Annotation2MetadataPass())
+    add!(mpm, InferFunctionAttrsPass())
+    add!(mpm, ConstantMergePass())
+    add!(mpm, NewPMFunctionPassManager()) do fpm
+        add!(fpm, LowerExpectIntrinsicPass())
+        if opt_level >= 2
+            add!(fpm, PropagateJuliaAddrspacesPass())
+        end
+        # DCE must come before simplifycfg: codegen can generate unused
+        # statements that would otherwise alter how simplifycfg optimizes the CFG.
+        add!(fpm, DCEPass())
+        add!(fpm, SimplifyCFGPass(; BasicSimplifyCFGOptions...))
+        if opt_level >= 1
+            add!(fpm, SROAPass())
+            add!(fpm, EarlyCSEPass())
+        end
+    end
+    if opt_level >= 1
+        add!(mpm, GlobalOptPass())
+        add!(mpm, NewPMFunctionPassManager()) do fpm
+            add!(fpm, PromotePass())
+            add!(fpm, instcombine_pass(job))
+        end
+    end
+    if LLVM.version() >= v"17"
+        add!(mpm, PipelineEarlySimplificationCallbacks(; opt_level))
+    end
+end
+
+function buildEarlyOptimizerPipeline(mpm, @nospecialize(job::CompilerJob), opt_level)
+    if LLVM.version() >= v"17"
+        add!(mpm, OptimizerEarlyCallbacks(; opt_level))
+    end
+    add!(mpm, NewPMCGSCCPassManager()) do cgpm
+        if LLVM.version() >= v"17"
+            add!(cgpm, CGSCCOptimizerLateCallbacks(; opt_level))
+        end
+        if opt_level >= 2
+            add!(cgpm, NewPMFunctionPassManager()) do fpm
+                add!(fpm, AllocOptPass())
+                add!(fpm, Float2IntPass())
+                add!(fpm, LowerConstantIntrinsicsPass())
+            end
+        end
+    end
+    add!(mpm, GPULowerCPUFeaturesPass())
+    if opt_level >= 1
+        add!(mpm, NewPMFunctionPassManager()) do fpm
+            if opt_level >= 2
+                add!(fpm, SROAPass())
+                add!(fpm, EarlyCSEPass(; memssa=true))
+                add!(fpm, instcombine_pass(job))
+                add!(fpm, aggressiveinstcombine_pass(job))
+                add!(fpm, JumpThreadingPass())
+                add!(fpm, CorrelatedValuePropagationPass())
+                add!(fpm, LibCallsShrinkWrapPass())
+                add!(fpm, ReassociatePass())
+                add!(fpm, ConstraintEliminationPass())
+                add!(fpm, AllocOptPass())
+            else
+                add!(fpm, EarlyCSEPass())
+                add!(fpm, instcombine_pass(job))
+            end
+            if LLVM.version() >= v"17"
+                add!(fpm, PeepholeCallbacks(; opt_level))
+            end
+        end
+    end
+    add!(mpm, GlobalOptPass())
+    add!(mpm, GlobalDCEPass())
+end
+
+function buildLoopOptimizerPipeline(fpm, @nospecialize(job::CompilerJob), opt_level)
+    add!(fpm, NewPMLoopPassManager(; use_memory_ssa=true)) do lpm
+        add!(lpm, LowerSIMDLoopPass())
+        if opt_level >= 2
+            add!(lpm, LoopInstSimplifyPass())
+            add!(lpm, LoopSimplifyCFGPass())
+            # run LICM with AllowSpeculation=false before rotation to avoid
+            # speculating loads that rotation can hoist more precisely.
+            add!(lpm, LICMPass(; allowspeculation=false))
+            add!(lpm, JuliaLICMPass())
+            add!(lpm, LoopRotatePass())
+            add!(lpm, LICMPass())
+            add!(lpm, JuliaLICMPass())
+            add!(lpm, SimpleLoopUnswitchPass(nontrivial=true, trivial=true))
+        end
+        if LLVM.version() >= v"17"
+            add!(lpm, LateLoopOptimizationsCallbacks(; opt_level))
+        end
+    end
+    if opt_level >= 2
+        add!(fpm, IRCEPass())
+    end
+    add!(fpm, SimplifyCFGPass(; BasicSimplifyCFGOptions...))
+    add!(fpm, instcombine_pass(job))
+    add!(fpm, NewPMLoopPassManager()) do lpm
+        if opt_level >= 2
+            add!(lpm, LoopIdiomRecognizePass())
+            add!(lpm, IndVarSimplifyPass())
+            add!(lpm, SimpleLoopUnswitchPass(nontrivial=true, trivial=true))
+            add!(lpm, LoopDeletionPass())
+            add!(lpm, LoopFullUnrollPass())
+        end
+        if LLVM.version() >= v"17"
+            add!(lpm, LoopOptimizerEndCallbacks(; opt_level))
+        end
+    end
+end
+
+function buildScalarOptimizerPipeline(fpm, @nospecialize(job::CompilerJob), opt_level)
+    if opt_level >= 2
+        add!(fpm, AllocOptPass())
+        add!(fpm, SROAPass())
+        if can_vectorize(job)
+            add!(fpm, VectorCombinePass())
+        end
+        add!(fpm, MergedLoadStoreMotionPass())
+        add!(fpm, GVNPass())
+        add!(fpm, SCCPPass())
+        add!(fpm, BDCEPass())
+        add!(fpm, instcombine_pass(job))
+        add!(fpm, CorrelatedValuePropagationPass())
+        add!(fpm, ADCEPass())
+        add!(fpm, MemCpyOptPass())
+        add!(fpm, DSEPass())
+        add!(fpm, IRCEPass())
+        add!(fpm, JumpThreadingPass())
+        add!(fpm, ConstraintEliminationPass())
+    elseif opt_level >= 1
+        add!(fpm, AllocOptPass())
+        add!(fpm, SROAPass())
+        add!(fpm, MemCpyOptPass())
+        add!(fpm, SCCPPass())
+        add!(fpm, BDCEPass())
+        add!(fpm, instcombine_pass(job))
+        add!(fpm, ADCEPass())
+    end
+    if opt_level >= 3
+        add!(fpm, GVNPass())
+    end
+    if opt_level >= 2
+        add!(fpm, DSEPass())
+        if LLVM.version() >= v"17"
+            add!(fpm, PeepholeCallbacks(; opt_level))
+        end
+        add!(fpm, SimplifyCFGPass(; AggressiveSimplifyCFGOptions...))
+        add!(fpm, AllocOptPass())
+        add!(fpm, NewPMLoopPassManager(; use_memory_ssa=true)) do lpm
+            add!(lpm, LICMPass())
+            add!(lpm, JuliaLICMPass())
+        end
+        add!(fpm, SimplifyCFGPass(; AggressiveSimplifyCFGOptions...))
+        add!(fpm, instcombine_pass(job))
+    elseif opt_level >= 1
+        add!(fpm, SimplifyCFGPass(; AggressiveSimplifyCFGOptions...))
+    end
+    if LLVM.version() >= v"17"
+        add!(fpm, ScalarOptimizerLateCallbacks(; opt_level))
+    end
+end
+
+function buildVectorPipeline(fpm, @nospecialize(job::CompilerJob), opt_level)
+    # re-rotate loops that might have been unrotated in the simplification above
+    add!(fpm, NewPMLoopPassManager()) do lpm
+        add!(lpm, LoopRotatePass())
+        add!(lpm, LoopDeletionPass())
+    end
+    add!(fpm, LoopDistributePass())
+    add!(fpm, InjectTLIMappings())
+    add!(fpm, LoopVectorizePass())
+    add!(fpm, LoopLoadEliminationPass())
+    add!(fpm, SimplifyCFGPass(; AggressiveSimplifyCFGOptions...))
+    add!(fpm, NewPMLoopPassManager(; use_memory_ssa=true)) do lpm
+        add!(lpm, LICMPass())
+    end
+    add!(fpm, EarlyCSEPass())
+    add!(fpm, CorrelatedValuePropagationPass())
+    add!(fpm, instcombine_pass(job))
+    add!(fpm, SLPVectorizerPass())
+    add!(fpm, VectorCombinePass())
+    if LLVM.version() >= v"17"
+        add!(fpm, VectorizerStartCallbacks(; opt_level))
+    end
+    add!(fpm, LoopUnrollPass(; opt_level))
+    if LLVM.version() >= v"21"
+        add!(fpm, VectorizerEndCallbacks(; opt_level))
+    end
+    if LLVM.version() >= v"16"
+        add!(fpm, SROAPass(; preserve_cfg=true))
+    else
+        add!(fpm, SROAPass())
+    end
+    add!(fpm, InstSimplifyPass())
+end
+
+function buildIntrinsicLoweringPipeline(mpm, @nospecialize(job::CompilerJob), opt_level)
+    add!(mpm, RemoveNIPass())
+
+    # lower GC intrinsics
+    if !uses_julia_runtime(job)
+        add!(mpm, NewPMFunctionPassManager()) do fpm
+            add!(fpm, GPULowerGCFramePass())
+        end
+        if job.config.libraries
+            add!(mpm, GPULinkRuntimePass())
+            add!(mpm, GPULinkLibrariesPass())
+            add!(mpm, GPUFinishRuntimeIntrinsicsPass())
+        end
+    end
+
+    # lower kernel state intrinsics
+    # NOTE: we can only do so here, as GC lowering can introduce calls to the runtime,
+    #       and thus additional uses of the kernel state intrinsics.
+    if job.config.kernel
+        # TODO: now that all kernel state-related passes are being run here, merge some?
+        add!(mpm, AddKernelStatePass())
+        add!(mpm, NewPMFunctionPassManager()) do fpm
+            add!(fpm, LowerKernelStatePass())
+        end
+        add!(mpm, CleanupKernelStatePass())
+    end
+
+    if !uses_julia_runtime(job)
+        # remove dead uses of ptls
+        add!(mpm, NewPMFunctionPassManager()) do fpm
+            add!(fpm, ADCEPass())
+        end
+        add!(mpm, GPULowerPTLSPass())
+    end
+
+    add!(mpm, NewPMFunctionPassManager()) do fpm
+        # lower exception handling
+        if uses_julia_runtime(job) && VERSION < v"1.13.0-DEV.36"
+            add!(fpm, LowerExcHandlersPass())
+        end
+        add!(fpm, GCInvariantVerifierPass())
+        add!(fpm, LateLowerGCPass())
+        if uses_julia_runtime(job) && VERSION >= v"1.11.0-DEV.208"
+            add!(fpm, FinalLowerGCPass())
+        end
+    end
+    if uses_julia_runtime(job) && VERSION < v"1.11.0-DEV.208"
+        add!(mpm, FinalLowerGCPass())
+    end
+
+    if opt_level >= 2
+        add!(mpm, NewPMFunctionPassManager()) do fpm
+            add!(fpm, GVNPass())
+            add!(fpm, SCCPPass())
+            add!(fpm, DCEPass())
+        end
+    end
+
+    # lower PTLS intrinsics
+    if uses_julia_runtime(job)
+        add!(mpm, LowerPTLSPass())
+    end
+
+    if opt_level >= 1
+        add!(mpm, NewPMFunctionPassManager()) do fpm
+            add!(fpm, instcombine_pass(job))
+            add!(fpm, SimplifyCFGPass(; AggressiveSimplifyCFGOptions...))
+        end
+    end
+
+    # remove Julia address spaces
+    add!(mpm, RemoveJuliaAddrspacesPass())
+
+    # Julia's operand bundles confuse the inliner, so repeat here now they are gone.
+    # FIXME: we should fix the inliner so that inlined code gets optimized early-on
+    add!(mpm, AlwaysInlinerPass())
+end
+
+function buildCleanupPipeline(mpm, @nospecialize(job::CompilerJob), opt_level)
+    if opt_level >= 2
+        add!(mpm, NewPMFunctionPassManager()) do fpm
+            if VERSION < v"1.12.0-DEV.1390"
+                add!(fpm, CombineMulAddPass())
+            end
+            add!(fpm, DivRemPairsPass())
+        end
+    end
+    if LLVM.version() >= v"17"
+        add!(mpm, OptimizerLastCallbacks(; opt_level))
+    end
+    add!(mpm, NewPMFunctionPassManager()) do fpm
+        add!(fpm, AnnotationRemarksPass())
+    end
+    add!(mpm, NewPMFunctionPassManager()) do fpm
+        add!(fpm, DemoteFloat16Pass())
+        if opt_level >= 2
+            add!(fpm, GVNPass())
+        end
+    end
+end
+
+
+
+## custom passes
+
+# lowering intrinsics
+function cpu_features!(mod::LLVM.Module)
+    job = current_job::CompilerJob
+    changed = false
+
+    argtyps = Dict(
+        "f32" => Float32,
+        "f64" => Float64,
+    )
+
+    # have_fma
+    for f in functions(mod)
+        ft = function_type(f)
+        fn = LLVM.name(f)
+        startswith(fn, "julia.cpu.have_fma.") || continue
+        typnam = fn[20:end]
+
+        # determine whether this back-end supports FMA on this type
+        has_fma = if haskey(argtyps, typnam)
+            typ = argtyps[typnam]
+            have_fma(job.config.target, typ)
+        else
+            # warn?
+            false
+        end
+        has_fma = ConstantInt(return_type(ft), has_fma)
+
+        # substitute all uses of the intrinsic with a constant
+        materialized = LLVM.Value[]
+        for use in uses(f)
+            val = user(use)
+            replace_uses!(val, has_fma)
+            push!(materialized, val)
+        end
+
+        # remove the intrinsic and its uses
+        for val in materialized
+            @assert isempty(uses(val))
+            erase!(val)
+        end
+        @assert isempty(uses(f))
+        erase!(f)
+    end
+
+    return changed
+end
+GPULowerCPUFeaturesPass() = NewPMModulePass("GPULowerCPUFeatures", cpu_features!)
+
+function link_runtime!(mod::LLVM.Module)
+    job = current_job::CompilerJob
+    job.config.libraries || return false
+    uses_julia_runtime(job) && return false
+
+    # GC lowering can introduce new calls to GPU runtime functions after the runtime
+    # was linked initially. Link again now so those calls resolve to definitions before
+    # later intrinsic-lowering passes inspect or rewrite the runtime call graph.
+    runtime = load_runtime(job)
+    # `RemoveNIPass` stripped non-integral address spaces from `mod`'s datalayout, but the
+    # cached runtime kept them; align it (as with target libraries) to avoid a warning.
+    triple!(runtime, triple(mod))
+    datalayout!(runtime, datalayout(mod))
+    link!(mod, runtime; only_needed=true)
+    return true
+end
+GPULinkRuntimePass() = NewPMModulePass("GPULinkRuntime", link_runtime!)
+
+function link_libraries!(mod::LLVM.Module)
+    job = current_job::CompilerJob
+    job.config.libraries || return false
+
+    # Runtime functions materialized by GC lowering can introduce target-library
+    # references after the normal library-linking phase has run. Give back-ends a
+    # second chance to resolve those references before they lower their own runtime
+    # intrinsics. This is a no-op for back-ends without a link_libraries! override.
+    if has_legacy_link_libraries(job)
+        undefined_fns = [LLVM.name(f) for f in functions(mod)
+                         if isdeclaration(f) && !LLVM.isintrinsic(f)]
+        link_libraries!(job, mod, undefined_fns)
+    else
+        link_libraries!(job, mod)
+    end
+    return true
+end
+GPULinkLibrariesPass() = NewPMModulePass("GPULinkLibraries", link_libraries!)
+
+function finish_runtime_intrinsics!(mod::LLVM.Module)
+    job = current_job::CompilerJob
+    return finish_runtime_intrinsics!(job, mod)
+end
+GPUFinishRuntimeIntrinsicsPass() =
+    NewPMModulePass("GPUFinishRuntimeIntrinsics", finish_runtime_intrinsics!)
+
+# lower object allocations to to PTX malloc
+#
+# this is a PoC implementation that is very simple: allocate, and never free. it also runs
+# _before_ Julia's GC lowering passes, so we don't get to use the results of its analyses.
+# when we ever implement a more potent GC, we will need those results, but the relevant pass
+# is currently very architecture/CPU specific: hard-coded pool sizes, TLS references, etc.
+# such IR is hard to clean-up, so we probably will need to have the GC lowering pass emit
+# lower-level intrinsics which then can be lowered to architecture-specific code.
+function lower_gc_frame!(fun::LLVM.Function)
+    job = current_job::CompilerJob
+    mod = LLVM.parent(fun)
+    changed = false
+
+    # plain alloc
+    if haskey(functions(mod), "julia.gc_alloc_obj")
+        alloc_obj = functions(mod)["julia.gc_alloc_obj"]
+        alloc_obj_ft = function_type(alloc_obj)
+        T_prjlvalue = return_type(alloc_obj_ft)
+        T_pjlvalue = convert(LLVMType, Any; allow_boxed=true)
+
+        for use in uses(alloc_obj)
+            call = user(use)::LLVM.CallInst
+
+            # decode the call
+            ops = arguments(call)
+            sz = ops[2]
+
+            # replace with PTX alloc_obj
+            @dispose builder=IRBuilder() begin
+                position!(builder, call)
+                ptr = call!(builder, Runtime.get(:gc_pool_alloc), [sz])
+                replace_uses!(call, ptr)
+            end
+
+            erase!(call)
+
+            changed = true
+        end
+
+        @compiler_assert isempty(uses(alloc_obj)) job
+    end
+
+    # we don't care about write barriers
+    if haskey(functions(mod), "julia.write_barrier")
+        barrier = functions(mod)["julia.write_barrier"]
+
+        for use in uses(barrier)
+            call = user(use)::LLVM.CallInst
+            erase!(call)
+            changed = true
+        end
+
+        @compiler_assert isempty(uses(barrier)) job
+    end
+
+    return changed
+end
+GPULowerGCFramePass() = NewPMFunctionPass("GPULowerGCFrame", lower_gc_frame!)
+
+# lower the `julia.ptls_states` intrinsic by removing it, since it is GPU incompatible.
+#
+# this assumes and checks that the TLS is unused, which should be the case for most GPU code
+# after lowering the GC intrinsics to TLS-less code and having run DCE.
+#
+# TODO: maybe don't have Julia emit actual uses of the TLS, but use intrinsics instead,
+#       making it easier to remove or reimplement that functionality here.
+function lower_ptls!(mod::LLVM.Module)
+    job = current_job::CompilerJob
+    changed = false
+
+    intrinsic = "julia.get_pgcstack"
+
+    if haskey(functions(mod), intrinsic)
+        ptls_getter = functions(mod)[intrinsic]
+
+        for use in uses(ptls_getter)
+            val = user(use)
+            if isempty(uses(val))
+                erase!(val)
+                changed = true
+            else
+                # the validator will detect this
+            end
+        end
+     end
+
+    return changed
+end
+GPULowerPTLSPass() = NewPMModulePass("GPULowerPTLS", lower_ptls!)

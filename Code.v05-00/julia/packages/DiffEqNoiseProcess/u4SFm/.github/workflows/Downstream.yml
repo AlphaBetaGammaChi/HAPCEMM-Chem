@@ -1,0 +1,30 @@
+name: IntegrationTest
+on:
+  push:
+    branches: [main]
+    tags: [v*]
+  pull_request:
+
+jobs:
+  test:
+    name: ${{ matrix.package.repo }}/${{ matrix.package.group }}/${{ matrix.julia-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version: [1]
+        os: [ubuntu-latest]
+        package:
+          - {user: SciML, repo: StochasticDiffEq.jl, group: Interface}
+          - {user: SciML, repo: StochasticDiffEq.jl, group: Interface2}
+          - {user: SciML, repo: StochasticDiffEq.jl, group: Interface3}
+          - {user: SciML, repo: SciMLSensitivity.jl, group: SDE1}
+          - {user: SciML, repo: SciMLSensitivity.jl, group: SDE2}
+          - {user: SciML, repo: SciMLSensitivity.jl, group: SDE3}
+    uses: "SciML/.github/.github/workflows/downstream.yml@v1"
+    with:
+      julia-version: "${{ matrix.julia-version }}"
+      os: "${{ matrix.os }}"
+      owner: "${{ matrix.package.user }}"
+      repo: "${{ matrix.package.repo }}"
+      group: "${{ matrix.package.group }}"
+    secrets: "inherit"

@@ -1,0 +1,219 @@
+"""
+    NamedArrayPartition(; kwargs...)
+    NamedArrayPartition(x::NamedTuple)
+
+Similar to an `ArrayPartition` but the individual arrays can be accessed via the
+constructor-specified names. However, unlike `ArrayPartition`, each individual array
+must have the same element type.
+"""
+struct NamedArrayPartition{T, A <: ArrayPartition{T}, NT <: NamedTuple} <: AbstractVector{T}
+    array_partition::A
+    names_to_indices::NT
+end
+NamedArrayPartition(; kwargs...) = NamedArrayPartition(NamedTuple(kwargs))
+function NamedArrayPartition(x::NamedTuple)
+    names_to_indices = NamedTuple(
+        Pair(symbol, index)
+            for (index, symbol) in enumerate(keys(x))
+    )
+
+    # enforce homogeneity of eltypes
+    @assert all(eltype.(values(x)) .== eltype(first(x)))
+    T = eltype(first(x))
+    S = typeof(values(x))
+    return NamedArrayPartition(ArrayPartition{T, S}(values(x)), names_to_indices)
+end
+
+# Note: overloading `getproperty` means we cannot access `NamedArrayPartition`
+# fields except through `getfield` and accessor functions.
+ArrayPartition(x::NamedArrayPartition) = getfield(x, :array_partition)
+
+function Base.similar(A::NamedArrayPartition)
+    return NamedArrayPartition(
+        similar(getfield(A, :array_partition)), getfield(A, :names_to_indices)
+    )
+end
+
+# return NamedArrayPartition when the requested dims still match the partition layout;
+# otherwise fall back to the plain backing array of the correct size. ArrayPartition's
+# own `similar(A, dims)` already does this degradation (it returns a Vector when
+# `dims != size(A)`), and we simply propagate that result instead of trying to
+# wrap a non-ArrayPartition in a NamedArrayPartition (which would hit the inner
+# constructor signature `NamedArrayPartition(::A<:ArrayPartition, ::NamedTuple)`).
+function Base.similar(A::NamedArrayPartition, dims::NTuple{N, Int}) where {N}
+    inner = similar(getfield(A, :array_partition), dims)
+    inner isa ArrayPartition || return inner
+    return NamedArrayPartition(inner, getfield(A, :names_to_indices))
+end
+
+# similar array partition of common type
+@inline function Base.similar(A::NamedArrayPartition, ::Type{T}) where {T}
+    return NamedArrayPartition(
+        similar(getfield(A, :array_partition), T), getfield(A, :names_to_indices)
+    )
+end
+
+function Base.similar(A::NamedArrayPartition, ::Type{T}, dims::NTuple{N, Int}) where {T, N}
+    inner = similar(getfield(A, :array_partition), T, dims)
+    inner isa ArrayPartition || return inner
+    return NamedArrayPartition(inner, getfield(A, :names_to_indices))
+end
+
+# similar array partition with different types
+function Base.similar(
+        A::NamedArrayPartition, ::Type{T}, ::Type{S}, R::DataType...
+    ) where {T, S}
+    return NamedArrayPartition(
+        similar(getfield(A, :array_partition), T, S, R...), getfield(A, :names_to_indices)
+    )
+end
+
+Base.Array(x::NamedArrayPartition) = Array(ArrayPartition(x))
+
+function Base.zero(x::NamedArrayPartition{T, S, TN}) where {T, S, TN}
+    return NamedArrayPartition{T, S, TN}(zero(ArrayPartition(x)), getfield(x, :names_to_indices))
+end
+Base.zero(A::NamedArrayPartition, dims::NTuple{N, Int}) where {N} = zero(A) # ignore dims since named array partitions are vectors
+
+Base.propertynames(x::NamedArrayPartition) = propertynames(getfield(x, :names_to_indices))
+function Base.getproperty(x::NamedArrayPartition, s::Symbol)
+    return getindex(ArrayPartition(x).x, getproperty(getfield(x, :names_to_indices), s))
+end
+
+# this enables x.s = some_array.
+@inline function Base.setproperty!(x::NamedArrayPartition, s::Symbol, v)
+    index = getproperty(getfield(x, :names_to_indices), s)
+    return ArrayPartition(x).x[index] .= v
+end
+
+# print out NamedArrayPartition as a NamedTuple
+Base.summary(x::NamedArrayPartition) = string(typeof(x), " with arrays:")
+function Base.show(io::IO, m::MIME"text/plain", x::NamedArrayPartition)
+    return show(
+        io, m, NamedTuple(Pair.(keys(getfield(x, :names_to_indices)), ArrayPartition(x).x))
+    )
+end
+
+Base.size(x::NamedArrayPartition) = size(ArrayPartition(x))
+Base.length(x::NamedArrayPartition) = length(ArrayPartition(x))
+# Delegate indexing to the underlying ArrayPartition.
+# Use concrete index types to avoid invalidating AbstractArray's generic setindex!.
+Base.@propagate_inbounds Base.getindex(x::NamedArrayPartition, i::Int) = ArrayPartition(x)[i]
+Base.@propagate_inbounds Base.setindex!(x::NamedArrayPartition, v, i::Int) = (ArrayPartition(x)[i] = v)
+
+# Indexing with non-scalar indices (UnitRange, Vector{Int}, etc.) goes through
+# AbstractArray's generic path, which routes via `similar(A, T, dims)`. NAP's
+# `similar(::NAP, T, dims)` cannot in general produce a NamedArrayPartition for
+# arbitrary `dims` (the partition layout is fixed by `names_to_indices`), so it
+# falls back to a plain Vector — making the inferred return type a small Union.
+#
+# Mirror ArrayPartition's `_unsafe_getindex` shortcut at `array_partition.jl:317`:
+# allocate the destination directly off the first underlying array and fill it
+# via `_unsafe_getindex!`. The result is always a Vector for non-scalar indexing,
+# so `x[I]` is type-stable. This matches the v3 indexing semantics (`x[1:end]`
+# returns a `Vector`, not a `NamedArrayPartition`); use `similar(x)` /
+# `copy(x)` if you want a NamedArrayPartition back.
+Base.@propagate_inbounds function Base._unsafe_getindex(
+        ::IndexStyle, A::NamedArrayPartition,
+        I::Vararg{Union{Real, AbstractArray}, N}
+    ) where {N}
+    shape = Base.index_shape(I...)
+    dest = similar(getfield(A, :array_partition).x[1], shape)
+    Base._unsafe_getindex!(dest, A, I...)
+    return dest
+end
+function Base.map(f, x::NamedArrayPartition)
+    return NamedArrayPartition(map(f, ArrayPartition(x)), getfield(x, :names_to_indices))
+end
+Base.mapreduce(f, op, x::NamedArrayPartition) = mapreduce(f, op, ArrayPartition(x))
+# Base.filter(f, x::NamedArrayPartition) = filter(f, ArrayPartition(x))
+
+function Base.similar(x::NamedArrayPartition{T, S, NT}) where {T, S, NT}
+    return NamedArrayPartition{T, S, NT}(
+        similar(ArrayPartition(x)), getfield(x, :names_to_indices)
+    )
+end
+
+# broadcasting
+function Base.BroadcastStyle(::Type{<:NamedArrayPartition})
+    return Broadcast.ArrayStyle{NamedArrayPartition}()
+end
+function Base.similar(
+        bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{NamedArrayPartition}},
+        ::Type{ElType}
+    ) where {ElType}
+    x = find_NamedArrayPartition(bc)
+    return NamedArrayPartition(similar(ArrayPartition(x)), getfield(x, :names_to_indices))
+end
+
+# when broadcasting with ArrayPartition + another array type, the output is the other array tupe
+function Base.BroadcastStyle(
+        ::Broadcast.ArrayStyle{NamedArrayPartition}, ::Broadcast.DefaultArrayStyle{1}
+    )
+    return Broadcast.DefaultArrayStyle{1}()
+end
+
+# hook into ArrayPartition broadcasting routines
+@inline RecursiveArrayTools.npartitions(x::NamedArrayPartition) = npartitions(ArrayPartition(x))
+@inline RecursiveArrayTools.unpack(
+    bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{NamedArrayPartition}},
+    i
+) = Broadcast.Broadcasted(
+    bc.f, RecursiveArrayTools.unpack_args(i, bc.args)
+)
+@inline RecursiveArrayTools.unpack(x::NamedArrayPartition, i) = unpack(ArrayPartition(x), i)
+
+function Base.copy(A::NamedArrayPartition{T, S, NT}) where {T, S, NT}
+    return NamedArrayPartition{T, S, NT}(copy(ArrayPartition(A)), getfield(A, :names_to_indices))
+end
+
+@inline NamedArrayPartition(
+    f::F,
+    N,
+    names_to_indices
+) where {
+    F <:
+    Function,
+} = NamedArrayPartition(
+    ArrayPartition(ntuple(f, Val(N))), names_to_indices
+)
+
+@inline function Base.copy(bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{NamedArrayPartition}})
+    N = npartitions(bc)
+    @inline function f(i)
+        return copy(unpack(bc, i))
+    end
+    x = find_NamedArrayPartition(bc)
+    return NamedArrayPartition(f, N, getfield(x, :names_to_indices))
+end
+
+@inline function Base.copyto!(
+        dest::NamedArrayPartition,
+        bc::Broadcast.Broadcasted{Broadcast.ArrayStyle{NamedArrayPartition}}
+    )
+    N = npartitions(dest, bc)
+    @inbounds for i in 1:N
+        copyto!(getfield(dest, :array_partition).x[i], unpack(bc, i))
+    end
+    return dest
+end
+
+#Overwrite ArrayInterface zeromatrix to work with NamedArrayPartitions & implicit solvers within OrdinaryDiffEq
+function ArrayInterface.zeromatrix(A::NamedArrayPartition)
+    B = ArrayPartition(A)
+    # Use foldl with explicit init to preserve array type (important for GPU arrays)
+    vecs = vec.(B.x)
+    rest = Base.tail(vecs)
+    x = isempty(rest) ? vecs[1] : foldl(vcat, rest; init = vecs[1])
+    return x .* x' .* false
+end
+
+# `x = find_NamedArrayPartition(x)` returns the first `NamedArrayPartition` among broadcast arguments.
+find_NamedArrayPartition(bc::Base.Broadcast.Broadcasted) = find_NamedArrayPartition(bc.args)
+function find_NamedArrayPartition(args::Tuple)
+    return find_NamedArrayPartition(find_NamedArrayPartition(args[1]), Base.tail(args))
+end
+find_NamedArrayPartition(x) = x
+find_NamedArrayPartition(::Tuple{}) = nothing
+find_NamedArrayPartition(x::NamedArrayPartition, rest) = x
+find_NamedArrayPartition(::Any, rest) = find_NamedArrayPartition(rest)

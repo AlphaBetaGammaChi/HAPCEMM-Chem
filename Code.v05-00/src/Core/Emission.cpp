@@ -1,3 +1,4 @@
+#include "Util/PhysConstant.hpp"
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 /*                                                                  */
 /*     Aircraft Plume Chemistry, Emission and Microphysics Model    */
@@ -206,8 +207,8 @@ void Emission::Populate_withEngine( const Engine &engine )
 void Emission::Populate_withFuel( const Fuel &fuel )
 {
     /*** Fuel characteristics */
-    CO2 = ( 12.0107 * fuel.getAtomC() ) / ( 12.0107 * fuel.getAtomC() + 1.0079 * fuel.getAtomH() + 10.0067 * fuel.getAtomN() + 32.065 * fuel.getAtomS() ) * ( 44.0095 / ( 1 * 12.0107 ) ); /* [ g/g fuel ] */
-    H2O = (  1.0079 * fuel.getAtomH() ) / ( 12.0107 * fuel.getAtomC() + 1.0079 * fuel.getAtomH() + 10.0067 * fuel.getAtomN() + 32.065 * fuel.getAtomS() ) * ( 18.0153 / ( 2 *  1.0079 ) ); /* [ g/g fuel ] */
+    CO2 = ( 12.0107 * fuel.getAtomC() ) / ( 12.0107 * fuel.getAtomC() + 1.0079 * fuel.getAtomH() + 14.007 * fuel.getAtomN() + 32.065 * fuel.getAtomS() ) * ( 44.0095 / ( 1 * 12.0107 ) ); /* [ g/g fuel ] */
+    H2O = (  1.0079 * fuel.getAtomH() ) / ( 12.0107 * fuel.getAtomC() + 1.0079 * fuel.getAtomH() + 14.007 * fuel.getAtomN() + 32.065 * fuel.getAtomS() ) * ( 18.0153 / ( 2 *  1.0079 ) ); /* [ g/g fuel ] */
     /* Convert to g/kg */
     CO2 *= 1000; /* [ g/kg fuel ]*/
     H2O *= 1000; /* [ g/kg fuel ]*/
@@ -217,12 +218,12 @@ void Emission::Populate_withFuel( const Fuel &fuel )
         H2O = 8940.0; /* [8940 g/kg fuel for H2, 8.94 kg H2O/kg H2 see Schumann U. (1996) ]*/
         CO2  = 0.0; 
         SO2  = 0.0;
-     } else if (fuel.getAtomC() == 0 && fuel.getAtomN() == 0 && fuel.getAtomH() ==  0) {
-        H2O = 1590.0; /* [1590.0 g/kg fuel for H2, 1.590 kg H2O/kg nh3 see Schumann U. (1996) ]*/
+     } else if (fuel.getAtomC() == 0 && fuel.getAtomN() > 0 && fuel.getAtomH() > 0) {
+        H2O = 1590.0; /* [1590.0 g/kg fuel for NH3, 1.590 kg H2O/kg nh3 see Schumann U. (1996) ]*/
         CO2  = 0.0; 
         SO2  = 0.0;
       } else{
-    /* getFSC from fuel */
+    /* getFSC from fuel can still have soot for NH3 or H2 fuels*/
     SO2 = fuel.getFSC() * 2.0 / 1000.0; 
        }
 } /* End of Emission::Populate_withFuel */
@@ -589,3 +590,12 @@ void Emission::Debug( ) const
 } /* End of Emission::Debug */
 
 /* End of Emission.cpp */
+
+double Emission::getSootNum( ) const
+{
+    if ( SootRad > 0.0 ) {
+        return (Soot / 1000.0) / ( 4.0/3.0 * physConst::PI * SootRad * SootRad * SootRad * physConst::RHO_SOOT );
+    } else {
+        return 0.0;
+    }
+}

@@ -1,0 +1,1402 @@
+### Fetch Packages and Set Global Variables ###
+
+# Fetch packages.
+using Catalyst, LinearAlgebra, JumpProcesses, OrdinaryDiffEqTsit5, OrdinaryDiffEqVerner, StochasticDiffEq, Test
+const MT = ModelingToolkitBase
+using ModelingToolkitBase: Pre, unwrap
+
+# Sets stable rng number.
+using StableRNGs
+rng = StableRNG(12345)
+
+# Sets the default `t` to use.
+t = default_t()
+
+# Fetch test functions.
+include("../test_functions.jl")
+
+### Creates Basic Test Network ###
+
+# Create the network.
+@parameters k[1:20]
+@species A(t) B(t) C(t) D(t)
+rxs = [Reaction(k[1], nothing, [A]),            # 0 -> A
+    Reaction(k[2], [B], nothing),            # B -> 0
+    Reaction(k[3], [A], [C]),                  # A -> C
+    Reaction(k[4], [C], [A, B]),              # C -> A + B
+    Reaction(k[5], [C], [A], [1], [2]),      # C -> A + A
+    Reaction(k[6], [A, B], [C]),              # A + B -> C
+    Reaction(k[7], [B], [A], [2], [1]),      # 2B -> A
+    Reaction(k[8], [A, B], [A, C]),            # A + B -> A + C
+    Reaction(k[9], [A, B], [C, D]),            # A + B -> C + D
+    Reaction(k[10], [A], [C, D], [2], [1, 1]), # 2A -> C + D
+    Reaction(k[11], [A], [A, B], [2], [1, 1]), # 2A -> A + B
+    Reaction(k[12], [A, B, C], [C, D], [1, 3, 4], [2, 3]),          # A+3B+4C -> 2C + 3D
+    Reaction(k[13], [A, B], nothing, [3, 1], nothing),           # 3A+B -> 0
+    Reaction(k[14], nothing, [A], nothing, [2]),               # 0 -> 2A
+    Reaction(k[15] * A / (2 + A), [A], nothing; only_use_rate = true), # A -> 0 with custom rate
+    Reaction(k[16], [A], [B]; only_use_rate = true),             # A -> B with custom rate.
+    Reaction(k[17] * A * exp(B), [C], [D], [2], [1]),              # 2C -> D with non constant rate.
+    Reaction(k[18] * B, nothing, [B], nothing, [2]),             # 0 -> 2B with non constant rate.
+    Reaction(k[19] * t, [A], [B]),                                # A -> B with non constant rate.
+    Reaction(k[20] * t * A, [B, C], [D], [2, 1], [2]),                  # 2A +B -> 2C with non constant rate.
+]
+@named rs = ReactionSystem(rxs, t, [A, B, C, D], [k])
+rs = complete(rs)
+odesys = complete(ode_model(rs))
+sdesys = complete(sde_model(rs))
+
+# Hard coded ODE rhs.
+function oderhs(u, kv, t)
+    A = u[1]
+    B = u[2]
+    C = u[3]
+    D = u[4]
+    k = kv[1]
+    du = zeros(eltype(u), 4)
+    du[1] = k[1] - k[3] * A + k[4] * C + 2 * k[5] * C - k[6] * A * B + k[7] * B^2 / 2 -
+            k[9] * A * B - k[10] * A^2 - k[11] * A^2 / 2 - k[12] * A * B^3 * C^4 / 144 -
+            3 * k[13] * A^3 * B / 6 + 2 * k[14] - k[15] * A / (2 + A) - k[16] -
+            k[19] * t * A
+    du[2] = -k[2] * B + k[4] * C - k[6] * A * B - k[7] * B^2 - k[8] * A * B - k[9] * A * B +
+            k[11] * A^2 / 2 - 3 * k[12] * A * B^3 * C^4 / 144 - k[13] * A^3 * B / 6 +
+            k[16] + 2 * k[18] * B + k[19] * t * A - 2 * k[20] * t * A * B^2 * C
+    du[3] = k[3] * A - k[4] * C - k[5] * C + k[6] * A * B + k[8] * A * B + k[9] * A * B +
+            k[10] * A^2 / 2 - 2 * k[12] * A * B^3 * C^4 / 144 -
+            2 * k[17] * A * exp(B) * C^2 / 2 - k[20] * t * A * B^2 * C
+    du[4] = k[9] * A * B + k[10] * A^2 / 2 + 3 * k[12] * A * B^3 * C^4 / 144 +
+            k[17] * A * exp(B) * C^2 / 2 + 2 * k[20] * t * A * B^2 * C
+    du
+end
+
+# SDE noise coefs.
+function sdenoise(u, kv, t)
+    A = u[1]
+    B = u[2]
+    C = u[3]
+    D = u[4]
+    k = kv[1]
+    G = zeros(eltype(u), length(k), length(u))
+    z = zero(eltype(u))
+
+    G = [sqrt(k[1]) z z z;
+         z -sqrt(k[2] * B) z z;
+         -sqrt(k[3] * A) z sqrt(k[3] * A) z;
+         sqrt(k[4] * C) sqrt(k[4] * C) -sqrt(k[4] * C) z;
+         2*sqrt(k[5] * C) z -sqrt(k[5] * C) z;
+         -sqrt(k[6] * A * B) -sqrt(k[6] * A * B) sqrt(k[6] * A * B) z;
+         sqrt(k[7] * B^2 / 2) -2*sqrt(k[7] * B^2 / 2) z z;
+         z -sqrt(k[8] * A * B) sqrt(k[8] * A * B) z;
+         -sqrt(k[9] * A * B) -sqrt(k[9] * A * B) sqrt(k[9] * A * B) sqrt(k[9] * A * B);
+         -2*sqrt(k[10] * A^2 / 2) z sqrt(k[10] * A^2 / 2) sqrt(k[10] * A^2 / 2);
+         -sqrt(k[11] * A^2 / 2) sqrt(k[11] * A^2 / 2) z z;
+         -sqrt(k[12] * A * B^3 * C^4 / 144) -3*sqrt(k[12] * A * B^3 * C^4 / 144) -2*sqrt(k[12] * A * B^3 * C^4 / 144) 3*sqrt(k[12] * A * B^3 * C^4 / 144);
+         -3*sqrt(k[13] * A^3 * B / 6) -sqrt(k[13] * A^3 * B / 6) z z;
+         2*sqrt(k[14]) z z z;
+         -sqrt(k[15] * A / (2 + A)) z z z;
+         -sqrt(k[16]) sqrt(k[16]) z z;
+         z z -2*sqrt(k[17] * A * exp(B) * C^2 / 2) sqrt(k[17] * A * exp(B) * C^2 / 2);
+         z 2*sqrt(k[18] * B) z z;
+         -sqrt(k[19] * t * A) sqrt(k[19] * t * A) z z;
+         z -2*sqrt(k[20] * t * A * B^2 * C) -sqrt(k[20] * t * A * B^2 * C) +2*sqrt(k[20] * t * A * B^2 * C)]'
+    return G
+end
+
+### Basic Tests ###
+
+# Test equation only constructor.
+let
+    @named rs2 = ReactionSystem(rxs, t)
+    rs2 = complete(rs2)
+    @test Catalyst.isequivalent(rs, rs2)
+
+    # Test with a type mismatch
+    @test Catalyst.isequivalent(rs, "Not a ReactionSystem") == false
+end
+
+# Initial conditions test.
+let
+    kvals = Float64.(1:length(k))
+    def_p = [k => kvals]
+    def_u0 = [A => 0.5, B => 1.0, C => 1.5, D => 2.0]
+    defs = merge(Dict(def_p), Dict(def_u0))
+    defs_typed = convert(Dict{Symbolics.SymbolicT,Symbolics.SymbolicT}, defs)
+
+    @named rs = ReactionSystem(rxs, t, [A, B, C, D], [k]; initial_conditions = defs)
+    rs = complete(rs)
+    odesys = complete(ode_model(rs))
+    sdesys = complete(sde_model(rs))
+    js = complete(jump_model(rs))
+
+    @test isequal(MT.get_initial_conditions(rs), MT.get_initial_conditions(js))
+    @test isequal(MT.get_initial_conditions(rs), defs_typed)
+
+    # these systems add initial conditions to the defaults
+    @test isequal(MT.get_initial_conditions(odesys), MT.get_initial_conditions(sdesys))
+    @test isequal(defs_typed, MT.get_initial_conditions(odesys))
+
+    u0map = [A => 5.0]
+    kvals[1] = 5.0
+    pmap = [k => kvals]
+    prob = ODEProblem(rs, u0map, (0, 10.0), pmap)
+    @test prob.ps[k[1]] == 5.0
+    @test prob.u0[1] == 5.0
+end
+
+### Check ODE, SDE, and Jump Functions ###
+
+# Test by evaluating drift and diffusion terms.
+
+let
+    u = rnd_u0(rs, rng)
+    p = rnd_ps(rs, rng)
+    du = oderhs(last.(u), last.(p), 0.0)
+    G = sdenoise(last.(u), last.(p), 0.0)
+    sdesys = complete(sde_model(rs))
+    sf = SDEFunction{false}(sdesys)
+    sprob = SDEProblem(rs, u, (0.0, 0.0), p)
+    du2 = sf.f(sprob.u0, sprob.p, 0.0)
+
+    du2 = sf.f(sprob.u0, sprob.p, 0.0)
+    @test norm(du - du2) < 100 * eps()
+    G2 = sf.g(sprob.u0, sprob.p, 0.0)
+    @test norm(G - G2) < 100 * eps()
+end
+
+# Test with jump System.
+let
+    @species A(t) B(t) C(t) D(t) E(t) F(t)
+    rxs = [Reaction(k[1], nothing, [A]),            # 0 -> A
+        Reaction(k[2], [B], nothing),            # B -> 0
+        Reaction(k[3], [A], [C]),                  # A -> C
+        Reaction(k[4], [C], [A, B]),              # C -> A + B
+        Reaction(k[5], [C], [A], [1], [2]),      # C -> A + A
+        Reaction(k[6], [A, B], [C]),              # A + B -> C
+        Reaction(k[7], [B], [A], [2], [1]),      # 2B -> A
+        Reaction(k[8], [A, B], [A, C]),            # A + B -> A + C
+        Reaction(k[9], [A, B], [C, D]),            # A + B -> C + D
+        Reaction(k[10], [A], [C, D], [2], [1, 1]), # 2A -> C + D
+        Reaction(k[11], [A], [A, B], [2], [1, 1]), # 2A -> A + B
+        Reaction(k[12], [A, B, C], [C, D], [1, 3, 4], [2, 3]),          # A+3B+4C -> 2C + 3D
+        Reaction(k[13], [A, B], nothing, [3, 1], nothing),           # 3A+B -> 0
+        Reaction(k[14], nothing, [A], nothing, [2]),               # 0 -> 2A
+        Reaction(k[15] * A / (2 + A), [A], nothing; only_use_rate = true), # A -> 0 with custom rate
+        Reaction(k[16], [A], [B]; only_use_rate = true),             # A -> B with custom rate.
+        Reaction(k[17] * A * exp(B), [C], [D], [2], [1]),              # 2C -> D with non constant rate.
+        Reaction(k[18] * B, nothing, [B], nothing, [2]),             # 0 -> 2B with non constant rate.
+        Reaction(k[19] * t, [D], [E]),                                # D -> E with non constant rate.
+        Reaction(k[20] * t * A, [D, E], [F], [2, 1], [2]),                  # 2D + E -> 2F with non constant rate.
+    ]
+    @named rs = ReactionSystem(rxs, t, [A, B, C, D, E, F], [k])
+    rs = complete(rs)
+    js = complete(jump_model(rs))
+
+    midxs = 1:14
+    cidxs = 15:18
+    vidxs = 19:20
+    @test all(map(i -> typeof(MT.jumps(js)[i]) <: JumpProcesses.MassActionJump, midxs))
+    @test all(map(i -> typeof(MT.jumps(js)[i]) <: JumpProcesses.ConstantRateJump, cidxs))
+    @test all(map(i -> typeof(MT.jumps(js)[i]) <: JumpProcesses.VariableRateJump, vidxs))
+
+    p = rand(rng, length(k))
+    pmap = [k => p]
+    u0 = rand(rng, 2:10, 6)
+    u0map = unknowns(js) .=> u0
+    ttt = rand(rng)
+    jumps = Vector{Union{ConstantRateJump, MassActionJump, VariableRateJump}}(undef,
+                                                                              length(rxs))
+
+    let
+        jumps[1] = MassActionJump(p[1], Vector{Pair{Int, Int}}(), [1 => 1])
+        jumps[2] = MassActionJump(p[2], [2 => 1], [2 => -1])
+        jumps[3] = MassActionJump(p[3], [1 => 1], [1 => -1, 3 => 1])
+        jumps[4] = MassActionJump(p[4], [3 => 1], [1 => 1, 2 => 1, 3 => -1])
+        jumps[5] = MassActionJump(p[5], [3 => 1], [1 => 2, 3 => -1])
+        jumps[6] = MassActionJump(p[6], [1 => 1, 2 => 1], [1 => -1, 2 => -1, 3 => 1])
+        jumps[7] = MassActionJump(p[7], [2 => 2], [1 => 1, 2 => -2])
+        jumps[8] = MassActionJump(p[8], [1 => 1, 2 => 1], [2 => -1, 3 => 1])
+        jumps[9] = MassActionJump(p[9], [1 => 1, 2 => 1], [1 => -1, 2 => -1, 3 => 1, 4 => 1])
+        jumps[10] = MassActionJump(p[10], [1 => 2], [1 => -2, 3 => 1, 4 => 1])
+        jumps[11] = MassActionJump(p[11], [1 => 2], [1 => -1, 2 => 1])
+        jumps[12] = MassActionJump(p[12], [1 => 1, 2 => 3, 3 => 4],
+                                [1 => -1, 2 => -3, 3 => -2, 4 => 3])
+        jumps[13] = MassActionJump(p[13], [1 => 3, 2 => 1], [1 => -3, 2 => -1])
+        jumps[14] = MassActionJump(p[14], Vector{Pair{Int, Int}}(), [1 => 2])
+
+        jumps[15] = ConstantRateJump((u, p, t) -> p[15] * u[1] / (2 + u[1]),
+                                    integrator -> (integrator.u[1] -= 1))
+        jumps[16] = ConstantRateJump((u, p, t) -> p[16],
+                                    integrator -> (integrator.u[1] -= 1; integrator.u[2] += 1))
+        jumps[17] = ConstantRateJump((u, p, t) -> p[17] * u[1] * exp(u[2]) * binomial(u[3], 2),
+                                    integrator -> (integrator.u[3] -= 2; integrator.u[4] += 1))
+        jumps[18] = ConstantRateJump((u, p, t) -> p[18] * u[2],
+                                    integrator -> (integrator.u[2] += 2))
+
+        jumps[19] = VariableRateJump((u, p, t) -> p[19] * u[4] * t,
+                                    integrator -> (integrator.u[4] -= 1; integrator.u[5] += 1))
+        jumps[20] = VariableRateJump((u, p, t) -> p[20] * t * u[1] * binomial(u[4], 2) * u[5],
+                                    integrator -> (integrator.u[4] -= 2; integrator.u[5] -= 1; integrator.u[6] += 2))
+
+        unknownoid = Dict(unknown => i for (i, unknown) in enumerate(unknowns(js)))
+        jprob = JumpProblem(js, merge(Dict(u0map), Dict(pmap)), (0.0, 1.0))
+        mtkpars = jprob.prob.p
+        jspmapper = MT.JumpSysMajParamMapper(js, mtkpars)
+        symbolic_majs = MassActionJump[MT.jumps(js)[i] for i in midxs]
+        symmaj = MT.assemble_maj(symbolic_majs, unknownoid, jspmapper)
+        maj = MassActionJump(symmaj.param_mapper(mtkpars), symmaj.reactant_stoch, symmaj.net_stoch,
+                            symmaj.param_mapper, scale_rates = false)
+        for i in midxs
+            @test abs(jumps[i].scaled_rates - maj.scaled_rates[i]) < 100 * eps()
+            @test jumps[i].reactant_stoch == maj.reactant_stoch[i]
+            @test jumps[i].net_stoch == maj.net_stoch[i]
+        end
+        for i in cidxs
+            crj = MT.assemble_crj(js, MT.jumps(js)[i], unknownoid)
+            @test isapprox(crj.rate(u0, mtkpars, ttt), jumps[i].rate(u0, p, ttt))
+            fake_integrator1 = (u = zeros(6), p = mtkpars, t = 0.0)
+            fake_integrator2 = (u = zeros(6), p, t = 0.0)
+            crj.affect!(fake_integrator1)
+            jumps[i].affect!(fake_integrator2)
+            @test fake_integrator1.u == fake_integrator2.u
+        end
+        for i in vidxs
+            vrj = MT.assemble_vrj(js, MT.jumps(js)[i], unknownoid)
+            @test isapprox(vrj.rate(u0, mtkpars, ttt), jumps[i].rate(u0, p, ttt))
+            fake_integrator1 = (u = zeros(6), p = mtkpars, t = 0.0)
+            fake_integrator2 = (u = zeros(6), p, t = 0.0)
+            vrj.affect!(fake_integrator1)
+            jumps[i].affect!(fake_integrator2)
+            @test fake_integrator1.u == fake_integrator2.u
+        end
+    end
+end
+
+### Niche Model Declarations ###
+
+# Checks model with vector species and parameters.
+# Checks that it works for programmatic/dsl-based modelling.
+# Checks that all forms of model input (parameter/initial condition and vector/non-vector) are
+# handled properly.
+let
+    # Declares programmatic model.
+    @parameters p[1:2] k d1 d2
+    @species (X(t))[1:2] Y1(t) Y2(t)
+    rxs = [
+        Reaction(p[1], [], [X[1]]),
+        Reaction(p[2], [], [X[2]]),
+        Reaction(k, [X[1]], [Y1]),
+        Reaction(k, [X[2]], [Y2]),
+        Reaction(d1, [Y1], []),
+        Reaction(d2, [Y2], []),
+    ]
+    rs_prog = complete(ReactionSystem(rxs, t; name = :rs))
+
+    # Declares DSL-based model.
+    rs_dsl = @reaction_network rs begin
+        @parameters p[1:2] k d1 d2
+        @species (X(t))[1:2] Y1(t) Y2(t)
+        (p[1],p[2]), 0 --> (X[1],X[2])
+        k, (X[1],X[2]) --> (Y1,Y2)
+        (d1,d2), (Y1,Y2) --> 0
+    end
+
+    # Checks equivalence.
+    rs_dsl == rs_prog
+
+    # Creates all possible initial conditions and parameter values.
+    u0_alts = [
+        [X => [2.0, 5.0], Y1 => 0.2, Y2 => 0.5],
+        [X[1] => 2.0, X[2] => 5.0, Y1 => 0.2, Y2 => 0.5],
+        [rs_dsl.X => [2.0, 5.0], rs_dsl.Y1 => 0.2, rs_dsl.Y2 => 0.5],
+        [rs_dsl.X[1] => 2.0, X[2] => 5.0, rs_dsl.Y1 => 0.2, rs_dsl.Y2 => 0.5],
+        [:X => [2.0, 5.0], :Y1 => 0.2, :Y2 => 0.5]
+    ]
+    ps_alts = [
+        [p => [1.0, 10.0], d1 => 5.0, d2 => 4.0, k => 2.0],
+        [rs_dsl.p => [1.0, 10.0], rs_dsl.d1 => 5.0, rs_dsl.d2 => 4.0, rs_dsl.k => 2.0],
+        [:p => [1.0, 10.0], :d1 => 5.0, :d2 => 4.0, :k => 2.0]
+    ]
+
+    # Loops through all inputs and check that the correct steady state is reached
+    # Target steady state: (X1, X2, Y1, Y2) = (p1/k, p2/k, p1/d1, p2/d2).
+    # Technically only one model needs to be check. However, "equivalent" models in MTK can still
+    # have slight differences, so checking for both here to be certain.
+    for rs in [rs_prog, rs_dsl]
+        oprob = ODEProblem(rs, u0_alts[1], (0.0, 10000.), ps_alts[1])
+        for rs in [rs_prog, rs_dsl], u0 in u0_alts, p in ps_alts
+            oprob_remade = remake(oprob; u0, p)
+            sol = solve(oprob_remade, Vern7(); abstol = 1e-8, reltol = 1e-8)
+            @test sol[[X[1], X[2], Y1 ,Y2]][end] ≈ [0.5, 5.0, 0.2, 2.5]
+        end
+    end
+end
+
+### Miscellaneous Getters ###
+
+# Tests spatial independent variables `get_sivs` and `has_sivs`.
+let
+    # Creates a `ReactionSystem`.
+    @parameters x
+    @parameters p d
+    @species S(t,x)
+    rxs = [
+        Reaction(p, [], [S]),
+        Reaction(d, [S], []),
+    ]
+    @named rs = ReactionSystem(rxs, t; spatial_ivs = [x])
+
+    # Test system independent variables (spatial and non-spatial).
+    @test Catalyst.has_sivs(rs)
+    @test isequal(Catalyst.get_sivs(rs), [x])
+    @test isequal(Catalyst.independent_variables(rs), [t])
+end
+
+# Tests `numparams` and `numreactions` for reaction system with subsystems.
+# Tests with multiple ReactionSystem subsystems (one with reactions, one with ODE equations).
+let
+    # Prepares content
+    @parameters k1 k2 k3 p1 p2
+    @species X1(t) X2(t) X3(t)
+    @variables V1(t) V2(t)
+    D = default_time_deriv()
+
+    # Creates a reaction system with subsystems.
+    sub_rxs = [
+        Reaction(k1, [X1], []),
+        Reaction(k2, [X2], [])
+    ]
+    @named sub_rs = ReactionSystem(sub_rxs, t)
+    sub_eqs = [
+        D(V1) ~ p1 - V1,
+        D(V2) ~ p2 - V2,
+    ]
+    # Use a ReactionSystem with ODE equations instead of a System
+    @named sub_osys = ReactionSystem(sub_eqs, t)
+    rxs = [
+        Reaction(k2, [X2], []),
+        Reaction(k3, [X3], [])
+    ]
+    @named rs = ReactionSystem(rxs, t; systems = [sub_rs, sub_osys])
+
+    # Tests content.
+    @test numparams(rs) == 6
+    @test numreactions(rs) == 4
+end
+
+# Tests `has_sivs` getter.
+
+### Test Show ###
+
+# Basic show test.
+let
+    io = IOBuffer()
+    show(io, rs)
+    str = String(take!(io))
+    @test count(isequal('\n'), str) < 30
+end
+
+# Test printing with arrays is working ok.
+# Needs fix for https://github.com/JuliaSymbolics/Symbolics.jl/issues/842.
+let
+    @parameters a
+    @species A(t) B(t) (C(t))[1:2]
+    rx1 = Reaction(a, [A, C[1]], [C[2], B], [1, 2], [2, 3])
+    io = IOBuffer()
+    show(io, rx1)
+    str = String(take!(io))
+    @test str == "a, A + 2*(C(t))[1] --> 2*(C(t))[2] + 3*B"
+end
+
+### Boundary Condition Species Tests ###
+
+# Test for constant and boundary condition species.
+function f!(du, u, p, t)
+    A = p[1]
+    k1 = p[2]
+    k2 = p[3]
+    B = u[1]
+    D = u[2]
+    E = u[3]
+    C = u[4]
+    du[1] = k1 * A - k2 * B
+    du[2] = -k1 * C * D + k2 * C * E
+    du[3] = k1 * C * D - k2 * C * E
+    du[4] = -C
+    nothing
+end
+function fs!(du, u, p, t)
+    A = p[1]
+    k1 = p[2]
+    k2 = p[3]
+    B = u[1]
+    D = u[2]
+    E = u[3]
+    C = u[4]
+    du[1] = k1 * A - k2 * B
+    du[2] = -k1 * C * D + k2 * C * E
+    du[3] = k1 * C * D - k2 * C * E
+    nothing
+end
+function gs!(dg, u, p, t)
+    A = p[1]
+    k1 = p[2]
+    k2 = p[3]
+    B = u[1]
+    D = u[2]
+    E = u[3]
+    C = u[4]
+    dg .= 0.0
+    dg[1, 1] = sqrt(k1 * A)
+    dg[1, 2] = -sqrt(k2 * B)
+    dg[2, 3] = -sqrt(k1 * C * D)
+    dg[2, 4] = sqrt(k2 * C * E)
+    dg[3, 3] = -dg[2, 3]
+    dg[3, 4] = -dg[2, 4]
+    nothing
+end
+
+# Tests for BC and constant species.
+let
+    @parameters k1 k2 A [isconstantspecies = true]
+    @species B(t) C(t) [isbcspecies = true] D(t) E(t)
+    Dt = default_time_deriv()
+    eqs = [(@reaction k1, $A --> B),
+        (@reaction k2, B --> $A),
+        (@reaction k1, $C + D --> E + $C),
+        Dt(C) ~ -C,
+        (@reaction k2, E + $C --> $C + D)]
+    @named rs = ReactionSystem(eqs, t)
+    rs = complete(rs)
+    @test all(eq -> eq isa Reaction, MT.get_eqs(rs)[1:4])
+    osys = complete(ode_model(rs))
+    @test issetequal(MT.get_unknowns(osys), [B, C, D, E])
+    _ps = filter(!isinitial, MT.get_ps(osys))
+    @test issetequal(_ps, [k1, k2, A])
+
+    # test nonlinear systems
+    u0 = [1.0, 2.0, 3.0, 4.0]
+    p = [2.0, 2.5, 3.5]
+    u0map = [B, D, E, C] .=> u0
+    pmap = [A, k1, k2] .=> p
+    tspan = (0.0, 5.0)
+    oprob1 = ODEProblem(osys, [u0map; pmap], tspan)
+    sts = [B, D, E, C]
+    syms = [:B, :D, :E, :C]
+    ofun = ODEFunction(f!; sys = MT.SymbolCache(syms))
+    oprob2 = ODEProblem(ofun, u0, tspan, p)
+    saveat = tspan[2] / 50
+    abstol = 1e-10
+    reltol = 1e-10
+    sol1 = solve(oprob1, Tsit5(); saveat, abstol, reltol)
+    sol2 = solve(oprob2, Tsit5(); saveat, abstol, reltol)
+    for i in eachindex(sts)
+        @test isapprox(sol1[sts[i]], sol2[syms[i]])
+    end
+
+    # Test sde systems.
+    # BC species require a constraint equation to define their dynamics in SDE Systems.
+    let
+        eqs = [(@reaction k1, $A --> B),
+            (@reaction k2, B --> $A),
+            (@reaction k1, $C + D --> E + $C),
+            (@reaction k2, E + $C --> $C + D),
+            Dt(C) ~ 0]  # Constraint equation for BC species (constant in time)
+        @named rs = ReactionSystem(eqs, t)
+        rs = complete(rs)
+        ssys = complete(sde_model(rs))
+        ssys = MT.mtkcompile(ssys)  # Required for Brownian-based SDE systems with constraints
+        @test issetequal(MT.get_unknowns(ssys), [B, C, D, E])
+        _ps = filter(!isinitial, MT.get_ps(ssys))
+        @test issetequal(_ps, [A, k1, k2])
+        du1 = zeros(4)
+        du2 = zeros(4)
+        sprob = SDEProblem(ssys, [u0map; pmap], tspan; check_length = false)
+        sprob.f(du1, sprob.u0, sprob.p, 1.0)
+        fs!(du2, u0, p, 1.0)
+        @test isapprox(du1, du2)
+        dg1 = zeros(4, 4)
+        dg2 = zeros(4, 4)
+        sprob.g(dg1, sprob.u0, sprob.p, 1.0)
+        gs!(dg2, u0, p, t)
+        @test isapprox(dg1, dg2)
+    end
+
+    let
+        # Test jump systems.
+        rxs = [(@reaction k1, $A --> B),
+            (@reaction k2, B --> $A),
+            (@reaction k1, $C + D --> E + $C),
+            (@reaction k2, $C + E --> $C + D),
+            (@reaction k1 * t, $A + $C --> B + $C),
+            (@reaction k1 * B, 2 * $A + $C --> $C + B)]
+        @named rs = ReactionSystem(rxs, t)
+        rs = complete(rs)
+        jsys = complete(jump_model(rs))
+        @test issetequal(unknowns(jsys), [B, C, D, E])
+        @test issetequal(parameters(jsys), [k1, k2, A])
+        majrates = [k1 * A, k1, k2]
+        majrs = [[], [C => 1, D => 1], [C => 1, E => 1]]
+        majns = [[B => 1], [D => -1, E => 1], [D => 1, E => -1]]
+        maj_jumps = filter(j -> j isa MassActionJump, MT.jumps(jsys))
+        for (i, maj) in enumerate(maj_jumps)
+            @test isequal(maj.scaled_rates, majrates[i])
+            @test issetequal(maj.reactant_stoch, majrs[i])
+            @test issetequal(maj.net_stoch, majns[i])
+        end
+        crj_jumps = filter(j -> j isa ConstantRateJump, MT.jumps(jsys))
+        @test isempty(crj_jumps)
+        vrj_jumps = filter(j -> j isa VariableRateJump, MT.jumps(jsys))
+        vrj1 = vrj_jumps[1]
+        @test isequal(vrj1.rate, k2 * B)
+        @test issetequal(vrj1.affect!, [B ~ -1 + Pre(B)])
+        vrj2 = vrj_jumps[2]
+        @test isequal(vrj2.rate, k1 * t * A * C)
+        @test issetequal(vrj2.affect!, [B ~ 1 + Pre(B)])
+        vrj3 = vrj_jumps[3]
+        @test isequal(vrj3.rate, k1 * B * A * (A - 1) / 2 * C)
+        @test issetequal(vrj3.affect!, [B ~ 1 + Pre(B)])
+    end
+end
+
+# Test that jump solutions actually run correctly for constants and BCs.
+let
+    @parameters k1 A [isconstantspecies = true]
+    @species C(t) [isbcspecies = true] B1(t) B2(t) B3(t)
+    @named rn = ReactionSystem([(@reaction k1, $C --> B1 + $C),
+                                   (@reaction k1, $A --> B2),
+                                   (@reaction 10 * k1, ∅ --> B3)], t)
+    rn = complete(rn)
+    jprob = JumpProblem(rn, [A => 10, C => 10, B1 => 0, B2 => 0, B3 => 0], (0.0, 10.0),
+                        [k1 => 1.0]; rng, save_positions = (false, false))
+    umean = zeros(4)
+    Nsims = 40000
+    for i in 1:Nsims
+        sol = solve(jprob, SSAStepper(), saveat = 10.0)
+        umean += sol(10.0, idxs = [B1, B2, B3, C])
+    end
+    umean /= Nsims
+    @test isapprox(umean[1], umean[2]; rtol = 1e-2)
+    @test isapprox(umean[1], umean[3]; rtol = 1e-2)
+    @test umean[4] == 10
+end
+
+### Species Tests ###
+
+# Test various species related checker functions.
+let
+    # Creates species and parameters.
+    @species X(t) Y(t) [isbcspecies=true]
+    @parameters x y [isconstantspecies=true]
+    @discretes xt(t) yt(t) [isconstantspecies=true]
+
+    # Tests properties.
+    @test !isspecies(x)
+    @test !isspecies(y)
+    @test !isspecies(xt)
+    @test !isspecies(yt)
+    @test isspecies(X)
+    @test isspecies(Y)
+    @test !Catalyst.isbc(x)
+    @test !Catalyst.isbc(y)
+    @test !Catalyst.isbc(xt)
+    @test !Catalyst.isbc(yt)
+    @test !Catalyst.isbc(X)
+    @test Catalyst.isbc(Y)
+    @test !Catalyst.isconstant(x)
+    @test Catalyst.isconstant(y)
+    @test !Catalyst.isconstant(xt)
+    @test Catalyst.isconstant(yt)
+    @test !Catalyst.isconstant(X)
+    @test !Catalyst.isconstant(Y)
+end
+
+
+### Error Tests ###
+
+# Tests various erroneous `ReactionSystem` creations.
+let
+    # Prepare model inputs.
+    @parameters k1 k2 x [isconstantspecies=true] Γ
+    @species X1(t) X2(t)
+    @variables V(t)
+
+    # System using a forbidden symbol.
+    @test_throws Exception rs = ReactionSystem([Reaction(Γ, [X1], [])], t; name = :rs)
+
+    # Species among parameters.
+    @test_throws Exception rs = ReactionSystem([Reaction(k1, [X1], [])], t, [X1], [k1, X2])
+
+    # Variable among parameters.
+    @test_throws Exception rs = ReactionSystem([Reaction(k1, [X1], [])], t, [X1], [k1, V])
+
+    # Parameter among unknowns.
+    @test_throws Exception rs = ReactionSystem([Reaction(k1, [X1], [])], t, [X1, k2], [k1])
+
+    # Constant species-parameter among unknowns.
+    @test_throws Exception rs = ReactionSystem([Reaction(k1, [X1], [])], t, [X1, x], [k1])
+end
+
+# Tests various erroneous `convert` calls.
+let
+    # Conversion of non-autonomous `ReactionSystem` to nonlinear `System`.
+    rs = @reaction_network begin
+        (p/(1+t),d), 0 <--> X
+    end
+    @test_throws Exception ss_ode_model(rs)
+
+    # Conversion of non-complete system to various system types.
+    nc = @network_component begin
+        (p,d), 0 <--> X
+    end
+    @test_throws Exception ode_model(nc)
+    @test_throws Exception sde_model(nc)
+    @test_throws Exception jump_model(nc)
+    @test_throws Exception ss_ode_model(nc)
+end
+
+# Checks that the same name cannot be used for two different of parameters/species/variables.
+let
+    # Stores a parameter, a species, and a variable (with identical names) in different variables.
+    X_p = let
+        only(@parameters X)
+    end
+    X_sp = let
+        only(@species X(t))
+    end
+    X_v = let
+        only(@variables X(t))
+    end
+
+    @test_broken false # (not sure how to mark a `@test_throws` as broken). Awaiting fix in MT: https://github.com/SciML/ModelingToolkit.jl/issues/4092
+    # Checks that creating systems with different in combination produces errors.
+    @parameters d
+    @species X(t)
+    rx = Reaction(d, [X], [])
+    # @test_throws ReactionSystem([rx], t, [X, X_sp,], [d, X_p]; name = :rs)
+    # @test_throws ReactionSystem([rx], t, [X, X, X_v], [d, X_p]; name = :rs)
+    # @test_throws ReactionSystem([rx], t, [X, X_sp, X_v], [d]; name = :rs)
+end
+
+### Specialised ReactionSystem Fields ###
+
+# Checks that correct bindings and (default) iniital conditions are created and stored in various ways and conversions.
+let
+    # Declare time differential.
+    D = default_time_deriv()
+
+    # Declares parameters, species, and variables with various combinations of initial conditions and bindings.
+    @parameters θ1 θ2 θ3 θ4 θ5
+    @parameters ϕ1 ϕ2 ϕ3 ϕ4 ϕ5
+    @parameters ψ1 ψ2 ψ3 ψ4 ψ5
+    @parameters χ1 χ2 χ3 χ4 χ5 χ6 χ7 χ8
+    @parameters a1 a2 a3 a4
+    @parameters b1=1.0 b2=2.0 b3=3.0 b4=4.0
+    @parameters c1=θ1 c2=θ1+θ2 c3=log(1+θ3) c4=θ4 * θ5^2
+    @parameters d1 d2 d3 d4
+    @species X1(t) X2(t) X3(t) X4(t)
+    @species Y1(t)=0.1 Y2(t)=0.2 Y3(t)=0.3 Y4(t)=0.4
+    @species Z1(t)=ϕ1 Z2(t)=ϕ1+ϕ2 Z3(t)=log(1+ϕ3) Z4(t)=ϕ5 * ϕ4^2
+    @species U1(t) U2(t) U3(t) U4(t)
+    @variables K1(t) K2(t) K3(t) K4(t)
+    @variables L1(t)=10.0 L2(t)=20.0 L3(t)=30.0 L4(t)=40.0
+    @variables M1(t)=ψ1 M2(t)=ψ1+ψ2 M3(t)=log(1+ψ3) M4(t)=ψ4 * ψ5^2
+    @variables N1(t) N2(t) N3(t) N4(t)
+    ps = [θ1, θ2, θ3, θ4, θ5, ϕ1, ϕ2, ϕ3, ϕ4, ϕ5, ψ1, ψ2, ψ3, ψ4, ψ5, χ1, χ2, χ3, χ4, χ5, χ6, χ7, χ8, a1, a2, a3, a4, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, d3, d4]
+    us = [X1, X2, X3, X4, Y1, Y2, Y3, Y4, Z1, Z2, Z3, Z4, U1, U2, U3, U4, K1, K2, K3, K4, L1, L2, L3, L4, M1, M2, M3, M4, N1, N2, N3, N4]
+
+    # Creates a single reaction system with all of them.
+    rxs = [
+        Reaction(a1, [X1], [Y1]),
+        Reaction(b1, [X2], [Y2]),
+        Reaction(c1, [X3], [Y3]),
+        Reaction(a2, [X4], [Y4]),
+        Reaction(b2, [Z1], [U1]),
+        Reaction(c2, [Z2], [U2]),
+        Reaction(a3, [Z3], [U3]),
+        Reaction(b3, [Z4], [U4]),
+        D(K1) ~ c3 - K1,
+        D(K2) ~ a4 - K2,
+        D(K3) ~ d1 - K3,
+        D(K4) ~ d2 - K4,
+        L1^2 + X1 ~ b4 ^ 2 + K1^2,
+        L2^2 + X2 ~ c4 ^ 2 + K2^2,
+        L3^2 + X3 ~ 1 ^ 2 + K3^2,
+        L4^2 + X4 ~ 1 ^ 2 + K4^2,
+        D(M1) ~ d3 - M1,
+        D(M2) ~ d4 - M2,
+        D(M3) ~ 1 - M3,
+        D(M4) ~ 1 - M4,
+        D(N1) ~ 1 - N1,
+        D(N2) ~ 1 - N2,
+        D(N3) ~ 1 - N3,
+        D(N4) ~ 1 - N4,
+    ]
+    initial_conditions = [
+        d1 => 100.0, d2 => χ1,
+        U1 => 200.0, U2 => χ2^3,
+        N1 => 300.0, N2 => χ3 + log(χ4+ 1),
+    ]
+    bindings = [
+        d3 => 1000.0, d4 => χ5,
+        U3 => 2000.0, U4 => χ6^3,
+        N3 => 3000.0, N4 => χ7 + log(χ8+ 1),
+    ]
+    @named rs = ReactionSystem(rxs, t, us, ps; initial_conditions, bindings)
+    rs_complete = complete(rs)
+
+    # Jump and nonlinear systems incompatible with reactions for various reasons.
+    default_scale = PhysicalScale.ODE
+    all_sys = [
+        rs, rs_complete,
+        ode_model(rs_complete), complete(ode_model(rs_complete)), mtkcompile(ode_model(rs_complete)),
+        sde_model(rs_complete), complete(sde_model(rs_complete)), mtkcompile(sde_model(rs_complete)),
+        hybrid_model(rs_complete; default_scale), complete(hybrid_model(rs_complete; default_scale)), mtkcompile(hybrid_model(rs_complete; default_scale))
+    ]
+
+    # Checks that all stored bindings and initial conditions are correct.
+    tosym(x) = convert(ModelingToolkitBase.SymbolicT, x)
+    ics = [
+        unwrap(b1) => tosym(1.0), unwrap(b2) => tosym(2.0), unwrap(b3) => tosym(3.0), unwrap(b4) => tosym(4.0),
+        unwrap(Y1) => tosym(0.1), unwrap(Y2) => tosym(0.2), unwrap(Y3) => tosym(0.3), unwrap(Y4) => tosym(0.4),
+        unwrap(L1) => tosym(10.0), unwrap(L2) => tosym(20.0), unwrap(L3) => tosym(30.0), unwrap(L4) => tosym(40.0),
+        unwrap(d1) => tosym(100.0), unwrap(d2) => unwrap(χ1),
+        unwrap(U1) => tosym(200.0), unwrap(U2) => unwrap(χ2^3),
+        unwrap(N1) => tosym(300.0), unwrap(N2) => unwrap(χ3 + log(χ4+ 1)),
+    ]
+    binds = [
+        unwrap(c1) => unwrap(θ1), unwrap(c2) => unwrap(θ1 + θ2), unwrap(c3) => unwrap(log(1+θ3)), unwrap(c4) => unwrap(θ4 * θ5^2),
+        unwrap(Z1) => unwrap(ϕ1), unwrap(Z2) => unwrap(ϕ1+ϕ2), unwrap(Z3) => unwrap(log(1+ϕ3)), unwrap(Z4) => unwrap(ϕ5 * ϕ4^2),
+        unwrap(M1) => unwrap(ψ1), unwrap(M2) => unwrap(ψ1+ψ2), unwrap(M3) => unwrap(log(1+ψ3)), unwrap(M4) => unwrap(ψ4 * ψ5^2),
+        unwrap(d3) => tosym(1000.0), unwrap(d4) => unwrap(χ5),
+        unwrap(U3) => tosym(2000.0), unwrap(U4) => unwrap(χ6^3),
+        unwrap(N3) => tosym(3000.0), unwrap(N4) => unwrap(χ7 + log(χ8+ 1)),
+    ]
+    for sys in all_sys
+        @test issetequal((collect(ModelingToolkitBase.get_initial_conditions(sys))), ics)
+        @test issetequal((collect(ModelingToolkitBase.get_bindings(sys))), binds)
+        @test issetequal((collect(ModelingToolkitBase.initial_conditions(sys))), ics)
+        @test issetequal((collect(ModelingToolkitBase.bindings(sys))), binds)
+    end
+end
+
+# Checks that correct bindings and initial conditiosn are stored and used in simulations.
+let
+    # Creates the model.
+    ps1 = @parameters d1_1 d2_1 d2_2 d3_1 d4_1 d4_2
+    ps2 = @parameters X1_1 X2_1 X2_2 X3_1 X4_1 X4_2
+    ps3 = @parameters d1 = d1_1 d2 = d2_1 + d2_2 d3 d4
+    ps4 = @parameters k3_1 k4_1 k4_2
+    ps5 = @parameters Y3_1 Y4_1 Y4_2
+    ps6 = @parameters k1 = 1.0 k2 = 2.0 k3 k4
+    us1 = @species X1(t) = X1_1 X2(t) = X2_1 + X2_2 X3(t) X4(t)
+    us2 = @species Y1(t) = 1.0 Y2(t) = 2.0 Y3(t) Y4(t)
+    rxs = [
+        Reaction(d1, [X1], []),
+        Reaction(d2, [X2], []),
+        Reaction(d3, [X3], []),
+        Reaction(d4, [X4], []),
+        Reaction(k1, [Y1], []),
+        Reaction(k2, [Y2], []),
+        Reaction(k3, [Y3], []),
+        Reaction(k4, [Y4], [])
+    ]
+    bindings = [d3 => d3_1, d4 => d4_1 + d4_2, X3 => X3_1, X4 => X4_1 + X4_2]
+    initial_conditions = [k3 => k3_1, k4 => k4_1 + k4_2, Y3 => Y3_1, Y4 => Y4_1 + Y4_2]
+    @mtkcomplete rs = ReactionSystem(rxs, t, [us1; us2], [ps1; ps2; ps3; ps4; ps5; ps6]; bindings, initial_conditions)
+
+    # Simulates the model as an ODE.
+    ps = [
+        d1_1 => 1.0, d2_1 => 0.5, d2_2 => 1.5, d3_1 => 3.0, d4_1 => 1.5, d4_2 => 2.5,
+        X1_1 => 1.0, X2_1 => 0.5, X2_2 => 1.5, X3_1 => 3.0, X4_1 => 1.5, X4_2 => 2.5,
+        k3_1 => 3.0, k4_1 => 1.5, k4_2 => 2.5,
+        Y3_1 => 3.0, Y4_1 => 1.5, Y4_2 => 2.5
+    ]
+    oprob = ODEProblem(rs, [], 10.0, ps)
+    osol = solve(oprob, Vern7(); saveat = 0.0:0.1:10.0, abstol = 1e-8, reltol = 1e-8)
+
+    # Checks that stored parameter values and initial conditions are correct.
+    @test oprob.ps[d1] == osol.ps[d1] == 1.0
+    @test oprob.ps[d2] == osol.ps[d2] == 2.0
+    @test oprob.ps[d3] == osol.ps[d3] == 3.0
+    @test oprob.ps[d4] == osol.ps[d4] == 4.0
+    @test oprob[X1] == osol[X1][1] == 1.0
+    @test oprob[X2] == osol[X2][1] == 2.0
+    @test oprob[X3] == osol[X3][1] == 3.0
+    @test oprob[X4] == osol[X4][1] == 4.0
+    @test oprob.ps[k1] == osol.ps[k1] == 1.0
+    @test oprob.ps[k2] == osol.ps[k2] == 2.0
+    @test oprob.ps[k3] == osol.ps[k3] == 3.0
+    @test oprob.ps[k4] == osol.ps[k4] == 4.0
+    @test oprob[Y1] == osol[Y1][1] == 1.0
+    @test oprob[Y2] == osol[Y2][1] == 2.0
+    @test oprob[Y3] == osol[Y3][1] == 3.0
+    @test oprob[Y4] == osol[Y4][1] == 4.0
+
+    # Checks that simulations are correct.
+    degradation_series(x0, d; range = 0.0:0.1:10.0) = x0 * exp.(-d .* range)
+    @test osol[X1] ≈ degradation_series(1.0, 1.0)
+    @test osol[X2] ≈ degradation_series(2.0, 2.0)
+    @test osol[X3] ≈ degradation_series(3.0, 3.0)
+    @test osol[X4] ≈ degradation_series(4.0, 4.0)
+    @test osol[Y1] ≈ degradation_series(1.0, 1.0)
+    @test osol[Y2] ≈ degradation_series(2.0, 2.0)
+    @test osol[Y3] ≈ degradation_series(3.0, 3.0)
+    @test osol[Y4] ≈ degradation_series(4.0, 4.0)
+end
+
+### Other Tests ###
+
+# Test for https://github.com/SciML/ModelingToolkit.jl/issues/436.
+let
+    @species S(t) I(t)
+    rxs = [Reaction(1, [S], [I]), Reaction(1.1, [S], [I])]
+    @named rs = ReactionSystem(rxs, t, [S, I], [])
+    rs = complete(rs)
+    js = complete(jump_model(rs))
+    jprob = JumpProblem(js, [S => 1, I => 1], (0.0, 10.0); rng)
+    sol = solve(jprob, SSAStepper())
+
+    # Test for https://github.com/SciML/ModelingToolkit.jl/issues/1042.
+    jprob = JumpProblem(rs, [S => 1, I => 1], (0.0, 10.0), []; aggregator = Direct(), rng, save_positions = (false, false))
+
+    @parameters k1 k2
+    @species R(t)
+    rxs = [Reaction(k1 * S, [S, I], [I], [2, 3], [2]),
+        Reaction(k2 * R, [I], [R])]
+    @named rs = ReactionSystem(rxs, t, [S, I, R], [k1, k2])
+    rs = complete(rs)
+    @test isequal(oderatelaw(equations(rs)[1]),
+                  k1 * S * S^2 * I^3 / (factorial(2) * factorial(3)))
+    @test_skip isequal(jumpratelaw(equations(eqs)[1]),
+                       k1 * S * binomial(S, 2) * binomial(I, 3))
+    dep = Set()
+    MT.get_variables!(dep, rxs[2], Set(unknowns(rs)))
+    dep2 = Set([R, I])
+    @test dep == dep2
+    dep = Set()
+    MT.modified_unknowns!(dep, rxs[2], Set(unknowns(rs)))
+    @test dep == Set([R, I])
+
+    isequal2(a, b) = isequal(simplify(a), simplify(b))
+
+    @test isequal2(jumpratelaw(rxs[1]), k1 * S * S * (S - 1) * I * (I - 1) * (I - 2) / 12)
+    @test isequal2(jumpratelaw(rxs[1]; combinatoric_ratelaw = false),
+                   k1 * S * S * (S - 1) * I * (I - 1) * (I - 2))
+    @test isequal2(oderatelaw(rxs[1]), k1 * S * S^2 * I^3 / 12)
+    @test isequal2(oderatelaw(rxs[1]; combinatoric_ratelaw = false), k1 * S * S^2 * I^3)
+
+    @named rs2 = ReactionSystem(rxs, t, [S, I, R], [k1, k2]; combinatoric_ratelaws = false)
+    rs2 = complete(rs2)
+
+    # Test ODE scaling:
+    os = complete(ode_model(rs))
+    @test isequal2(equations(os)[1].rhs, -2 * k1 * S * S^2 * I^3 / 12)
+    os = ode_model(rs; combinatoric_ratelaws = false)
+    @test isequal2(equations(os)[1].rhs, -2 * k1 * S * S^2 * I^3)
+    os2 = complete(ode_model(rs2))
+    @test isequal2(equations(os2)[1].rhs, -2 * k1 * S * S^2 * I^3)
+    os3 = complete(ode_model(rs2; combinatoric_ratelaws = true))
+    @test isequal2(equations(os3)[1].rhs, -2 * k1 * S * S^2 * I^3 / 12)
+
+    # Test ConstantRateJump rate scaling.
+    js = complete(jump_model(rs))
+    @test isequal2(MT.jumps(js)[1].rate,
+                    k1 * S * S * (S - 1) * I * (I - 1) * (I - 2) / 12)
+    js = complete(jump_model(rs; combinatoric_ratelaws = false))
+    @test isequal2(MT.jumps(js)[1].rate, k1 * S * S * (S - 1) * I * (I - 1) * (I - 2))
+    js2 = complete(jump_model(rs2))
+    @test isequal2(MT.jumps(js2)[1].rate, k1 * S * S * (S - 1) * I * (I - 1) * (I - 2))
+    js3 = complete(jump_model(rs2; combinatoric_ratelaws = true))
+    @test isequal2(MT.jumps(js3)[1].rate,
+                    k1 * S * S * (S - 1) * I * (I - 1) * (I - 2) / 12)
+
+    # Test MassActionJump rate scaling.
+    rxs = [Reaction(k1, [S, I], [I], [2, 3], [2]),
+        Reaction(k2, [I], [R])]
+    @named rs = ReactionSystem(rxs, t, [S, I, R], [k1, k2])
+    rs = complete(rs)
+    js = complete(jump_model(rs))
+    @test isequal2(MT.jumps(js)[1].scaled_rates, k1 / 12)
+    js = complete(jump_model(rs; combinatoric_ratelaws = false))
+    @test isequal2(MT.jumps(js)[1].scaled_rates, k1)
+
+    # test building directly from rxs
+    @parameters x, y
+    rxs = [Reaction(x * t * A * B + y, [A], nothing)]
+    @named rs1 = ReactionSystem(rxs, t, [A, B], [x, y])
+    @named rs2 = ReactionSystem(rxs, t)
+    @test Catalyst.isequivalent(rs1, rs2)
+
+    @species L(t), H(t)
+    obs = [Equation(L, 2 * x + y)]
+    @named rs3 = ReactionSystem(rxs, t; observed = obs)
+    L2 = L
+    @unpack L = rs3
+    @test isequal(L, L2)
+end
+
+# Test that non-integer stoichiometry goes through.
+let
+    @parameters k b
+    @species A(t) B(t) C(t) D(t)
+    rx1 = Reaction(k, [B, C], [B, D], [2.5, 1], [3.5, 2.5])
+    rx2 = Reaction(2 * k, [B], [D], [1], [2.5])
+    rx3 = Reaction(2 * k, [B], [D], [2.5], [2])
+    @named mixedsys = ReactionSystem([rx1, rx2, rx3], t, [A, B, C, D], [k, b])
+    mixedsys = complete(mixedsys)
+    osys = ode_model(mixedsys; combinatoric_ratelaws = false)
+end
+
+# Test balanced_bc_check.
+let
+    @species A(t) [isbcspecies = true]
+    rx = @reaction k, 2 * $A + B --> C + $A
+    @test_throws ErrorException ReactionSystem([rx], t; name = :rs)
+    @named rs = ReactionSystem([rx], t; balanced_bc_check = false)
+end
+
+# Fix for SBML test 305.
+let
+    @parameters k1 k2 S2 [isconstantspecies = true]
+    @species S1(t) S3(t) [isbcspecies = true]
+    rx = Reaction(k2, [S1], nothing)
+    ∂ₜ = default_time_deriv()
+    eq = S3 ~ k1 * S2
+    @named rs = ReactionSystem([rx, eq], t)
+    rs = complete(rs)
+    @test issetequal(unknowns(rs), [S1, S3])
+    @test issetequal(parameters(rs), [S2, k1, k2])
+    osys = ode_model(rs)
+    @test issetequal(unknowns(osys), [S1, S3])
+    @test issetequal(parameters(osys), [S2, k1, k2])
+    osys2 = mtkcompile(osys)
+    @test length(equations(osys2)) == 1
+    @test issetequal(unknowns(osys2), [S1])
+    @test issetequal(parameters(osys2), [S2, k1, k2])
+end
+let
+    @parameters k1 k2 S2 [isconstantspecies = true]
+    @variables S3(t)
+    @species S1(t)
+    rx = Reaction(k2, [S1], nothing)
+    ∂ₜ = default_time_deriv()
+    eq = S3 ~ k1 * S2
+    @named rs = ReactionSystem([rx, eq], t)
+    rs = complete(rs)
+    @test issetequal(unknowns(rs), [S1, S3])
+    @test issetequal(parameters(rs), [S2, k1, k2])
+    osys = ode_model(rs)
+    @test issetequal(unknowns(osys), [S1, S3])
+    @test issetequal(parameters(osys), [S2, k1, k2])
+    osys2 = mtkcompile(osys)
+    @test length(equations(osys2)) == 1
+    @test issetequal(unknowns(osys2), [S1])
+    @test issetequal(parameters(osys2), [S2, k1, k2])
+end
+
+# Constant species = parameters basic tests.
+let
+    @parameters k b [isconstantspecies = true] c
+    @test_throws ArgumentError @species A(t) B(t) a [isconstantspecies = true]
+    @test_throws ArgumentError Reaction(k, [A, c], [B])
+    @test_throws ArgumentError Reaction(k, [A], [B, c])
+    rx = Reaction(k, [A, b], [B, b], [1, 1], [1, 2])
+    @named rs = ReactionSystem([rx], t)
+    @test issetequal(unknowns(rs), [A, B])
+    @test issetequal(parameters(rs), [k, b])
+end
+
+# Test parameteric initial conditions.
+let
+    @parameters d X0
+    @species X(t)=X0
+    rx = Reaction(d, [X], nothing, [1], nothing)
+    @named rs = ReactionSystem([rx], t)
+    rs = complete(rs)
+    prob = ODEProblem(rs, [], (0.0, 1.0), [d => 1.0, X0 => 7.6])
+    @test prob[X] == 7.6
+end
+
+# Test for classification of jump types.
+let
+    rn = @reaction_network begin
+        t, A --> B          # vrj
+        1.0, B --> D        # vrj
+        k * D, H --> I + H  # vrj
+        k2, I --> L         # vrj
+        k, E --> F          # maj
+        k * E, E --> G      # crj
+        k2, G --> H         # maj
+        k2, G --> A + B     # maj
+    end
+    jsys = jump_model(rn)
+    jumps = Catalyst.assemble_jumps(rn)
+    @test count(j -> j isa VariableRateJump, jumps) == 4
+    @test count(j -> j isa ConstantRateJump, jumps) == 1
+    @test count(j -> j isa MassActionJump, jumps) == 3
+    dg = [[1, 2], [2, 3], [4], [4], [5, 6], [5, 6, 7, 8], [3, 7, 8], [1, 2, 7, 8]]
+    dgact = Catalyst.get_depgraph(rn)
+    @test dg == dgact
+end
+
+# Test array metadata for species works.
+let
+    @species (A(t))[1:20]
+    using ModelingToolkitBase: value
+    Av = value(A)
+    @test isspecies(Av)
+    @test all(i -> isspecies(Av[i]), 1:length(Av))
+end
+
+# Test mixed models are formulated correctly.
+let
+    @parameters k1 k2::Integer
+    @variables V(t)
+    @species A(t) B(t)
+    rx = Reaction(k1, [A], [B], [k2], [2])
+    D = default_time_deriv()
+    eq = D(V) ~ -k1 * k2 * V + A
+    @named rs = ReactionSystem([eq, rx], t)
+    rs = complete(rs)
+    @test length(unknowns(rs)) == 3
+    @test issetequal(unknowns(rs), [A, B, V])
+    @test length(parameters(rs)) == 2
+    @test issetequal(parameters(rs), [k1, k2])
+    @test length(species(rs)) == 2
+    @test issetequal(species(rs), [A, B])
+    @test all(typeof.(MT.get_eqs(rs)) .<: (Reaction, Equation))
+    @test length(Catalyst.get_rxs(rs)) == 1
+    @test reactions(rs)[1] == rx
+    osys = ode_model(rs)
+    @test issetequal(unknowns(osys), [A, B, V])
+    @test issetequal(parameters(osys), [k1, k2])
+    @test length(equations(osys)) == 3
+end
+
+# Test errors for repeated substrates or products
+let
+    @species A(t) B(t)
+    @test_throws ArgumentError Reaction(1.0, [A, A, B], [B])
+    @test_throws ArgumentError Reaction(1.0, [B], [A, A])
+    @test_throws ArgumentError Reaction(1.0, [A, A], [B, B])
+end
+
+# Test order of species and products doesn't matter for equality or hashing
+let
+    @species A(t) α(t)
+    rx = Reaction(1.0, [α, A], [α, A], [2, 3], [4, 5])
+    rx2 = Reaction(1.0, [A, α], [A, α], [3, 2], [5, 4])
+    @test rx == rx2
+    @test hash(rx) == hash(rx2)
+
+    rx = Reaction(1.0, [α, A], [α, A], [2, 3], [4, 5]; netstoich = [α => 2, A => 2])
+    rx2 = Reaction(1.0, [A, α], [A, α], [3, 2], [5, 4]; netstoich = [A => 2, α => 2])
+    @test rx == rx2
+    @test hash(rx) == hash(rx2)
+end
+
+# Additional unsorted tests.
+let
+    rn = @reaction_network begin k, X --> 0 end
+    isspecies(species(rn)[1])
+    @test Catalyst.has_species(rn)
+    @test Catalyst.has_rxs(rn)
+
+    @species X
+    @variables Y
+    @test isspecies(X)
+    @test !isspecies(Y)
+    @test isspecies(Catalyst.tospecies(Y))
+end
+
+# Tests system-level metadata.
+let
+    # Create model.
+    @species X(t)
+    @parameters d
+    @named rs1 = ReactionSystem([Reaction(d, [X], nothing)], t)
+    @named rs2 = ReactionSystem([Reaction(d, [X], nothing)], t; metadata = [MiscSystemData => π])
+
+    # Check metadata for `ReactionSystem`s.
+    @test ModelingToolkitBase.getmetadata(rs1, MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(rs2, MiscSystemData, nothing) == π
+    @test ModelingToolkitBase.getmetadata(complete(rs1), MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(complete(rs2), MiscSystemData, nothing) == π
+
+    # Check metadata for converted `ReactionSystem`s.
+    @test ModelingToolkitBase.getmetadata(ode_model(complete(rs1)), MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(ode_model(complete(rs2)), MiscSystemData, nothing) == π
+    @test ModelingToolkitBase.getmetadata(complete(ode_model(complete(rs1))), MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(complete(ode_model(complete(rs2))), MiscSystemData, nothing) == π
+    @test ModelingToolkitBase.getmetadata(sde_model(complete(rs1)), MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(sde_model(complete(rs2)), MiscSystemData, nothing) == π
+    @test ModelingToolkitBase.getmetadata(complete(sde_model(complete(rs1))), MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(complete(sde_model(complete(rs2))), MiscSystemData, nothing) == π
+    @test ModelingToolkitBase.getmetadata(jump_model(complete(rs1)), MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(jump_model(complete(rs2)), MiscSystemData, nothing) == π
+    @test ModelingToolkitBase.getmetadata(complete(jump_model(complete(rs1))), MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(complete(jump_model(complete(rs2))), MiscSystemData, nothing) == π
+    @test ModelingToolkitBase.getmetadata(ss_ode_model(complete(rs1)), MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(ss_ode_model(complete(rs2)), MiscSystemData, nothing) == π
+    @test ModelingToolkitBase.getmetadata(complete(ss_ode_model(complete(rs1))), MiscSystemData, nothing) == nothing
+    @test ModelingToolkitBase.getmetadata(complete(ss_ode_model(complete(rs2))), MiscSystemData, nothing) == π
+
+    # Check metadata for `ReactionSystem`s where metadata has been udpated
+    rs1 = ModelingToolkitBase.setmetadata(rs1, MiscSystemData, "Metadata")
+    rs2 = ModelingToolkitBase.setmetadata(rs2, MiscSystemData, ones(2, 3))
+    @test ModelingToolkitBase.getmetadata(rs1, MiscSystemData, nothing) == "Metadata"
+    @test ModelingToolkitBase.getmetadata(rs2, MiscSystemData, nothing) == ones(2, 3)
+    @test ModelingToolkitBase.getmetadata(complete(rs1), MiscSystemData, nothing) == "Metadata"
+    @test_broken ModelingToolkitBase.getmetadata(complete(rs2), MiscSystemData, nothing) == ones(2, 3) # Weird and obscure Catalyst bug: https://github.com/SciML/Catalyst.jl/issues/1353.
+end
+
+# Tests u0_map and parameter_map system-level metadata.
+let
+    @species X(t) Y(t)
+    @parameters k1 k2
+
+    u0map = [X => 1.0, Y => 2.0]
+    pmap = [k1 => 0.1, k2 => 0.2]
+
+    # System without metadata has no u0_map or parameter_map.
+    @named rs_plain = ReactionSystem([Reaction(k1, [X], [Y])], t)
+    @test !Catalyst.has_u0_map(rs_plain)
+    @test !Catalyst.has_parameter_map(rs_plain)
+    @test Catalyst.get_u0_map(rs_plain) === nothing
+    @test Catalyst.get_parameter_map(rs_plain) === nothing
+
+    # System with metadata via constructor.
+    @named rs = ReactionSystem([Reaction(k1, [X], [Y])], t;
+        metadata = [Catalyst.U0Map => u0map, Catalyst.ParameterMap => pmap])
+    @test Catalyst.has_u0_map(rs)
+    @test Catalyst.has_parameter_map(rs)
+    @test isequal(Catalyst.get_u0_map(rs), u0map)
+    @test isequal(Catalyst.get_parameter_map(rs), pmap)
+
+    # Setting via set_* functions (out-of-place).
+    rs2 = Catalyst.set_u0_map(rs_plain, u0map)
+    rs3 = Catalyst.set_parameter_map(rs_plain, pmap)
+    @test Catalyst.has_u0_map(rs2)
+    @test !Catalyst.has_u0_map(rs_plain)  # original unchanged
+    @test isequal(Catalyst.get_u0_map(rs2), u0map)
+    @test Catalyst.has_parameter_map(rs3)
+    @test !Catalyst.has_parameter_map(rs_plain)  # original unchanged
+    @test isequal(Catalyst.get_parameter_map(rs3), pmap)
+
+    # Preservation through complete.
+    rs_c = complete(rs)
+    @test Catalyst.has_u0_map(rs_c)
+    @test Catalyst.has_parameter_map(rs_c)
+    @test isequal(Catalyst.get_u0_map(rs_c), u0map)
+    @test isequal(Catalyst.get_parameter_map(rs_c), pmap)
+
+    # Preservation through flatten (hierarchical system).
+    @named sub = ReactionSystem([Reaction(k2, [Y], [X])], t)
+    @named parent_rs = ReactionSystem([Reaction(k1, [X], [Y])], t;
+        systems = [sub], metadata = [Catalyst.U0Map => u0map, Catalyst.ParameterMap => pmap])
+    flat = Catalyst.flatten(parent_rs)
+    @test isequal(Catalyst.get_u0_map(flat), u0map)
+    @test isequal(Catalyst.get_parameter_map(flat), pmap)
+
+    # Preservation through model conversions.
+    rs_comp = complete(rs)
+    for model_fn in [ode_model, sde_model, jump_model, ss_ode_model]
+        sys = model_fn(rs_comp)
+        @test isequal(ModelingToolkitBase.getmetadata(sys, Catalyst.U0Map, nothing), u0map)
+        @test isequal(ModelingToolkitBase.getmetadata(sys, Catalyst.ParameterMap, nothing), pmap)
+    end
+end
+
+# Tests construction of empty reaction networks.
+let
+    # Using DSL.
+    empty_network = @reaction_network
+    @test length(MT.get_eqs(empty_network)) == 0
+    @test nameof(MT.get_iv(empty_network)) == :t
+    @test length(MT.get_unknowns(empty_network)) == 0
+    @test length(MT.get_ps(empty_network)) == 0
+
+    # Using `make_empty_network`.
+    empty_network = make_empty_network()
+    @test length(MT.get_eqs(empty_network)) == 0
+    @test nameof(MT.get_iv(empty_network)) == :t
+    @test length(MT.get_unknowns(empty_network)) == 0
+    @test length(MT.get_ps(empty_network)) == 0
+end
+
+# Checks that the `reactionsystem_uptodate` function work. If it does not, the ReactionSystem
+# structure's fields have been updated, without updating the `reactionsystem_fields` constant. If so,
+# there are several places in the code where the `reactionsystem_uptodate` function is called, here
+# the code might need adaptation to take the updated reaction system into account.
+let
+    @test_nowarn Catalyst.reactionsystem_uptodate_check() # Will fix this once most things are actually workin.
+end
+
+# Test that functions using the incidence matrix properly cache it
+let
+    rn = @reaction_network begin
+        k1, A --> B
+        k2, B --> C
+        k3, C --> A
+    end
+
+    nps = Catalyst.get_networkproperties(rn)
+    @test isempty(nps.incidencemat) == true
+
+    img = incidencematgraph(rn)
+    @test size(nps.incidencemat) == (3,3)
+
+    Catalyst.reset!(nps)
+    lcs = linkageclasses(rn)
+    @test size(nps.incidencemat) == (3,3)
+
+    Catalyst.reset!(nps)
+    sns = subnetworks(rn)
+    @test size(nps.incidencemat) == (3,3)
+
+    Catalyst.reset!(nps)
+    δ = deficiency(rn)
+    @test size(nps.incidencemat) == (3,3)
+
+    Catalyst.reset!(nps)
+    δ_l = linkagedeficiencies(rn)
+    @test size(nps.incidencemat) == (3,3)
+
+    Catalyst.reset!(nps)
+    rev = isreversible(rn)
+    @test size(nps.incidencemat) == (3,3)
+
+    Catalyst.reset!(nps)
+    weakrev = isweaklyreversible(rn, sns)
+    @test size(nps.incidencemat) == (3,3)
+end
+
+########## tests related to hybrid systems ##########
+
+let
+    # Helper functions to access jump System equation types in MTK 11
+    # Jumps are now stored in a flat vector, filter by type
+    massactionjumps(js) = filter(j -> j isa MassActionJump, MT.jumps(js))
+    constantratejumps(js) = filter(j -> j isa ConstantRateJump, MT.jumps(js))
+    variableratejumps(js) = filter(j -> j isa VariableRateJump, MT.jumps(js))
+    odeeqs(js) = equations(js)
+
+    # Test that jump_model errors when given ODE equations (use hybrid_model instead)
+    let
+        t = default_t()
+        D = default_time_deriv()
+        @parameters λ k
+        @variables V(t)
+        @species A(t) B(t) C(t)
+        rxs = [Reaction(k*V, [], [A]), Reaction(λ*A, [B], nothing),
+            Reaction(k, [A, B], nothing), Reaction(λ, [C], [A])]
+        eqs = [D(V) ~ λ*V*C]
+        cevents = [[V ~ 2.0] => [V ~ V/2, A ~ A/2]]
+        @named rs = ReactionSystem(vcat(rxs, eqs), t; continuous_events = cevents)
+        rs = complete(rs)
+        @test_throws ErrorException jump_model(rs)
+    end
+
+    let
+        t = default_t()
+        D = default_time_deriv()
+        @parameters λ k
+        @variables V(t)
+        @species A(t) B(t) C(t)
+        metadata = [:physical_scale => PhysicalScale.ODE]
+        rxs = [Reaction(k*V, [], [A]), Reaction(λ*A, [B], nothing; metadata),
+            Reaction(k, [A, B], nothing), Reaction(λ, [C], [A])]
+        eqs = [D(V) ~ λ*V*C]
+        cevents = [[V ~ 2.0] => [V ~ V/2, A ~ A/2]]
+        @named rs = ReactionSystem(vcat(rxs, eqs), t; continuous_events = cevents)
+        rs = complete(rs)
+        sys = complete(hybrid_model(rs; default_scale = PhysicalScale.Jump))
+        @test sys isa MT.System
+        @test MT.has_equations(sys)
+        @test length(massactionjumps(sys)) == 1
+        @test isempty(constantratejumps(sys))
+        @test length(variableratejumps(sys)) == 2
+        @test length(odeeqs(sys)) == 4
+        odes = union(eqs, [D(A) ~ 0, D(B) ~ -λ*A*B, D(C) ~ 0])
+        @test issetequal(odes, odeeqs(sys))
+        @test length(continuous_events(sys)) == 1
+    end
+
+    let
+        t = default_t()
+        D = default_time_deriv()
+        @parameters λ k
+        @variables V(t)
+        @species A(t) B(t) C(t)
+        md1 = [:physical_scale => PhysicalScale.ODE]
+        md2 = [:physical_scale => PhysicalScale.VariableRateJump]
+        rxs = [Reaction(k*V, [], [A]), Reaction(λ*A, [B], nothing; metadata = md1),
+            Reaction(k, [A, B], nothing), Reaction(λ, [C], [A]; metadata = md2)]
+        eqs = [D(V) ~ λ*V*C]
+        cevents = [[V ~ 2.0] => [V ~ V/2, A ~ A/2]]
+        @named rs = ReactionSystem(vcat(rxs, eqs), t; continuous_events = cevents)
+        rs = complete(rs)
+        sys = complete(hybrid_model(rs; default_scale = PhysicalScale.Jump))
+        @test sys isa MT.System
+        @test MT.has_equations(sys)
+        @test isempty(massactionjumps(sys))
+        @test isempty(constantratejumps(sys))
+        @test length(variableratejumps(sys)) == 3
+        @test length(odeeqs(sys)) == 4
+        odes = union(eqs, [D(A) ~ 0, D(B) ~ -λ*A*B, D(C) ~ 0])
+        @test issetequal(odes, odeeqs(sys))
+        @test length(continuous_events(sys)) == 1
+    end
+
+end
+
+# Tests of isequivalent for hybrid systems.
+let
+    @parameters k1 k2 k3 k4
+    @species A(t) B(t) C(t) E(t)  # Use E instead of D to avoid conflict with Differential
+    @variables V(t) X(t)
+
+    # Define reactions
+    rx1 = Reaction(k1, [A], [B])
+    rx2 = Reaction(k2, [B], [C])
+    rx3 = Reaction(k3, [C], [E])
+    rx4 = Reaction(k4, [E], [A])
+
+    # Define ODE equation
+    D = default_time_deriv()
+    eq = D(V) ~ -k1 * V + A
+
+    # Define events
+    continuous_events = [[X ~ 0] => [X ~ -X]]
+    discrete_events = (X == 1) => [V ~ V/2]
+
+    # Define metadata
+    metadata = [MiscSystemData => "Comprehensive test system"]
+
+    # Define initial conditions and parameters
+    u0 = Dict([A => 1.0, B => 2.0, C => 3.0, E => 4.0, V => 5.0])
+    p = Dict([k1 => 0.1, k2 => 0.2, k3 => 0.3, k4 => 0.4])
+    defs = merge(u0, p)
+
+    # Define observed variables
+    obs = [X ~ A + B]
+
+    # Define a subsystem
+    sub_rx = Reaction(k1, [A], [B])
+    @named sub_rs = ReactionSystem([sub_rx], t)
+
+    # Create the first reaction system
+    @named rs1 = ReactionSystem([rx1, rx2, rx3, rx4, eq], t;
+        continuous_events, discrete_events,
+        metadata, observed = obs, initial_conditions = defs, systems = [sub_rs])
+    rs1 = complete(rs1)
+
+    # Create the second reaction system with the same components
+    rs2 = ReactionSystem([rx1, rx2, rx3, rx4, eq], t;
+        continuous_events, discrete_events,
+        metadata, observed = obs, initial_conditions = defs, systems = [sub_rs], name = :rs1)
+    rs2 = complete(rs2)
+
+    # Check equivalence
+    @test Catalyst.isequivalent(rs1, rs2)
+end

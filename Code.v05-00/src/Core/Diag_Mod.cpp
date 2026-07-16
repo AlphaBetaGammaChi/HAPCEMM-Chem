@@ -94,38 +94,35 @@ namespace Diag {
         if(toSave.size() != dim.getSize()) {
             throw std::runtime_error("Save failed! NcDim dimension size and array sizes don't match! Variable name: " + name );
         }
-        float* array = util::vect2float ( toSave, toSave.size() );
+        std::vector<float> array = util::vect2float ( toSave, toSave.size() );
         NcVar var = currFile.addVar( name, varDataType, dim );
         var.putAtt("units", units );
         var.putAtt("long_name", desc );
-        var.putVar(array);
-        delete[] array;
+        var.putVar(array.data());
 
     }
     void add2DVar(NcFile& currFile, const Vector_2D& toSave, const vector<NcDim> dims, const string& name, const string& desc, const string& units) {
         if((toSave.size() != dims[0].getSize()) || (toSave[0].size() != dims[1].getSize())) {
             throw std::runtime_error("Save failed! NcDim dimension size and array sizes don't match! Variable name: " + name );
         }
-        float* array = util::vect2float (toSave, toSave.size(), toSave[0].size() );
+        std::vector<float> array = util::vect2float (toSave, toSave.size(), toSave[0].size() );
         NcVar var = currFile.addVar( name, varDataType, dims );
         var.putAtt("units", units );
         var.putAtt("long_name", desc );
-        var.putVar( array );
+        var.putVar( array.data() );
 
-        delete[] array;
     }
 
     void add3DVar(NcFile& currFile, const Vector_3D& toSave, const vector<NcDim> dims, const string& name, const string& desc, const string& units) {
         if((toSave.size() != dims[0].getSize()) || (toSave[0].size() != dims[1].getSize()) || (toSave[0][0].size() != dims[2].getSize())) {
             throw std::runtime_error("Save failed! NcDim dimension size and array sizes don't match! Variable name: " + name );
         }
-        float* array = util::vect2float (toSave, toSave.size(), toSave[0].size(), toSave[0][0].size() );
+        std::vector<float> array = util::vect2float (toSave, toSave.size(), toSave[0].size(), toSave[0][0].size() );
         NcVar var = currFile.addVar( name, varDataType, dims );
         var.putAtt("units", units );
         var.putAtt("long_name", desc );
-        var.putVar( array );
+        var.putVar( array.data() );
 
-        delete[] array;
     }
 
     void Diag_TS_Phys( const char* rootName,

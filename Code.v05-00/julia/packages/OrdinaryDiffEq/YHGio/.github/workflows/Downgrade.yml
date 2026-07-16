@@ -1,0 +1,28 @@
+name: Downgrade
+on:
+  pull_request:
+    branches:
+      - master
+      - v7
+    paths-ignore:
+      - 'docs/**'
+  push:
+    branches:
+      - master
+      - v7
+    paths-ignore:
+      - 'docs/**'
+concurrency:
+  # Skip intermediate builds: always.
+  # Cancel intermediate builds: only if it is a pull request build.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+jobs:
+  test:
+    name: "Downgrade"
+    uses: "SciML/.github/.github/workflows/downgrade.yml@v1"
+    with:
+      julia-version: "1.11"
+      group: "InterfaceI"
+      skip: "Pkg,TOML,Statistics,LinearAlgebra,SparseArrays,InteractiveUtils"
+    secrets: "inherit"

@@ -55,6 +55,7 @@ class Emission
         double getSO2toSO4( ) const;
         double getSoot( ) const;
         double getSootRad( ) const;
+        double getSootNum( ) const;
         std::string getEngineName( ) const;
         std::string getFuelChem( ) const;
         void Debug( ) const;

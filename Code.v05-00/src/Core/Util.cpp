@@ -28,10 +28,9 @@ namespace util
         return temp;
     }
 
-    float* vect2float( const std::vector<std::vector<std::vector<double>>> &vals, unsigned int N1, unsigned int N2, unsigned int N3 )
+    std::vector<float> vect2float( const std::vector<std::vector<std::vector<double>>> &vals, unsigned int N1, unsigned int N2, unsigned int N3 )
     {
-        float* temp;
-        temp = new float[N1*N2*N3];
+        std::vector<float> temp(N1 * N2 * N3);
 
         for( unsigned int n1 = 0; n1 < N1; n1++ ) {
             for( unsigned int n2 = 0; n2 < N2; n2++ ){
@@ -43,10 +42,9 @@ namespace util
         return temp;
     }
 
-    float* vect2float( const std::vector<std::vector<double>> &vals, unsigned int N, unsigned int M )
+    std::vector<float> vect2float( const std::vector<std::vector<double>> &vals, unsigned int N, unsigned int M )
     {
-        float* temp;
-        temp = new float[N*M];
+        std::vector<float> temp(N * M);
 
         for( unsigned int n = 0; n < N; n++ ) {
             for( unsigned int m = 0; m < M; m++ )
@@ -56,10 +54,9 @@ namespace util
         return temp;
     }
 
-    float* vect2float( const std::vector<double> &vals, unsigned int N )
+    std::vector<float> vect2float( const std::vector<double> &vals, unsigned int N )
     {
-        float* temp;
-        temp = new float[N];
+        std::vector<float> temp(N);
 
         for( unsigned int n = 0; n < N; n++ )
             temp[n] = (float) vals[n];

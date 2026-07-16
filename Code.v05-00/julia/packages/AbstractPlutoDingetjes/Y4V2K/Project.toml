@@ -1,0 +1,14 @@
+name = "AbstractPlutoDingetjes"
+uuid = "6e696c72-6542-2067-7265-42206c756150"
+authors = ["Paul Berg <paul@plutojl.org>", "Fons van der Plas <fons@plutojl.org>"]
+version = "1.4.0"
+
+[compat]
+julia="1.10"
+
+[extras]
+OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["OrderedCollections", "Test"]

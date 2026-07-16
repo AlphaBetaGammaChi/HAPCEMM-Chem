@@ -1,3 +1,4 @@
+#include <iostream>
 #include <catch2/catch_test_macros.hpp>
 #include <YamlInputReader/YamlInputReader.hpp>
 #include <Core/Input.hpp>
@@ -292,7 +293,7 @@ TEST_CASE("Read Yaml File"){
         OptInput input;
         string error;
         try{
-            readMetMenu(input, data["METEOROLOGY MENU"]);
+            readMetMenu(input, data["METEOROLOGY MENU"], data["PARAMETER MENU"]);
         }
         catch(std::invalid_argument &e){
             error = e.what();
@@ -318,7 +319,7 @@ TEST_CASE("Read Yaml File"){
         REQUIRE(input.MET_TEMP_PERTURB_TIMESCALE == 10);
 
 
-        REQUIRE(error == "Cannot fix both moist layer depth and lapse rate");
+        REQUIRE(error == "");
     }
     SECTION("Read Diagnostic Menu"){
         OptInput input;

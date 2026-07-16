@@ -1,0 +1,103 @@
+
+
+precompile_test_harness("Inference caching") do load_path
+    # Write out the Native test setup as a micro package
+    create_standalone(load_path, "NativeCompiler", "native.jl")
+
+    write(joinpath(load_path, "NativeBackend.jl"), :(
+        module NativeBackend
+        import NativeCompiler
+        using PrecompileTools
+
+        function kernel(A, x)
+            A[1] = x
+            return
+        end
+
+        function kernel_w_global(A, x, sym)
+            if sym == :A
+                A[1] = x
+            end
+            return
+        end
+
+        function square(x)
+            return x*x
+        end
+
+        let
+            job, _ = NativeCompiler.Native.create_job(kernel, (Vector{Int}, Int))
+            precompile(job)
+        end
+
+        let
+            job, _ = NativeCompiler.Native.create_job(kernel_w_global, (Vector{Int}, Int, Symbol))
+            precompile(job)
+        end
+
+        let
+            # Emit the func abi to box the return
+            job, _ = NativeCompiler.Native.create_job(square, (Float64,), entry_abi=:func)
+            precompile(job)
+        end
+
+        # identity is foreign
+        @setup_workload begin
+            job, _ = NativeCompiler.Native.create_job(identity, (Int,))
+            @compile_workload begin
+                precompile(job)
+            end
+        end
+    end) |> string)
+
+    Base.compilecache(Base.PkgId("NativeBackend"), stderr, stdout)
+    @eval let
+        import NativeCompiler
+
+        # Check that no cached entry is present
+        identity_mi = GPUCompiler.methodinstance(typeof(identity), Tuple{Int})
+
+        token = let
+            job, _ = NativeCompiler.Native.create_job(identity, (Int,))
+            GPUCompiler.ci_cache_token(job)
+        end
+        @test !check_presence(identity_mi, token)
+
+        using NativeBackend
+
+        # Check that kernel survived
+        kernel_mi = GPUCompiler.methodinstance(typeof(NativeBackend.kernel), Tuple{Vector{Int}, Int})
+        @test check_presence(kernel_mi, token)
+
+        kernel_w_global_mi = GPUCompiler.methodinstance(typeof(NativeBackend.kernel_w_global), Tuple{Vector{Int}, Int, Symbol})
+        @test check_presence(kernel_w_global_mi, token)
+
+        square_mi = GPUCompiler.methodinstance(typeof(NativeBackend.square), Tuple{Float64})
+        @test check_presence(square_mi, token)
+
+        # check that identity survived
+        @test check_presence(identity_mi, token) broken=(v"1.12.0-DEV.1268" <= VERSION < v"1.12.5" || v"1.13.0-" <= VERSION < v"1.13.0-beta3"|| v"1.14.0-" <= VERSION < v"1.14.0-DEV.1843")
+
+        GPUCompiler.clear_disk_cache!()
+        @test GPUCompiler.disk_cache_enabled() == false
+
+        GPUCompiler.enable_disk_cache!()
+        @test GPUCompiler.disk_cache_enabled() == true
+
+        job, _ = NativeCompiler.Native.create_job(NativeBackend.kernel, (Vector{Int}, Int); validate=false)
+        @assert job.source == kernel_mi
+        ci = GPUCompiler.ci_cache_lookup(GPUCompiler.ci_cache(job), job.source, job.world, job.world)
+        @assert ci !== nothing
+        @assert ci.inferred !== nothing
+        path = GPUCompiler.cache_file(ci, job.config)
+        @test path !== nothing
+        @test !ispath(path)
+        NativeCompiler.Native.cached_execution(NativeBackend.kernel, (Vector{Int}, Int))
+        @test ispath(path)
+        GPUCompiler.clear_disk_cache!()
+        @test !ispath(path)
+
+        GPUCompiler.enable_disk_cache!(false)
+        @test GPUCompiler.disk_cache_enabled() == false
+    end
+end

@@ -1,0 +1,1747 @@
+# This file only include the algorithm struct to be exported by LinearSolve.jl. The main
+# functionality is implemented as package extensions
+"""
+    PETScAlgorithm(solver_type = :gmres; kwargs...)
+
+A `LinearSolve.jl` algorithm that wraps PETSc's KSP (Krylov Subspace) linear
+solvers via [PETSc.jl](https://github.com/JuliaParallel/PETSc.jl).
+
+!!! compat
+    Requires `PETSc.jl`, `MPI.jl`, and `SparseMatricesCSR.jl` to be loaded:
+    ```julia
+    using PETSc, MPI, SparseMatricesCSR
+    MPI.Init()
+    ```
+
+!!! warning "Serial and MPI-parallel"
+    Standard Julia matrices use serial solves via `MPI.COMM_SELF` unless a
+    non-`nothing` communicator is supplied. Distributed `PSparseMatrix` and
+    `PVector` inputs are handled by the MPI extension when `PETSc` and
+    `PartitionedArrays` are loaded.
+
+!!! note "Replicated SparseMatrixCSC with MPI"
+    Plain Julia sparse matrices such as `SparseMatrixCSC` can also be solved on a
+    multi-rank communicator by passing `comm = MPI.COMM_WORLD` (or another MPI
+    communicator). Each rank assembles only its owned row interval into PETSc, PETSc
+    solves the distributed system, and the final `sol.u` is gathered back as the full
+    Julia vector on every rank.
+
+---
+
+## Positional Arguments
+
+- `solver_type::Symbol` — PETSc KSP solver type.
+  Common values: `:gmres` (default), `:cg`, `:bcgs`, `:bicg`, `:preonly`,
+  `:richardson`.
+
+---
+
+## Keyword Arguments
+
+| Keyword | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `pc_type` | `Symbol` | `:none` | Preconditioner type: `:jacobi`, `:ilu`, `:lu`, `:gamg`, `:hypre`, … |
+| `comm` | `MPI.Comm` | `nothing` | MPI communicator. `nothing` maps to `MPI.COMM_SELF` at solve time. |
+| `nullspace` | `Symbol` | `:none` | Null-space strategy: `:none`, `:constant`, or `:custom`. |
+| `nullspace_vecs` | `Vector` | `nothing` | Orthonormal null-space basis; required when `nullspace = :custom`. |
+| `prec_matrix` | `AbstractMatrix` | `nothing` | Separate matrix used only for building the preconditioner. |
+| `initial_guess_nonzero` | `Bool` | `false` | Use the current solution vector as the initial Krylov guess. |
+| `transposed` | `Bool` | `false` | Solve the transposed system `Aᵀx = b`. |
+| `ksp_options` | `NamedTuple` | `(;)` | Extra PETSc Options Database flags (see table below). |
+
+### Common `ksp_options`
+
+| Option | Description |
+| :--- | :--- |
+| `ksp_monitor = ""` | Print residual norm each iteration. |
+| `ksp_view = ""` | Print solver configuration after setup. |
+| `pc_factor_levels = 2` | Fill levels for ILU. |
+| `log_view = ""` | PETSc performance logging summary. |
+
+---
+
+## Memory Management
+
+PETSc objects live in C-side memory outside Julia's GC. Call
+`cleanup_petsc_cache!` explicitly when finished with a solve to release
+resources promptly:
+
+```julia
+PETScExt = Base.get_extension(LinearSolve, :LinearSolvePETScExt)
+
+sol = solve(prob, PETScAlgorithm(:gmres))
+PETScExt.cleanup_petsc_cache!(sol)
+
+# Or via the cache directly:
+cache = SciMLBase.init(prob, PETScAlgorithm(:cg))
+solve!(cache)
+PETScExt.cleanup_petsc_cache!(cache)
+```
+
+A GC finalizer is registered as a safety net, but explicit cleanup is
+strongly preferred for deterministic, timely resource release.
+
+---
+
+## Example
+
+```julia
+using LinearSolve, PETSc, MPI, SparseArrays, SparseMatricesCSR, LinearAlgebra
+
+MPI.Init()
+PETScExt = Base.get_extension(LinearSolve, :LinearSolvePETScExt)
+
+n = 100
+A = sprand(n, n, 0.1); A = A + A' + 20I
+b = rand(n)
+
+sol = solve(
+    LinearProblem(A, b),
+    PETScAlgorithm(:gmres; pc_type = :ilu, ksp_options = (ksp_monitor = "",))
+)
+println("Residual: ", norm(A * sol.u - b) / norm(b))
+PETScExt.cleanup_petsc_cache!(sol)
+```
+
+## Distributed SparseMatrixCSC Example
+
+```julia
+using LinearSolve, PETSc, MPI, SparseArrays, SparseMatricesCSR, LinearAlgebra
+
+MPI.Init()
+PETScExt = Base.get_extension(LinearSolve, :LinearSolvePETScExt)
+
+n = 12
+A = spdiagm(-1 => -ones(n - 1), 0 => 4.0 .* ones(n), 1 => -ones(n - 1))
+b = ones(n)
+
+sol = solve(
+    LinearProblem(A, b),
+    PETScAlgorithm(:gmres; comm = MPI.COMM_WORLD);
+    abstol = 1.0e-10,
+    reltol = 1.0e-10
+)
+
+# sol.u is the full replicated solution on every rank.
+println(norm(A * sol.u - b) / norm(b))
+PETScExt.cleanup_petsc_cache!(sol)
+```
+"""
+struct PETScAlgorithm <: SciMLLinearSolveAlgorithm
+    solver_type::Symbol
+    pc_type::Symbol
+    comm::Any             # MPI.Comm, stored as Any to avoid an MPI.jl dependency in LinearSolve
+    nullspace::Symbol     # :none | :constant | :custom
+    nullspace_vecs::Any   # nothing | Vector of AbstractVectors
+    prec_matrix::Any      # nothing | AbstractMatrix
+    initial_guess_nonzero::Bool
+    transposed::Bool
+    ksp_options::NamedTuple
+
+    function PETScAlgorithm(
+            solver_type::Symbol = :gmres;
+            pc_type::Symbol = :none,
+            comm = nothing,
+            nullspace::Symbol = :none,
+            nullspace_vecs = nothing,
+            prec_matrix = nothing,
+            initial_guess_nonzero::Bool = false,
+            transposed::Bool = false,
+            ksp_options::NamedTuple = NamedTuple(),
+        )
+        Base.get_extension(@__MODULE__, :LinearSolvePETScExt) === nothing && error(
+            "PETScAlgorithm requires PETSc, MPI, and SparseMatricesCSR to be loaded: `using PETSc, MPI, SparseMatricesCSR`"
+        )
+        nullspace ∈ (:none, :constant, :custom) || error(
+            "nullspace must be :none, :constant, or :custom (got :$nullspace)"
+        )
+        nullspace == :custom && nullspace_vecs === nothing && error(
+            "nullspace = :custom requires nullspace_vecs to be provided"
+        )
+        return new(
+            solver_type, pc_type, comm,
+            nullspace, nullspace_vecs,
+            prec_matrix,
+            initial_guess_nonzero, transposed,
+            ksp_options,
+        )
+    end
+end
+
+"""
+`HYPREAlgorithm(solver; comm = nothing, Pl = nothing)`
+
+[HYPRE.jl](https://github.com/fredrikekre/HYPRE.jl) is an interface to
+[`hypre`](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods)
+and provide iterative solvers and preconditioners for sparse linear systems. It is mainly
+developed for large multi-process distributed problems (using MPI), but can also be used for
+single-process problems with Julias standard sparse matrices.
+
+If you need more fine-grained control over the solver/preconditioner options you can
+alternatively pass an already created solver to `HYPREAlgorithm` (and to the `Pl` keyword
+argument). See HYPRE.jl docs for how to set up solvers with specific options.
+
+!!! note
+
+    Using HYPRE solvers requires Julia version 1.9 or higher, and that the package HYPRE.jl
+    is installed.
+
+## Positional Arguments
+
+The single positional argument `solver` has the following choices:
+
+  - `HYPRE.BiCGSTAB`
+  - `HYPRE.BoomerAMG`
+  - `HYPRE.FlexGMRES`
+  - `HYPRE.GMRES`
+  - `HYPRE.Hybrid`
+  - `HYPRE.ILU`
+  - `HYPRE.ParaSails` (as preconditioner only)
+  - `HYPRE.PCG`
+
+## Keyword Arguments
+
+  - `comm`: optional MPI communicator used to auto-construct distributed
+    `HYPREMatrix` / `HYPREVector` inputs from plain Julia sparse matrices and vectors.
+  - `Pl`: A choice of left preconditioner.
+
+## Example
+
+For example, to use `HYPRE.PCG` as the solver, with `HYPRE.BoomerAMG` as the preconditioner,
+the algorithm should be defined as follows:
+
+```julia
+using HYPRE
+
+HYPRE.Init()
+A, b = setup_system(...)
+prob = LinearProblem(A, b)
+alg = HYPREAlgorithm(HYPRE.PCG)
+prec = HYPRE.BoomerAMG
+sol = solve(prob, alg; Pl = prec)
+```
+
+For automatic distributed construction from a plain Julia sparse matrix on an MPI
+communicator, pass the communicator through `comm`:
+
+```julia
+using HYPRE, MPI
+
+MPI.Init()
+HYPRE.Init()
+alg = HYPREAlgorithm(HYPRE.PCG; comm = MPI.COMM_WORLD)
+sol = solve(prob, alg)
+```
+"""
+struct HYPREAlgorithm <: SciMLLinearSolveAlgorithm
+    solver::Any
+    comm::Any
+    function HYPREAlgorithm(solver; comm = nothing)
+        ext = Base.get_extension(@__MODULE__, :LinearSolveHYPREExt)
+        if ext === nothing
+            error("HYPREAlgorithm requires that HYPRE is loaded, i.e. `using HYPRE`")
+        else
+            return new{}(solver, comm)
+        end
+    end
+end
+
+"""
+`PartitionedSolversAlgorithm(solver = nothing; kwargs...)`
+
+[PartitionedSolvers](https://github.com/PartitionedArrays/PartitionedArrays.jl/tree/master/PartitionedSolvers)
+provides distributed linear solver building blocks for
+[PartitionedArrays.jl](https://github.com/PartitionedArrays/PartitionedArrays.jl).
+
+This algorithm is intended for `PSparseMatrix` / `PVector` inputs. The integration
+delegates actual solves to the local `PartitionedSolvers` solver constructors and caches
+the resulting solver object for repeated solves. The default dispatch for `PSparseMatrix`
+inputs chooses the CG-backed PartitionedSolvers path, but the integration is
+solver-agnostic: any PartitionedSolvers solver constructor (for example
+`PartitionedSolvers.cg`, `PartitionedSolvers.jacobi`, or `PartitionedSolvers.amg`) can be
+passed, and only the convergence keywords that the chosen solver actually accepts are
+forwarded automatically.
+
+## Positional Arguments
+
+  - `solver`: optional PartitionedSolvers solver object or constructor such as
+    `PartitionedSolvers.cg`. If omitted, the integration uses the local
+    `PartitionedSolvers` default solver.
+
+## Keyword Arguments
+
+  - `kwargs...`: forwarded when constructing an explicit underlying PartitionedSolvers
+    solver. They take precedence over the auto-derived convergence keywords.
+
+## Example
+
+```julia
+using LinearSolve, PartitionedArrays, PartitionedSolvers
+
+alg = PartitionedSolversAlgorithm(PartitionedSolvers.cg)
+sol = solve(prob, alg)
+```
+"""
+struct PartitionedSolversAlgorithm <: SciMLLinearSolveAlgorithm
+    solver::Any
+    kwargs::NamedTuple
+    function PartitionedSolversAlgorithm(solver = nothing; kwargs...)
+        ext = Base.get_extension(@__MODULE__, :LinearSolvePartitionedSolversExt)
+        if ext === nothing
+            error(
+                "PartitionedSolversAlgorithm requires PartitionedArrays and PartitionedSolvers to be loaded: `using PartitionedArrays, PartitionedSolvers`"
+            )
+        else
+            return new(solver, NamedTuple(kwargs))
+        end
+    end
+end
+
+# Debug: About to define CudaOffloadLUFactorization
+"""
+`CudaOffloadLUFactorization()`
+
+An offloading technique used to GPU-accelerate CPU-based computations using LU factorization.
+Requires a sufficiently large `A` to overcome the data transfer costs.
+
+!!! note
+
+    Using this solver requires adding the package CUDA.jl, i.e. `using CUDA`
+"""
+struct CudaOffloadLUFactorization <: AbstractFactorization
+    residualsafety::Bool
+    function CudaOffloadLUFactorization(; throwerror = true, residualsafety::Bool = false)
+        ext = Base.get_extension(@__MODULE__, :LinearSolveCUDAExt)
+        if ext === nothing && throwerror
+            error("CudaOffloadLUFactorization requires that CUDA is loaded, i.e. `using CUDA`")
+        else
+            return new(residualsafety)
+        end
+    end
+end
+
+"""
+`CUDAOffload32MixedLUFactorization()`
+
+A mixed precision GPU-accelerated LU factorization that converts matrices to Float32
+before offloading to CUDA GPU for factorization, then converts back for the solve.
+This can provide speedups when the reduced precision is acceptable and memory
+bandwidth is a bottleneck.
+
+## Performance Notes
+- Converts Float64 matrices to Float32 for GPU factorization
+- Can be significantly faster for large matrices where memory bandwidth is limiting
+- May have reduced accuracy compared to full precision methods
+- Most beneficial when the condition number of the matrix is moderate
+
+!!! note
+
+    Using this solver requires adding the package CUDA.jl, i.e. `using CUDA`
+"""
+struct CUDAOffload32MixedLUFactorization <: AbstractFactorization
+    function CUDAOffload32MixedLUFactorization(; throwerror = true)
+        ext = Base.get_extension(@__MODULE__, :LinearSolveCUDAExt)
+        if ext === nothing && throwerror
+            error("CUDAOffload32MixedLUFactorization requires that CUDA is loaded, i.e. `using CUDA`")
+        else
+            return new()
+        end
+    end
+end
+
+"""
+`CudaOffloadQRFactorization()`
+
+An offloading technique used to GPU-accelerate CPU-based computations using QR factorization.
+Requires a sufficiently large `A` to overcome the data transfer costs.
+
+!!! note
+
+    Using this solver requires adding the package CUDA.jl, i.e. `using CUDA`
+"""
+struct CudaOffloadQRFactorization <: AbstractFactorization
+    function CudaOffloadQRFactorization()
+        ext = Base.get_extension(@__MODULE__, :LinearSolveCUDAExt)
+        if ext === nothing
+            error("CudaOffloadQRFactorization requires that CUDA is loaded, i.e. `using CUDA`")
+        else
+            return new()
+        end
+    end
+end
+
+"""
+`CudaOffloadFactorization()`
+
+!!! warning
+    This algorithm is deprecated. Use `CudaOffloadLUFactorization` or `CudaOffloadQRFactorization()` instead.
+
+An offloading technique used to GPU-accelerate CPU-based computations.
+Requires a sufficiently large `A` to overcome the data transfer costs.
+
+!!! note
+
+    Using this solver requires adding the package CUDA.jl, i.e. `using CUDA`
+"""
+struct CudaOffloadFactorization <: AbstractFactorization
+    function CudaOffloadFactorization()
+        Base.depwarn("`CudaOffloadFactorization` is deprecated, use `CudaOffloadLUFactorization` or `CudaOffloadQRFactorization` instead.", :CudaOffloadFactorization)
+        ext = Base.get_extension(@__MODULE__, :LinearSolveCUDAExt)
+        if ext === nothing
+            error("CudaOffloadFactorization requires that CUDA is loaded, i.e. `using CUDA`")
+        else
+            return new()
+        end
+    end
+end
+
+"""
+`AMDGPUOffloadLUFactorization()`
+
+An offloading technique using LU factorization to GPU-accelerate CPU-based computations on AMD GPUs.
+Requires a sufficiently large `A` to overcome the data transfer costs.
+
+!!! note
+
+    Using this solver requires adding the package AMDGPU.jl, i.e. `using AMDGPU`
+"""
+struct AMDGPUOffloadLUFactorization <: LinearSolve.AbstractFactorization
+    function AMDGPUOffloadLUFactorization()
+        ext = Base.get_extension(@__MODULE__, :LinearSolveAMDGPUExt)
+        if ext === nothing
+            error("AMDGPUOffloadLUFactorization requires that AMDGPU is loaded, i.e. `using AMDGPU`")
+        else
+            return new{}()
+        end
+    end
+end
+
+"""
+`AMDGPUOffloadQRFactorization()`
+
+An offloading technique using QR factorization to GPU-accelerate CPU-based computations on AMD GPUs.
+Requires a sufficiently large `A` to overcome the data transfer costs.
+
+!!! note
+
+    Using this solver requires adding the package AMDGPU.jl, i.e. `using AMDGPU`
+"""
+struct AMDGPUOffloadQRFactorization <: LinearSolve.AbstractFactorization
+    function AMDGPUOffloadQRFactorization()
+        ext = Base.get_extension(@__MODULE__, :LinearSolveAMDGPUExt)
+        if ext === nothing
+            error("AMDGPUOffloadQRFactorization requires that AMDGPU is loaded, i.e. `using AMDGPU`")
+        else
+            return new{}()
+        end
+    end
+end
+
+## RFLUFactorization
+
+"""
+    RFLUFactorization{P, T}(; pivot = Val(true), thread = Val(true))
+
+A fast pure Julia LU-factorization implementation using RecursiveFactorization.jl.
+This is by far the fastest LU-factorization implementation, usually outperforming
+OpenBLAS and MKL for smaller matrices (<500x500), but currently optimized only for
+Base `Array` with `Float32` or `Float64`. Additional optimization for complex matrices
+is in the works.
+
+## Type Parameters
+- `P`: Pivoting strategy as `Val{Bool}`. `Val{true}` enables partial pivoting for stability.
+- `T`: Threading strategy as `Val{Bool}`. `Val{true}` enables multi-threading for performance.
+
+## Constructor Arguments
+- `pivot = Val(true)`: Enable partial pivoting. Set to `Val{false}` to disable for speed
+  at the cost of numerical stability.
+- `thread = Val(true)`: Enable multi-threading. Set to `Val{false}` for single-threaded
+  execution.
+- `throwerror = true`: Whether to throw an error if RecursiveFactorization.jl is not loaded.
+
+## Performance Notes
+- Fastest for dense matrices with dimensions roughly < 500×500
+- Optimized specifically for Float32 and Float64 element types
+- Recursive blocking strategy provides excellent cache performance
+- Multi-threading can provide significant speedups on multi-core systems
+
+## Requirements
+Using this solver requires that RecursiveFactorization.jl is loaded: `using RecursiveFactorization`
+
+## Example
+```julia
+using RecursiveFactorization
+# Fast, stable (with pivoting)
+alg1 = RFLUFactorization()
+# Fastest (no pivoting), less stable
+alg2 = RFLUFactorization(pivot=Val(false))
+```
+"""
+struct RFLUFactorization{P, T} <: AbstractDenseFactorization
+    residualsafety::Bool
+    function RFLUFactorization(::Val{P}, ::Val{T}; throwerror = true, residualsafety::Bool = false) where {P, T}
+        if !userecursivefactorization(nothing)
+            throwerror &&
+                error("RFLUFactorization requires that RecursiveFactorization.jl is loaded, i.e. `using RecursiveFactorization`")
+        end
+        return new{P, T}(residualsafety)
+    end
+end
+
+function RFLUFactorization(; pivot = Val(true), thread = Val(true), throwerror = true, residualsafety::Bool = false)
+    return RFLUFactorization(pivot, thread; throwerror, residualsafety)
+end
+
+"""
+`ButterflyFactorization()`
+
+A fast pure Julia LU-factorization implementation
+using RecursiveFactorization.jl. This method utilizes a butterfly
+factorization approach rather than pivoting.
+"""
+struct ButterflyFactorization{T} <: AbstractDenseFactorization
+    thread::Val{T}
+    function ButterflyFactorization(::Val{T}; throwerror = true) where {T}
+        if !userecursivefactorization(nothing)
+            throwerror &&
+                error("ButterflyFactorization requires that RecursiveFactorization.jl is loaded, i.e. `using RecursiveFactorization`")
+        end
+        return new{T}()
+    end
+end
+
+function ButterflyFactorization(; thread = Val(true), throwerror = true)
+    return ButterflyFactorization(thread; throwerror)
+end
+
+
+# There's no options like pivot here.
+# But I'm not sure it makes sense as a GenericFactorization
+# since it just uses `LAPACK.getrf!`.
+"""
+    FastLUFactorization()
+
+A high-performance LU factorization using the FastLapackInterface.jl package.
+This provides an optimized interface to LAPACK routines with reduced overhead
+compared to the standard LinearAlgebra LAPACK wrappers.
+
+## Features
+- Reduced function call overhead compared to standard LAPACK wrappers
+- Optimized for performance-critical applications
+- Uses partial pivoting (no choice of pivoting method available)
+- Suitable for dense matrices where maximum performance is required
+
+## Limitations
+- Does not allow customization of pivoting strategy (always uses partial pivoting)
+- Requires FastLapackInterface.jl to be loaded
+- Limited to dense matrix types supported by LAPACK
+
+## Requirements
+Using this solver requires that FastLapackInterface.jl is loaded: `using FastLapackInterface`
+
+## Performance Notes
+This factorization is optimized for cases where the overhead of standard LAPACK
+function calls becomes significant, typically for moderate-sized dense matrices
+or when performing many factorizations.
+
+## Example
+```julia
+using FastLapackInterface
+alg = FastLUFactorization()
+sol = solve(prob, alg)
+```
+"""
+struct FastLUFactorization <: AbstractDenseFactorization end
+
+"""
+    FastQRFactorization{P}(; pivot = ColumnNorm(), blocksize = 36)
+
+A high-performance QR factorization using the FastLapackInterface.jl package.
+This provides an optimized interface to LAPACK QR routines with reduced overhead
+compared to the standard LinearAlgebra LAPACK wrappers.
+
+## Type Parameters
+- `P`: The type of pivoting strategy used
+
+## Fields
+- `pivot::P`: Pivoting strategy (e.g., `ColumnNorm()` for column pivoting, `nothing` for no pivoting)
+- `blocksize::Int`: Block size for the blocked QR algorithm (default: 36)
+
+## Features
+- Reduced function call overhead compared to standard LAPACK wrappers
+- Supports various pivoting strategies for numerical stability
+- Configurable block size for optimal performance
+- Suitable for dense matrices, especially overdetermined systems
+
+## Performance Notes
+The block size can be tuned for optimal performance depending on matrix size and architecture.
+The default value of 36 is generally good for most cases, but experimentation may be beneficial
+for specific applications.
+
+## Requirements
+Using this solver requires that FastLapackInterface.jl is loaded: `using FastLapackInterface`
+
+## Example
+```julia
+using FastLapackInterface
+# QR with column pivoting
+alg1 = FastQRFactorization()
+# QR without pivoting for speed
+alg2 = FastQRFactorization(pivot=nothing)
+# Custom block size
+alg3 = FastQRFactorization(blocksize=64)
+```
+"""
+struct FastQRFactorization{P} <: AbstractDenseFactorization
+    pivot::P
+    blocksize::Int
+end
+
+# is 36 or 16 better here? LinearAlgebra and FastLapackInterface use 36,
+# but QRFactorization uses 16.
+FastQRFactorization() = FastQRFactorization(NoPivot(), 36)
+
+"""
+```julia
+MKLPardisoFactorize(; nprocs::Union{Int, Nothing} = nothing,
+    matrix_type = nothing,
+    cache_analysis = false,
+    iparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing,
+    dparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing)
+```
+
+A sparse factorization method using MKL Pardiso.
+
+!!! note
+
+    Using this solver requires adding the package Pardiso.jl, i.e. `using Pardiso`
+
+## Keyword Arguments
+
+Setting `cache_analysis = true` disables Pardiso's scaling and matching defaults
+and caches the result of the initial analysis phase for all further computations
+with this solver.
+
+For the definition of the other keyword arguments, see the Pardiso.jl documentation.
+All values default to `nothing` and the solver internally determines the values
+given the input types, and these keyword arguments are only for overriding the
+default handling process. This should not be required by most users.
+"""
+MKLPardisoFactorize(; kwargs...) = PardisoJL(; vendor = :MKL, solver_type = 0, kwargs...)
+
+"""
+```julia
+MKLPardisoIterate(; nprocs::Union{Int, Nothing} = nothing,
+    matrix_type = nothing,
+    cache_analysis = false,
+    iparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing,
+    dparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing)
+```
+
+A mixed factorization+iterative method using MKL Pardiso.
+
+!!! note
+
+    Using this solver requires adding the package Pardiso.jl, i.e. `using Pardiso`
+
+## Keyword Arguments
+
+Setting `cache_analysis = true` disables Pardiso's scaling and matching defaults
+and caches the result of the initial analysis phase for all further computations
+with this solver.
+
+For the definition of the other keyword arguments, see the Pardiso.jl documentation.
+All values default to `nothing` and the solver internally determines the values
+given the input types, and these keyword arguments are only for overriding the
+default handling process. This should not be required by most users.
+"""
+MKLPardisoIterate(; kwargs...) = PardisoJL(; vendor = :MKL, solver_type = 1, kwargs...)
+
+"""
+```julia
+PanuaPardisoFactorize(; nprocs::Union{Int, Nothing} = nothing,
+    matrix_type = nothing,
+    cache_analysis = false,
+    iparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing,
+    dparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing)
+```
+
+A sparse factorization method using Panua Pardiso.
+
+!!! note
+
+    Using this solver requires adding the package Pardiso.jl, i.e. `using Pardiso`
+
+## Keyword Arguments
+
+Setting `cache_analysis = true` disables Pardiso's scaling and matching defaults
+and caches the result of the initial analysis phase for all further computations
+with this solver.
+
+For the definition of the keyword arguments, see the Pardiso.jl documentation.
+All values default to `nothing` and the solver internally determines the values
+given the input types, and these keyword arguments are only for overriding the
+default handling process. This should not be required by most users.
+"""
+PanuaPardisoFactorize(; kwargs...) = PardisoJL(;
+    vendor = :Panua, solver_type = 0, kwargs...
+)
+
+"""
+```julia
+PanuaPardisoIterate(; nprocs::Union{Int, Nothing} = nothing,
+    matrix_type = nothing,
+    iparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing,
+    dparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing)
+```
+
+A mixed factorization+iterative method using Panua Pardiso.
+
+!!! note
+
+    Using this solver requires adding the package Pardiso.jl, i.e. `using Pardiso`
+
+## Keyword Arguments
+
+For the definition of the keyword arguments, see the Pardiso.jl documentation.
+All values default to `nothing` and the solver internally determines the values
+given the input types, and these keyword arguments are only for overriding the
+default handling process. This should not be required by most users.
+"""
+PanuaPardisoIterate(; kwargs...) = PardisoJL(; vendor = :Panua, solver_type = 1, kwargs...)
+
+"""
+```julia
+PardisoJL(; nprocs::Union{Int, Nothing} = nothing,
+    solver_type = nothing,
+    matrix_type = nothing,
+    iparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing,
+    dparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing,
+    vendor::Union{Symbol, Nothing} = nothing
+)
+```
+
+A generic method using  Pardiso. Specifying `solver_type` is required.
+
+!!! note
+
+    Using this solver requires adding the package Pardiso.jl, i.e. `using Pardiso`
+
+## Keyword Arguments
+
+The `vendor` keyword allows to choose between Panua pardiso  (former pardiso-project.org; `vendor=:Panua`)
+and  MKL Pardiso (`vendor=:MKL`). If `vendor==nothing`, Panua pardiso is preferred over MKL Pardiso.
+
+For the definition of the other keyword arguments, see the Pardiso.jl documentation.
+All values default to `nothing` and the solver internally determines the values
+given the input types, and these keyword arguments are only for overriding the
+default handling process. This should not be required by most users.
+"""
+struct PardisoJL{T1, T2} <: AbstractSparseFactorization
+    nprocs::Union{Int, Nothing}
+    solver_type::T1
+    matrix_type::T2
+    cache_analysis::Bool
+    iparm::Union{Vector{Tuple{Int, Int}}, Nothing}
+    dparm::Union{Vector{Tuple{Int, Int}}, Nothing}
+    vendor::Union{Symbol, Nothing}
+
+    function PardisoJL(;
+            nprocs::Union{Int, Nothing} = nothing,
+            solver_type = nothing,
+            matrix_type = nothing,
+            cache_analysis = false,
+            iparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing,
+            dparm::Union{Vector{Tuple{Int, Int}}, Nothing} = nothing,
+            vendor::Union{Symbol, Nothing} = nothing
+        )
+        ext = Base.get_extension(@__MODULE__, :LinearSolvePardisoExt)
+        if ext === nothing
+            error("PardisoJL requires that Pardiso is loaded, i.e. `using Pardiso`")
+        else
+            T1 = typeof(solver_type)
+            T2 = typeof(matrix_type)
+            @assert T1 <: Union{Int, Nothing, ext.Pardiso.Solver}
+            @assert T2 <: Union{Int, Nothing, ext.Pardiso.MatrixType}
+            return new{T1, T2}(
+                nprocs, solver_type, matrix_type, cache_analysis, iparm, dparm, vendor
+            )
+        end
+    end
+end
+
+"""
+```julia
+KrylovKitJL(args...; KrylovAlg = Krylov.gmres!, kwargs...)
+```
+
+A generic iterative solver implementation allowing the choice of KrylovKit.jl
+solvers.
+
+!!! note
+
+    Using this solver requires adding the package KrylovKit.jl, i.e. `using KrylovKit`
+"""
+struct KrylovKitJL{F, I, P, A, K} <: LinearSolve.AbstractKrylovSubspaceMethod
+    KrylovAlg::F
+    gmres_restart::I
+    precs::P
+    args::A
+    kwargs::K
+end
+
+"""
+```julia
+KrylovKitJL_CG(args...; Pl = nothing, Pr = nothing, kwargs...)
+```
+
+A generic CG implementation for Hermitian and positive definite linear systems
+
+!!! note
+
+    Using this solver requires adding the package KrylovKit.jl, i.e. `using KrylovKit`
+"""
+function KrylovKitJL_CG end
+
+"""
+```julia
+KrylovKitJL_GMRES(args...; Pl = nothing, Pr = nothing, gmres_restart = 0, kwargs...)
+```
+
+A generic GMRES implementation.
+
+!!! note
+
+    Using this solver requires adding the package KrylovKit.jl, i.e. `using KrylovKit`
+"""
+function KrylovKitJL_GMRES end
+
+"""
+```julia
+IterativeSolversJL(args...;
+    generate_iterator = IterativeSolvers.gmres_iterable!,
+    Pl = nothing, Pr = nothing,
+    gmres_restart = 0, kwargs...)
+```
+
+A generic wrapper over the IterativeSolvers.jl solvers.
+
+!!! note
+
+    Using this solver requires adding the package IterativeSolvers.jl, i.e. `using IterativeSolvers`
+"""
+struct IterativeSolversJL{F, I, P, A, K} <: LinearSolve.AbstractKrylovSubspaceMethod
+    generate_iterator::F
+    gmres_restart::I
+    precs::P
+    args::A
+    kwargs::K
+end
+
+"""
+```julia
+IterativeSolversJL_CG(args...; Pl = nothing, Pr = nothing, kwargs...)
+```
+
+A wrapper over the IterativeSolvers.jl CG.
+
+!!! note
+
+    Using this solver requires adding the package IterativeSolvers.jl, i.e. `using IterativeSolvers`
+"""
+function IterativeSolversJL_CG end
+
+"""
+```julia
+IterativeSolversJL_GMRES(args...; Pl = nothing, Pr = nothing, gmres_restart = 0, kwargs...)
+```
+
+A wrapper over the IterativeSolvers.jl GMRES.
+
+!!! note
+
+    Using this solver requires adding the package IterativeSolvers.jl, i.e. `using IterativeSolvers`
+"""
+function IterativeSolversJL_GMRES end
+
+"""
+```julia
+IterativeSolversJL_IDRS(args...; Pl = nothing, idrs_s = 4, kwargs...)
+```
+
+A wrapper over the IterativeSolvers.jl IDR(S).
+
+!!! note
+
+    Using this solver requires adding the package IterativeSolvers.jl, i.e. `using IterativeSolvers`
+"""
+function IterativeSolversJL_IDRS end
+
+"""
+```julia
+IterativeSolversJL_BICGSTAB(args...; Pl = nothing, Pr = nothing, kwargs...)
+```
+
+A wrapper over the IterativeSolvers.jl BICGSTAB.
+
+!!! note
+
+    Using this solver requires adding the package IterativeSolvers.jl, i.e. `using IterativeSolvers`
+"""
+function IterativeSolversJL_BICGSTAB end
+
+"""
+```julia
+IterativeSolversJL_MINRES(args...; Pl = nothing, Pr = nothing, kwargs...)
+```
+
+A wrapper over the IterativeSolvers.jl MINRES.
+
+!!! note
+
+    Using this solver requires adding the package IterativeSolvers.jl, i.e. `using IterativeSolvers`
+"""
+function IterativeSolversJL_MINRES end
+
+"""
+```julia
+GinkgoJL(args...; KrylovAlg = :gmres, executor = :omp, kwargs...)
+```
+
+A generic wrapper over [Ginkgo.jl](https://github.com/youwuyou/Ginkgo.jl) iterative solvers.
+Ginkgo is a high-performance numerical linear algebra library that supports multiple backends
+including OpenMP, CUDA, HIP, and SYCL, making it suitable for both CPU and GPU computation.
+
+!!! note
+
+    Using this solver requires adding the package Ginkgo.jl, i.e. `using Ginkgo`
+
+## Keyword Arguments
+
+  - `KrylovAlg`: The Ginkgo solver to use. Supported values:
+    - `:gmres` (default): GMRES — for general non-symmetric systems
+      (not yet exposed by Ginkgo.jl v1; use `GinkgoJL_CG()` in the meantime)
+    - `:cg`: Conjugate Gradient — for symmetric positive definite systems only
+  - `executor`: The Ginkgo backend executor. Options:
+    - `:omp` (default): OpenMP CPU executor
+    - `:cuda`: NVIDIA GPU executor
+    - `:reference`: Reference (single-threaded) executor
+
+!!! warning
+
+    Ginkgo.jl currently only supports `Float32` element types with `Int32` indices for sparse
+    matrices. The input matrix and vectors will be converted to `Float32` automatically.
+
+## Example
+
+```julia
+using LinearSolve, Ginkgo, SparseArrays
+A = sprand(Float32, 100, 100, 0.1)
+A = A'A + 30I  # make symmetric positive definite
+b = rand(Float32, 100)
+prob = LinearProblem(A, b)
+sol = solve(prob, GinkgoJL_CG())
+```
+"""
+struct GinkgoJL{F, E, A, K} <: LinearSolve.AbstractKrylovSubspaceMethod
+    KrylovAlg::F
+    executor::E
+    args::A
+    kwargs::K
+end
+
+"""
+```julia
+GinkgoJL_CG(args...; executor = :omp, kwargs...)
+```
+
+A CG solver via Ginkgo.jl for symmetric positive definite systems.
+
+!!! note
+
+    Using this solver requires adding the package Ginkgo.jl, i.e. `using Ginkgo`
+"""
+function GinkgoJL_CG end
+
+"""
+```julia
+GinkgoJL_GMRES(args...; executor = :omp, kwargs...)
+```
+
+A GMRES solver via Ginkgo.jl for general non-symmetric systems.
+
+!!! note
+
+    Using this solver requires adding the package Ginkgo.jl, i.e. `using Ginkgo`.
+    GMRES is not yet exposed by Ginkgo.jl v1. This stub is provided for forward compatibility;
+    an error will be raised at solve time until Ginkgo.jl adds GMRES support.
+"""
+function GinkgoJL_GMRES end
+
+"""
+    MetalLUFactorization()
+
+A wrapper over Apple's Metal GPU library for LU factorization. Direct calls to Metal
+in a way that pre-allocates workspace to avoid allocations and automatically offloads
+to the GPU. This solver is optimized for Metal-capable Apple Silicon Macs.
+
+## Requirements
+Using this solver requires that Metal.jl is loaded: `using Metal`
+
+## Performance Notes
+- Most efficient for large dense matrices where GPU acceleration benefits outweigh transfer costs
+- Automatically manages GPU memory and transfers
+- Particularly effective on Apple Silicon Macs with unified memory
+
+## Example
+```julia
+using Metal
+alg = MetalLUFactorization()
+sol = solve(prob, alg)
+```
+"""
+struct MetalLUFactorization <: AbstractFactorization
+    residualsafety::Bool
+    function MetalLUFactorization(; throwerror = true, residualsafety::Bool = false)
+        return @static if !Sys.isapple()
+            if throwerror
+                error("MetalLUFactorization is only available on Apple platforms")
+            else
+                return new(residualsafety)
+            end
+        else
+            ext = Base.get_extension(@__MODULE__, :LinearSolveMetalExt)
+            if ext === nothing && throwerror
+                error("MetalLUFactorization requires that Metal.jl is loaded, i.e. `using Metal`")
+            else
+                return new(residualsafety)
+            end
+        end
+    end
+end
+
+"""
+    MetalOffload32MixedLUFactorization()
+
+A mixed precision Metal GPU-accelerated LU factorization that converts matrices to Float32
+before offloading to Metal GPU for factorization, then converts back for the solve.
+This can provide speedups on Apple Silicon when reduced precision is acceptable.
+
+## Performance Notes
+- Converts Float64 matrices to Float32 for GPU factorization
+- Can be significantly faster for large matrices where memory bandwidth is limiting
+- Particularly effective on Apple Silicon Macs with unified memory architecture
+- May have reduced accuracy compared to full precision methods
+
+## Requirements
+Using this solver requires that Metal.jl is loaded: `using Metal`
+
+## Example
+```julia
+using Metal
+alg = MetalOffload32MixedLUFactorization()
+sol = solve(prob, alg)
+```
+"""
+struct MetalOffload32MixedLUFactorization <: AbstractFactorization
+    function MetalOffload32MixedLUFactorization(; throwerror = true)
+        return @static if !Sys.isapple()
+            if throwerror
+                error("MetalOffload32MixedLUFactorization is only available on Apple platforms")
+            else
+                return new()
+            end
+        else
+            ext = Base.get_extension(@__MODULE__, :LinearSolveMetalExt)
+            if ext === nothing && throwerror
+                error("MetalOffload32MixedLUFactorization requires that Metal.jl is loaded, i.e. `using Metal`")
+            else
+                return new()
+            end
+        end
+    end
+end
+
+"""
+    BLISLUFactorization()
+
+An LU factorization implementation using the BLIS (BLAS-like Library Instantiation Software)
+framework. BLIS provides high-performance dense linear algebra kernels optimized for various
+CPU architectures.
+
+## Requirements
+Using this solver requires that blis_jll is available and the BLIS extension is loaded.
+The solver will be automatically available when conditions are met.
+
+## Performance Notes
+- Optimized for modern CPU architectures with BLIS-specific optimizations
+- May provide better performance than standard BLAS on certain processors
+- Best suited for dense matrices with Float32, Float64, ComplexF32, or ComplexF64 elements
+
+## Example
+```julia
+alg = BLISLUFactorization()
+sol = solve(prob, alg)
+```
+"""
+struct BLISLUFactorization <: AbstractFactorization
+    residualsafety::Bool
+    function BLISLUFactorization(; throwerror = true, residualsafety::Bool = false)
+        ext = Base.get_extension(@__MODULE__, :LinearSolveBLISExt)
+        if ext === nothing && throwerror
+            error("BLISLUFactorization requires that the BLIS extension is loaded and blis_jll is available")
+        else
+            return new(residualsafety)
+        end
+    end
+end
+
+"""
+`CUSOLVERRFFactorization(; symbolic = :RF, reuse_symbolic = true)`
+
+A GPU-accelerated sparse LU factorization using NVIDIA's cusolverRF library.
+This solver is specifically designed for sparse matrices on CUDA GPUs and
+provides high-performance factorization and solve capabilities.
+
+## Keyword Arguments
+
+  - `symbolic`: The symbolic factorization method to use. Options are:
+    - `:RF` (default): Use cusolverRF's built-in symbolic analysis
+    - `:KLU`: Use KLU for symbolic analysis
+  - `reuse_symbolic`: Whether to reuse the symbolic factorization when the
+    sparsity pattern doesn't change (default: `true`)
+
+!!! note
+    This solver requires CUSOLVERRF.jl to be loaded and only supports
+    `Float64` element types with `Int32` indices.
+"""
+struct CUSOLVERRFFactorization <: AbstractSparseFactorization
+    symbolic::Symbol
+    reuse_symbolic::Bool
+
+    function CUSOLVERRFFactorization(; symbolic::Symbol = :RF, reuse_symbolic::Bool = true)
+        ext = Base.get_extension(@__MODULE__, :LinearSolveCUSOLVERRFExt)
+        if ext === nothing
+            error("CUSOLVERRFFactorization requires that CUSOLVERRF.jl is loaded, i.e. `using CUSOLVERRF`")
+        else
+            return new{}(symbolic, reuse_symbolic)
+        end
+    end
+end
+
+"""
+    MKL32MixedLUFactorization()
+
+A mixed precision LU factorization using Intel MKL that performs factorization in Float32
+precision while maintaining Float64 interface. This can provide significant speedups
+for large matrices when reduced precision is acceptable.
+
+## Performance Notes
+- Converts Float64 matrices to Float32 for factorization
+- Uses optimized MKL routines for the factorization
+- Can be 2x faster than full precision for memory-bandwidth limited problems
+- May have reduced accuracy compared to full Float64 precision
+
+## Requirements
+This solver requires MKL to be available through MKL_jll.
+
+## Example
+```julia
+alg = MKL32MixedLUFactorization()
+sol = solve(prob, alg)
+```
+"""
+struct MKL32MixedLUFactorization <: AbstractDenseFactorization end
+
+"""
+    AppleAccelerate32MixedLUFactorization()
+
+A mixed precision LU factorization using Apple's Accelerate framework that performs
+factorization in Float32 precision while maintaining Float64 interface. This can
+provide significant speedups on Apple hardware when reduced precision is acceptable.
+
+## Performance Notes
+- Converts Float64 matrices to Float32 for factorization
+- Uses optimized Accelerate routines for the factorization
+- Particularly effective on Apple Silicon with unified memory
+- May have reduced accuracy compared to full Float64 precision
+
+## Requirements
+This solver is only available on Apple platforms and requires the Accelerate framework.
+
+## Example
+```julia
+alg = AppleAccelerate32MixedLUFactorization()
+sol = solve(prob, alg)
+```
+"""
+struct AppleAccelerate32MixedLUFactorization <: AbstractDenseFactorization end
+
+"""
+    OpenBLAS32MixedLUFactorization()
+
+A mixed precision LU factorization using OpenBLAS that performs factorization in Float32
+precision while maintaining Float64 interface. This can provide significant speedups
+for large matrices when reduced precision is acceptable.
+
+## Performance Notes
+- Converts Float64 matrices to Float32 for factorization
+- Uses optimized OpenBLAS routines for the factorization
+- Can be 2x faster than full precision for memory-bandwidth limited problems
+- May have reduced accuracy compared to full Float64 precision
+
+## Requirements
+This solver requires OpenBLAS to be available through OpenBLAS_jll.
+
+## Example
+```julia
+alg = OpenBLAS32MixedLUFactorization()
+sol = solve(prob, alg)
+```
+"""
+struct OpenBLAS32MixedLUFactorization <: AbstractDenseFactorization end
+
+"""
+    RF32MixedLUFactorization{P, T}(; pivot = Val(true), thread = Val(true))
+
+A mixed precision LU factorization using RecursiveFactorization.jl that performs
+factorization in Float32 precision while maintaining Float64 interface. This combines
+the speed benefits of RecursiveFactorization.jl with reduced precision computation
+for additional performance gains.
+
+## Type Parameters
+- `P`: Pivoting strategy as `Val{Bool}`. `Val{true}` enables partial pivoting for stability.
+- `T`: Threading strategy as `Val{Bool}`. `Val{true}` enables multi-threading for performance.
+
+## Constructor Arguments
+- `pivot = Val(true)`: Enable partial pivoting. Set to `Val{false}` to disable for speed
+  at the cost of numerical stability.
+- `thread = Val(true)`: Enable multi-threading. Set to `Val{false}` for single-threaded
+  execution.
+
+## Performance Notes
+- Converts Float64 matrices to Float32 for factorization
+- Leverages RecursiveFactorization.jl's optimized blocking strategies
+- Can provide significant speedups for small to medium matrices (< 500×500)
+- May have reduced accuracy compared to full Float64 precision
+
+## Requirements
+Using this solver requires that RecursiveFactorization.jl is loaded: `using RecursiveFactorization`
+
+## Example
+```julia
+using RecursiveFactorization
+# Fast mixed precision with pivoting
+alg1 = RF32MixedLUFactorization()
+# Fastest mixed precision (no pivoting), less stable
+alg2 = RF32MixedLUFactorization(pivot=Val(false))
+```
+"""
+struct RF32MixedLUFactorization{P, T} <: AbstractDenseFactorization
+    function RF32MixedLUFactorization(::Val{P}, ::Val{T}; throwerror = true) where {P, T}
+        if !userecursivefactorization(nothing)
+            throwerror &&
+                error("RF32MixedLUFactorization requires that RecursiveFactorization.jl is loaded, i.e. `using RecursiveFactorization`")
+        end
+        return new{P, T}()
+    end
+end
+
+function RF32MixedLUFactorization(; pivot = Val(true), thread = Val(true), throwerror = true)
+    return RF32MixedLUFactorization(pivot, thread; throwerror)
+end
+
+"""
+    AlgebraicMultigridJL(args...; kwargs...)
+
+A wrapper for [AlgebraicMultigrid.jl](https://github.com/JuliaLinearAlgebra/AlgebraicMultigrid.jl)
+solvers.
+
+## Positional Arguments
+
+The first positional argument (if given) is the AMG algorithm type. If omitted,
+defaults to `AlgebraicMultigrid.RugeStubenAMG()`.
+
+## Keyword Arguments
+
+All keyword arguments are forwarded to the AMG hierarchy constructor.
+
+## Example
+
+```julia
+using LinearSolve, AlgebraicMultigrid
+# Default (Ruge-Stuben)
+alg = AlgebraicMultigridJL()
+# Smoothed Aggregation
+alg = AlgebraicMultigridJL(AlgebraicMultigrid.SmoothedAggregationAMG())
+```
+
+!!! note
+
+    Using this solver requires adding the package AlgebraicMultigrid.jl,
+    i.e. `using AlgebraicMultigrid`
+"""
+struct AlgebraicMultigridJL{A, K} <: SciMLLinearSolveAlgorithm
+    args::A
+    kwargs::K
+end
+
+function AlgebraicMultigridJL(args...; kwargs...)
+    return AlgebraicMultigridJL(args, kwargs)
+end
+
+needs_concrete_A(::AlgebraicMultigridJL) = true
+
+"""
+`ParUFactorization(;reuse_symbolic=true)`
+
+A parallel sparse LU factorization from SuiteSparse's
+[ParU](https://github.com/DrTimothyAldenDavis/SuiteSparse) library.
+ParU is a multithreaded direct solver for sparse systems of linear equations
+using OpenMP task parallelism for the numeric factorization phase.
+
+ParU calls UMFPACK for its symbolic analysis phase (computing fill-reducing
+column ordering and symbolic factorization), then performs a parallel numeric
+factorization exploiting dense frontal matrices. It can outperform UMFPACK on
+larger systems where the parallelism can be exploited.
+
+Only supports `Float64` element type.
+
+## Keyword Arguments
+
+  - `reuse_symbolic`: Cache and reuse the symbolic factorization across solves
+    when the sparsity pattern of `A` does not change. Defaults to `true`.
+
+!!! note
+
+    Using this solver requires loading the package `ParU_jll`, i.e.:
+    ```julia
+    import ParU_jll
+    using LinearSolve, SparseArrays
+    ```
+
+## Example
+
+```julia
+import ParU_jll
+using LinearSolve, SparseArrays
+
+A = sprand(100, 100, 0.1) + 10I
+b = rand(100)
+prob = LinearProblem(A, b)
+sol = solve(prob, ParUFactorization())
+```
+"""
+struct ParUFactorization <: AbstractSparseFactorization
+    reuse_symbolic::Bool
+    function ParUFactorization(; reuse_symbolic::Bool = true)
+        ext = Base.get_extension(@__MODULE__, :LinearSolveParUExt)
+        if ext === nothing
+            error("ParUFactorization requires that ParU_jll and SparseArrays are loaded, i.e. `import ParU_jll; using SparseArrays`")
+        end
+        return new(reuse_symbolic)
+    end
+end
+
+"""
+`MUMPSFactorization(; sym = :unsymmetric, transposed = false, verbose = false, ooc = false, itref = 0, user_perm = false, icntl = nothing, cntl = nothing, par = 1)`
+
+A sparse direct solver wrapper around [MUMPS.jl](https://github.com/JuliaSmoothOptimizers/MUMPS.jl),
+backed by the `MUMPS_jll` artifact.
+
+This wrapper is intended for repeated solves with the same sparse matrix, using a cached
+MUMPS factorization inside the `LinearSolve` cache. When `cache.A` is replaced, the old
+MUMPS object is finalized and a new factorization is built.
+
+## Keyword Arguments
+
+  - `sym`: Matrix structure passed to MUMPS. Choices are `:unsymmetric` (default),
+    `:definite`, and `:symmetric`.
+  - `transposed`: Solve `A' * x = b` instead of `A * x = b`.
+  - `verbose`: Enable MUMPS output.
+  - `ooc`: Enable out-of-core factorization.
+  - `itref`: Maximum number of iterative refinement steps.
+  - `user_perm`: Tell MUMPS to use a user-supplied permutation.
+  - `icntl`: Optional custom MUMPS `ICNTL` vector. When provided, it overrides the
+    wrapper-generated control vector.
+  - `cntl`: Optional custom MUMPS `CNTL` vector.
+  - `par`: MUMPS host participation flag. Defaults to `1`.
+
+!!! note
+
+    Using this solver requires loading `MUMPS.jl` and `SparseArrays`, and initializing MPI:
+    ```julia
+    using MPI, MUMPS, SparseArrays
+    MPI.Init()
+    ```
+
+## Supported Element Types
+
+`Float32`, `Float64`, `ComplexF32`, and `ComplexF64`.
+
+Inputs with other element types are rejected with an error instead of being
+silently converted to a lower-precision type.
+
+## Memory Management
+
+MUMPS holds MPI-backed resources outside Julia's GC. Call
+`cleanup_mumps_cache!` explicitly when you are finished with a solve and before
+`MPI.Finalize()`:
+
+```julia
+using LinearSolve, SparseArrays, MPI, MUMPS
+
+MPI.Init()
+MUMPSExt = Base.get_extension(LinearSolve, :LinearSolveMUMPSExt)
+
+A = sparse([4.0 1.0; 2.0 3.0])
+b = [1.0, 2.0]
+sol = solve(LinearProblem(A, b), MUMPSFactorization())
+
+MUMPSExt.cleanup_mumps_cache!(sol)
+MPI.Finalize()
+```
+
+The extension also registers a GC finalizer as a safety net, but explicit
+cleanup is strongly preferred for deterministic teardown.
+
+## Example
+
+```julia
+using LinearSolve, SparseArrays, MPI, MUMPS
+
+MPI.Init()
+MUMPSExt = Base.get_extension(LinearSolve, :LinearSolveMUMPSExt)
+A = sparse([4.0 1.0; 2.0 3.0])
+b = [1.0, 2.0]
+sol = solve(LinearProblem(A, b), MUMPSFactorization())
+MUMPSExt.cleanup_mumps_cache!(sol)
+```
+"""
+struct MUMPSFactorization <: AbstractSparseFactorization
+    sym::Int
+    transposed::Bool
+    verbose::Bool
+    ooc::Bool
+    itref::Int
+    user_perm::Bool
+    icntl::Any
+    cntl::Any
+    par::Int
+
+    function MUMPSFactorization(;
+            sym::Union{Symbol, Integer} = :unsymmetric,
+            transposed::Bool = false,
+            verbose::Bool = false,
+            ooc::Bool = false,
+            itref::Int = 0,
+            user_perm::Bool = false,
+            icntl = nothing,
+            cntl = nothing,
+            par::Int = 1,
+        )
+        ext = Base.get_extension(@__MODULE__, :LinearSolveMUMPSExt)
+        if ext === nothing
+            error("MUMPSFactorization requires that MUMPS and SparseArrays are loaded, i.e. `using MPI, MUMPS, SparseArrays`")
+        end
+        sym_val = if sym isa Symbol
+            if sym === :unsymmetric
+                0
+            elseif sym === :definite
+                1
+            elseif sym === :symmetric
+                2
+            else
+                error("Unknown MUMPS symmetry flag: $sym")
+            end
+        else
+            Int(sym)
+        end
+        return new(sym_val, transposed, verbose, ooc, itref, user_perm, icntl, cntl, par)
+    end
+end
+
+"""
+`SuperLUDISTFactorization(; comm = nothing, nprow = 0, npcol = 0, options = nothing, threads = nothing)`
+
+A sparse direct solver wrapper around
+[SuperLUDIST.jl](https://github.com/JuliaSparse/SuperLUDIST.jl), backed by the
+`SuperLU_DIST_jll` artifact through that package.
+
+This wrapper targets ordinary replicated Julia sparse matrices
+(`SparseMatrixCSC`). Each participating rank builds the same Julia matrix and
+right-hand side locally, and `SuperLUDIST` performs the distributed solve on
+the requested communicator. The resulting factorization is cached inside the
+`LinearSolve` cache and reused across repeated solves with new right-hand
+sides.
+
+## Keyword Arguments
+
+  - `comm`: optional MPI communicator. `nothing` maps to `MPI.COMM_SELF`.
+  - `nprow`, `npcol`: process-grid dimensions for SuperLU_DIST. If both are
+    left as `0`, a near-square grid is chosen automatically from the
+    communicator size.
+  - `options`: either `nothing`, a `NamedTuple` of `SuperLUDIST.Options` field
+    updates, or a prebuilt `SuperLUDIST.Options` object.
+  - `threads`: optional OpenMP thread count passed through
+    `SuperLUDIST.superlu_set_num_threads`.
+
+!!! note
+
+    Using this solver requires loading `SuperLUDIST.jl` and `SparseArrays`, and
+    initializing MPI for multi-rank usage:
+    ```julia
+    using MPI, SuperLUDIST, SparseArrays
+    MPI.Init()
+    ```
+
+## Supported Element Types
+
+`Float32` and `Float64`.
+
+`ComplexF64` is intentionally rejected for now because the current upstream
+`SuperLUDIST.jl` replicated complex solve path crashes during finalization.
+
+## Example
+
+```julia
+using LinearSolve, SparseArrays, MPI, SuperLUDIST
+
+MPI.Init()
+A = sparse([4.0 1.0; 2.0 3.0])
+b = [1.0, 2.0]
+
+sol = solve(
+    LinearProblem(A, b),
+    SuperLUDISTFactorization(; comm = MPI.COMM_SELF)
+)
+```
+"""
+struct SuperLUDISTFactorization <: AbstractSparseFactorization
+    comm::Any
+    nprow::Int
+    npcol::Int
+    options::Any
+    threads::Union{Nothing, Int}
+
+    function SuperLUDISTFactorization(;
+            comm = nothing,
+            nprow::Integer = 0,
+            npcol::Integer = 0,
+            options = nothing,
+            threads::Union{Nothing, Integer} = nothing,
+        )
+        ext = Base.get_extension(@__MODULE__, :LinearSolveSuperLUDISTExt)
+        if ext === nothing
+            error("SuperLUDISTFactorization requires that SuperLUDIST and SparseArrays are loaded, i.e. `using MPI, SuperLUDIST, SparseArrays`")
+        end
+        nprow >= 0 || error("nprow must be nonnegative")
+        npcol >= 0 || error("npcol must be nonnegative")
+        threads === nothing || threads > 0 || error("threads must be positive")
+        return new(comm, Int(nprow), Int(npcol), options, threads === nothing ? nothing : Int(threads))
+    end
+end
+
+"""
+`HSLMA57Factorization(; kwargs...)`
+
+A sparse symmetric direct solver powered by
+[HSL.jl](https://github.com/JuliaSmoothOptimizers/HSL.jl)'s MA57 backend.
+
+Keyword arguments are forwarded to `HSL.Ma57(...)`.
+
+!!! note
+
+    Using this solver requires loading `HSL.jl` and `SparseArrays`:
+    ```julia
+    using HSL, SparseArrays
+    ```
+
+    `HSL.jl` requires a manual installation of `HSL_jll.jl` due proprietary
+    licensing. See `HSL.jl` installation instructions:
+    https://github.com/JuliaSmoothOptimizers/HSL.jl
+"""
+struct HSLMA57Factorization{K} <: AbstractSparseFactorization
+    kwargs::K
+
+    function HSLMA57Factorization(; kwargs...)
+        ext = Base.get_extension(@__MODULE__, :LinearSolveHSLExt)
+        if ext === nothing
+            error("HSLMA57Factorization requires `using HSL, SparseArrays`. Note: `HSL.jl` requires manual installation of `HSL_jll.jl`.")
+        end
+        return new{typeof(kwargs)}(kwargs)
+    end
+end
+
+"""
+`HSLMA97Factorization(; matrix_type = :real_indef, kwargs...)`
+
+A sparse symmetric/Hermitian direct solver powered by
+[HSL.jl](https://github.com/JuliaSmoothOptimizers/HSL.jl)'s MA97 backend.
+
+## Keyword Arguments
+
+  - `matrix_type`: Passed to `HSL.ma97_factorize!`. Supported values include
+    `:real_spd`, `:real_indef`, `:herm_pd`, `:herm_indef`, `:cmpl_indef`.
+  - `kwargs...`: Forwarded to `HSL.Ma97(...)`.
+
+!!! note
+
+    Using this solver requires loading `HSL.jl` and `SparseArrays`:
+    ```julia
+    using HSL, SparseArrays
+    ```
+
+    `HSL.jl` requires a manual installation of `HSL_jll.jl` due proprietary
+    licensing. See `HSL.jl` installation instructions:
+    https://github.com/JuliaSmoothOptimizers/HSL.jl
+"""
+struct HSLMA97Factorization{K} <: AbstractSparseFactorization
+    matrix_type::Symbol
+    kwargs::K
+
+    function HSLMA97Factorization(; matrix_type::Symbol = :real_indef, kwargs...)
+        ext = Base.get_extension(@__MODULE__, :LinearSolveHSLExt)
+        if ext === nothing
+            error("HSLMA97Factorization requires `using HSL, SparseArrays`. Note: `HSL.jl` requires manual installation of `HSL_jll.jl`.")
+        end
+
+        matrix_type ∈ (:real_spd, :real_indef, :herm_pd, :herm_indef, :cmpl_indef) || error(
+            "Unsupported matrix_type: $(matrix_type). Expected one of :real_spd, :real_indef, :herm_pd, :herm_indef, :cmpl_indef."
+        )
+
+        return new{typeof(kwargs)}(matrix_type, kwargs)
+    end
+end
+
+"""
+    ElementalJL(; method = :LU)
+
+A wrapper for [Elemental.jl](https://github.com/JuliaParallel/Elemental.jl),
+providing distributed-memory dense linear algebra solvers built on the
+[Elemental](https://github.com/elemental/Elemental) C++ library by Jack Poulson.
+(LLNL maintains an active GPU-focused fork of Elemental called
+[Hydrogen](https://github.com/LLNL/Elemental).)
+
+## Keyword Arguments
+
+  - `method`: The factorization method to use. Options:
+    - `:LU` (default) — LU factorization with partial pivoting. Suitable for
+      general square systems.
+    - `:QR` — QR factorization. Suitable for square or overdetermined systems.
+    - `:LQ` — LQ factorization. Suitable for square or underdetermined systems.
+    - `:Cholesky` — Cholesky factorization. Requires the matrix to be Hermitian
+      positive definite.
+
+## Supported Element Types
+
+`Float32`, `Float64`, `ComplexF32`, `ComplexF64`. Matrices with other element
+types are promoted to `Float64` (real) or `ComplexF64` (complex) before being
+passed to Elemental.
+
+## Notes
+
+  - Serial `Elemental.Matrix` values are accepted directly as the problem
+    matrix `A`; they are copied before factorization so the original is
+    never mutated.
+  - When `A` is a standard Julia `AbstractMatrix`, it is copied into an
+    `Elemental.Matrix` for the factorization.
+  - The factorization is cached across repeated solves with the same matrix
+    (i.e. when `isfresh = false`).
+
+!!! note
+
+    Using this solver requires adding the package Elemental.jl:
+    ```julia
+    using Elemental
+    ```
+    Elemental.jl automatically initialises MPI when loaded; no explicit
+    `MPI.Init()` call is needed for serial usage.
+
+## Example
+
+```julia
+using LinearSolve, Elemental
+
+A = rand(100, 100); A = A + A' + 100I  # well-conditioned
+b = rand(100)
+prob = LinearProblem(A, b)
+
+# LU (default)
+sol = solve(prob, ElementalJL())
+# LQ
+sol = solve(prob, ElementalJL(method = :LQ))
+# Cholesky (symmetric positive definite)
+sol = solve(prob, ElementalJL(method = :Cholesky))
+```
+"""
+struct ElementalJL <: AbstractDenseFactorization
+    method::Symbol
+end
+
+function ElementalJL(; method::Symbol = :LU)
+    return ElementalJL(method)
+end
+
+"""
+    SpecializedLUFactorization()
+
+A type-stable, structure-detecting dense LU-style solver from
+SpecializingFactorizations.jl. It cheaply scans the (dense) matrix `A` to detect
+whether it actually has special structure (diagonal, bidiagonal, tridiagonal,
+banded, triangular, symmetric positive definite, symmetric/Hermitian indefinite)
+and dispatches to the matching specialized factorization instead of always using
+a general `O(n^3)` LU. Detection is tracked by a runtime enum stored in a single
+concrete workspace type, so the whole detect -> factor -> solve pipeline is
+type-stable and allocation-free on the warm path.
+
+This is for **square** systems only; use [`SpecializedQRFactorization`](@ref) for
+rectangular / rank-deficient least-squares problems.
+
+!!! note
+
+    Using this solver requires that SpecializingFactorizations.jl is loaded:
+    `using SpecializingFactorizations`.
+
+## Example
+
+```julia
+using SpecializingFactorizations
+A = Matrix(Tridiagonal(rand(99), rand(100) .+ 4, rand(99)))
+b = rand(100)
+prob = LinearProblem(A, b)
+sol = solve(prob, SpecializedLUFactorization())
+```
+"""
+struct SpecializedLUFactorization <: AbstractDenseFactorization end
+
+"""
+    SpecializedQRFactorization()
+
+A type-stable, rank-revealing dense QR least-squares solver from
+SpecializingFactorizations.jl. It uses a column-pivoted, rank-revealing QR
+(LAPACK `geqp3`) to reveal the numerical rank of a possibly **rectangular** or
+**rank-deficient** matrix and returns the least-squares solution for any shape,
+**including singular and rank-deficient** matrices, without ever throwing. For a
+rank-deficient system it returns the minimum-norm least-squares solution
+(matching `pinv(A) * b`). For square `BlasFloat` inputs it reuses the same
+structure-detection scan as [`SpecializedLUFactorization`](@ref) to take cheaper
+structured paths when doing so provably reproduces the dense rank-revealing
+result.
+
+!!! note
+
+    Using this solver requires that SpecializingFactorizations.jl is loaded:
+    `using SpecializingFactorizations`.
+
+## Example
+
+```julia
+using SpecializingFactorizations
+A = randn(100, 40)  # overdetermined least-squares
+b = randn(100)
+prob = LinearProblem(A, b)
+sol = solve(prob, SpecializedQRFactorization())
+```
+"""
+struct SpecializedQRFactorization <: AbstractDenseFactorization end

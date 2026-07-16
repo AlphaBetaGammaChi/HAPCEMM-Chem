@@ -113,6 +113,9 @@ namespace AIM
          * - double :: mole fraction of sulfuric acid */
 
         /* Apply limitations */
+        if ( nSulf < 1.0E-05 )
+            return 0.0;
+
         if ( nSulf >= 1.0E+11 )
             nSulf = 1.0E+11;
 
@@ -156,6 +159,9 @@ namespace AIM
          * - double :: nucleation rate */
         
         /* Apply limitations */
+        if ( nSulf < 1.0E-05 )
+            return 0.0;
+
         if ( nSulf >= 1.0E+11 )
             nSulf = 1.0E+11;
 
@@ -207,6 +213,9 @@ namespace AIM
          * - double :: total number of molecules */
         
         /* Apply limitations */
+        if ( nSulf < 1.0E-05 )
+            return 0.0;
+
         if ( nSulf >= 1.0E+11 )
             nSulf = 1.0E+11;
 

@@ -30,8 +30,22 @@ SIMULATION MENU:
     netCDF filename format (string): APCEMM_ADJ_Case_*
   BOX MODEL SUBMENU:
     Run box model (T/F): F
-    netCDF filename format (string): APCEMM_BOX_CASE_*  
+    netCDF filename format (string): APCEMM_BOX_CASE_*
+    Box model duration [hr] (double): 120.0
+    Box model mode (int): 1
+    Box model threads (int): 1
+    Fuel: C12H24
+    Custom Species: []
+    Custom Fuel EIs: []
     Box model coupling (T/F): F
+    Output variables (string): all
+  CHEMISTRY SOLVER SUBMENU:
+    Chemistry solver (string): kpp
+    MICM mechanism path (string): ./mechanism/
+    ADJOINT SUBMENU:
+      Enable adjoint (T/F): F
+      Adjoint mode (string): all
+      Adjoint target name (string): ""
   RANDOM NUMBER GENERATION SUBMENU:
     Force seed value (T/F): F
     Seed value (positive int): 0
@@ -137,6 +151,10 @@ AEROSOL MENU:
 # Exactly one of "Init temp. from met." and "Impose lapse rate" must be true
 # Exactly one of "Init RH from met." and "Impose moist layer depth" must be true
 METEOROLOGY MENU:
+  METEOROLOGICAL PARAMETERS SUBMENU:
+    Temperature [K] (double): 223.0
+    Relative Humidity [%] (double): 50.0
+
   # --- MET INPUT OPTIONS ---+
   METEOROLOGICAL INPUT SUBMENU:
     Use met. input (T/F): T

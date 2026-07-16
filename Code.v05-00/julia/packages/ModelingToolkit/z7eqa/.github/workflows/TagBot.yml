@@ -1,0 +1,20 @@
+name: "TagBot"
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+jobs:
+  tagbot:
+    uses: "SciML/.github/.github/workflows/tagbot.yml@v1"
+    secrets: "inherit"
+  tagbot-subpackages:
+    strategy:
+      fail-fast: false
+      matrix:
+        subdir:
+          - "lib/ModelingToolkitBase"
+          - "lib/SciCompDSL"
+    uses: "SciML/.github/.github/workflows/tagbot.yml@v1"
+    with:
+      subdir: "${{ matrix.subdir }}"
+    secrets: "inherit"

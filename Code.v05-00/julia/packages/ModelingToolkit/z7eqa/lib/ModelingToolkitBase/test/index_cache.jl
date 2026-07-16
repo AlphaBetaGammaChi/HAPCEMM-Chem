@@ -1,0 +1,200 @@
+using ModelingToolkitBase, SymbolicIndexingInterface, SciMLStructures
+using ModelingToolkitBase: t_nounits as t, D_nounits as D, SymbolicDiscreteCallback
+using OrdinaryDiffEq
+using OrdinaryDiffEqRosenbrock
+using SciMLBase
+import SymbolicUtils as SU
+using PreallocationTools: DiffCache
+using ForwardDiff
+using Symbolics: unwrap
+using Setfield: @set!
+import DifferentiationInterface as DI
+using ADTypes
+using Test
+
+# Ensure indexes of array symbolics are cached appropriately
+@variables x(t)[1:2]
+@named sys = System(Equation[], t, [x], [])
+sys1 = complete(sys)
+@named sys = System(Equation[], t, [x...], [])
+sys2 = complete(sys)
+for sys in [sys1, sys2]
+    for (sym, idx) in [(x, 1:2), (x[1], 1), (x[2], 2)]
+        @test is_variable(sys, sym)
+        @test variable_index(sys, sym) == idx
+    end
+end
+
+@variables x(t)[1:2, 1:2]
+@named sys = System(Equation[], t, [x], [])
+sys1 = complete(sys)
+@named sys = System(Equation[], t, [x...], [])
+sys2 = complete(sys)
+for sys in [sys1, sys2]
+    @test is_variable(sys, x)
+    @test variable_index(sys, x) == [1 3; 2 4]
+    for i in eachindex(x)
+        @test is_variable(sys, x[i])
+        @test variable_index(sys, x[i]) == variable_index(sys, x)[i]
+    end
+end
+
+# Ensure Symbol to symbolic map is correct
+@parameters p1 p2[1:2] p3::String
+@variables x(t) y(t)[1:2] z(t)
+
+@named sys = System(Equation[], t, [x, y, z], [p1, p2, p3])
+sys = complete(sys)
+
+ic = ModelingToolkitBase.get_index_cache(sys)
+
+@test isequal(ic.symbol_to_variable[:p1], p1)
+@test isequal(ic.symbol_to_variable[:p2], p2)
+@test isequal(ic.symbol_to_variable[:p3], p3)
+@test isequal(ic.symbol_to_variable[:x], x)
+@test isequal(ic.symbol_to_variable[:y], y)
+@test isequal(ic.symbol_to_variable[:z], z)
+
+@testset "tunable_parameters is ordered" begin
+    @parameters p q[1:3] r[1:2, 1:2] s [tunable = false]
+    @named sys = System(Equation[], t, [], [p, q, r, s])
+    sys = complete(sys)
+    @test all(splat(isequal), zip(tunable_parameters(sys), parameters(sys)[1:3]))
+
+    offset = 1
+    for par in tunable_parameters(sys)
+        idx = parameter_index(sys, par)
+        @test idx.portion isa SciMLStructures.Tunable
+        if Symbolics.isarraysymbolic(par)
+            @test vec(idx.idx) == offset:(offset + length(par) - 1)
+        else
+            @test idx.idx == offset
+        end
+        offset += length(par)
+    end
+end
+
+@testset "reorder_dimension_by_tunables" begin
+    @parameters p q[1:3] r[1:2, 1:2] s [tunable = false]
+    @named sys = System(Equation[], t, [], [p, q, r, s])
+    src = ones(8)
+    dst = zeros(8)
+    # system must be complete...
+    @test_throws ArgumentError reorder_dimension_by_tunables!(dst, sys, src, [p, q, r])
+    @test_throws ArgumentError reorder_dimension_by_tunables(sys, src, [p, q, r])
+    sys = complete(sys; split = false)
+    # with split = true...
+    @test_throws ArgumentError reorder_dimension_by_tunables!(dst, sys, src, [p, q, r])
+    @test_throws ArgumentError reorder_dimension_by_tunables(sys, src, [p, q, r])
+    sys = complete(sys)
+    # and the arrays must have matching size
+    @test_throws ArgumentError reorder_dimension_by_tunables!(
+        zeros(2, 4), sys, src, [p, q, r]
+    )
+
+    ps = MTKParameters(sys, [p => 1.0, q => 3ones(3), r => 4ones(2, 2), s => 0.0])
+    src = ps.tunable
+    reorder_dimension_by_tunables!(dst, sys, src, [q, r, p])
+    @test dst ≈ vcat(3ones(3), 4ones(4), 1.0)
+    @test reorder_dimension_by_tunables(sys, src, [r, p, q]) ≈ vcat(4ones(4), 1.0, 3ones(3))
+    reorder_dimension_by_tunables!(dst, sys, src, [q[1], r[:, 1], q[2], r[:, 2], q[3], p])
+    @test dst ≈ vcat(3.0, 4ones(2), 3.0, 4ones(2), 3.0, 1.0)
+    src = stack([copy(ps.tunable) for i in 1:5]; dims = 1)
+    dst = zeros(size(src))
+    reorder_dimension_by_tunables!(dst, sys, src, [r, q, p]; dim = 2)
+    @test dst ≈ stack([vcat(4ones(4), 3ones(3), 1.0) for i in 1:5]; dims = 1)
+end
+
+mutable struct ParamTest
+    y::Any
+end
+(pt::ParamTest)(x) = pt.y - x
+@testset "Issue#3215: Callable discrete parameter" begin
+    function update_affect!(mod, obs, ctx, integ)
+        p_1 = mod.p_1
+        p_1.y = integ.t
+        return (; p_1)
+    end
+
+    tp1 = typeof(ParamTest(1))
+    @parameters (p_1::tp1)(..) = ParamTest(1)
+    @variables x(ModelingToolkitBase.t_nounits) = 0
+
+    event1 = [1.0, 2, 3] => (f = update_affect!, modified = (; p_1))
+
+    @named sys = System(
+        [
+            ModelingToolkitBase.D_nounits(x) ~ p_1(x),
+        ],
+        ModelingToolkitBase.t_nounits;
+        discrete_events = [event1]
+    )
+    ss = @test_nowarn complete(sys)
+    @test length(parameters(ss)) == 1
+    @test !is_timeseries_parameter(ss, p_1)
+end
+
+@testset "Old index cache doesn't influence new index cache construction" begin
+    @variables x(t)
+    @discretes d(t)
+    @named sys = System([D(x) ~ t + 2], t)
+    sys = complete(sys)
+    @set! sys.discrete_events = [SymbolicDiscreteCallback(x > 1, [d ~ Pre(d) + 1]; discrete_parameters = [d])]
+    @set! sys.ps = [unwrap(d)]
+    # This used to throw, since `d` wasn't a parameter before and thus not present in
+    # the `IndexCache`. This failed the construction of the subsequent `IndexCache`, since
+    # it uses `is_parameter` to check if `discrete_parameters` are in the parameters of
+    # the system.
+    @test_nowarn complete(sys)
+end
+
+@testset "Special `DiffCache` params" begin
+    @variables x(t)
+    @named sys = System([D(x) ~ 2x + t], t)
+    sys, dcp = ModelingToolkitBase.add_diffcache(sys, 8)
+
+    @test SU.symtype(dcp) === SU.FnType{Tuple, Any, Any}
+    sys = complete(sys)
+    prob = ODEProblem(sys, [x => 1.0], (0.0, 1.0))
+    diffcachewrapper = prob.ps[dcp]
+    arr = diffcachewrapper(1.0, (2, 2, 2))
+    @test arr isa Array{Float64, 3}
+    @test size(arr) == (2, 2, 2)
+    dual = ForwardDiff.Dual(1.0)
+    arr = diffcachewrapper(dual, (4, 2))
+    @test arr isa AbstractMatrix{typeof(dual)}
+    @test size(arr) == (4, 2)
+
+    @test SciMLBase.successful_retcode(solve(prob, Tsit5()))
+    idata = prob.f.initialization_data
+    @test_nowarn @inferred idata.metadata.oop_reconstruct_u0_p.pgetter(prob, idata.initializeprob)
+end
+
+function costfn(theta, ps)
+    setter, prob, getter = ps
+    p = setter(prob, theta)
+    newprob = SciMLBase.remake(prob; p)
+    sol = solve(newprob, Rodas5P(); saveat=0.1)
+    sum(abs2, getter(sol))
+end
+
+@testset "gradients with special `DiffCache` params" begin
+    @variables x(t)
+    @parameters p1=2.0 p2=3.0
+    @named sys = System([D(x) ~ -p1*x + p2*t], t)
+    sys, _ = ModelingToolkitBase.add_diffcache(sys, 4)
+    sys = complete(sys)
+
+    prob = ODEProblem{true, SciMLBase.FullSpecialize}(sys, [x => 1.0], (0.0, 1.0))
+    setter = setp_oop(prob, [p1, p2])
+    getter = getsym(prob, x)
+
+    ps = (setter, prob, getter)
+    @test costfn([2.0, 3.0], ps) ≠ zeros(2)
+    prep = DI.prepare_gradient(Base.Fix2(costfn, ps), AutoForwardDiff(), [2.0, 3.0])
+    if VERSION >= v"1.12-" && VERSION < v"1.13-"
+        @test_nowarn @inferred DI.gradient(Base.Fix2(costfn, ps), prep, AutoForwardDiff(), [2.0, 3.0])
+    else
+        @test_nowarn DI.gradient(Base.Fix2(costfn, ps), prep, AutoForwardDiff(), [2.0, 3.0])
+    end
+end

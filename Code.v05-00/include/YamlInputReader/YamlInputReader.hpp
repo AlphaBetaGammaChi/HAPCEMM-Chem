@@ -19,7 +19,7 @@ namespace YamlInputReader{
     void readTransportMenu(OptInput& input, const YAML::Node& transportNode);
     void readChemMenu(OptInput& input, const YAML::Node& chemNode);
     void readAeroMenu(OptInput& input, const YAML::Node& aeroNode);
-    void readMetMenu(OptInput& input, const YAML::Node& metNode);
+    void readMetMenu(OptInput& input, const YAML::Node& metNode, const YAML::Node& paramNode);
     void readDiagMenu(OptInput& input, const YAML::Node& diagNode);
     void readAdvancedMenu(OptInput& input, const YAML::Node& advancedNode);
     

@@ -1,0 +1,12 @@
+prefix=${pcfiledir}/../..
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: hwloc
+Description: Hardware locality detection and management library
+Version: 2.14.0
+Requires.private: libxml-2.0 pciaccess 
+Cflags: -I${includedir}
+Libs: -L${libdir} -lhwloc
+Libs.private: -lm  -L/workspace/destdir/lib/pkgconfig/../../lib -lpciaccess  -L/workspace/destdir/lib/pkgconfig/../../lib -lxml2     -lpthread

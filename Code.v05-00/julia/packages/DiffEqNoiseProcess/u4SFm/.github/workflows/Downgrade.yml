@@ -1,0 +1,24 @@
+name: Downgrade
+on:
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - 'docs/**'
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'docs/**'
+jobs:
+  test:
+    if: false  # Disabled: waiting on upstream dependency updates. See issue #245 for details.
+    name: "Downgrade"
+    strategy:
+      matrix:
+        julia-version: ['1.10']
+    uses: "SciML/.github/.github/workflows/downgrade.yml@v1"
+    with:
+      julia-version: "${{ matrix.julia-version }}"
+      skip: "Pkg,TOML"
+    secrets: "inherit"

@@ -55,6 +55,7 @@ class Input
     double EI_LUB_;
 
     // Background geoengineering parameters
+    int    backgroundGeoengineeringType_;    /*!< 0=None 1=NaCl 2=AgI 3=BiI3 4=Al2O3 5=CaCO3 6=Diamond 7=Dust */
     double backgroundGeoengineeringRho_;
     double backgroundGeoengineeringRadius_;
     double backgroundGeoengineeringNumber_;
@@ -89,6 +90,7 @@ class Input
 
     UInt emissionDay_;
     UInt emissionMonth_;
+    double boxModelDuration_;
 
     private:
     void checkInputValidity();
@@ -124,6 +126,7 @@ class Input
         UInt Case() const { return Case_; }
 
         double simulationTime() const { return simulationTime_; }
+        double boxModelDuration() const { return boxModelDuration_; }
         double temperature_K() const { return temperature_K_; } // From the meteorology
         double pressure_Pa() const { return pressure_Pa_; }
         double relHumidity_w() const { return relHumidity_w_; } // From the meteorology
@@ -160,6 +163,7 @@ class Input
         double EI_LUB() const { return EI_LUB_; }
 
         // Background geoengineering accessors
+        int    backgroundGeoengineeringType()    const { return backgroundGeoengineeringType_; }
         double backgroundGeoengineeringRho() const { return backgroundGeoengineeringRho_; }
         double backgroundGeoengineeringRadius() const { return backgroundGeoengineeringRadius_; }
         double backgroundGeoengineeringNumber() const { return backgroundGeoengineeringNumber_; }

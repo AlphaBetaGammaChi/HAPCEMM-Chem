@@ -1,0 +1,1845 @@
+import NaNMath
+import SpecialFunctions: gamma, loggamma, erf, erfc, erfcinv, erfi, erfcx,
+                         dawson, digamma, trigamma, invdigamma, polygamma,
+                         airyai, airyaiprime, airybi, airybiprime, besselj0,
+                         besselj1, bessely0, bessely1, besselj, bessely, besseli,
+                         besselk, hankelh1, hankelh2, polygamma, beta, logbeta, expint,
+                         expinti, sinint, cosint
+
+const monadic = [deg2rad, rad2deg, asind, log1p, acsch,
+                 acos, asec, acosh, acsc, cscd, log, tand, log10, csch, asinh,
+                 abs2, cosh, sin, cos, atan, cospi, cbrt, acosd, acoth, acotd,
+                 asecd, exp, acot, sqrt, sind, sinpi, asech, log2, tan, exp10,
+                 sech, coth, asin, cotd, cosd, sinh, abs, csc, tanh, secd,
+                 atand, sec, acscd, cot, exp2, expm1, atanh, gamma,
+                 loggamma, erf, erfc, erfcinv, erfi, erfcx, dawson, digamma,
+                 trigamma, invdigamma, polygamma, airyai, airyaiprime, airybi,
+                 airybiprime, besselj0, besselj1, bessely0, bessely1, isfinite,
+                 NaNMath.sin, NaNMath.cos, NaNMath.tan, NaNMath.asin, NaNMath.acos,
+                 NaNMath.acosh, NaNMath.atanh, NaNMath.log, NaNMath.log2,
+                 NaNMath.log10, NaNMath.lgamma, NaNMath.log1p, NaNMath.sqrt, sign,
+                 signbit, ceil, floor, factorial, expint, expinti, sinint, cosint]
+
+const diadic = [max, min, hypot, atan, NaNMath.atanh, mod, rem, copysign,
+                besselj, bessely, besseli, besselk, hankelh1, hankelh2,
+                polygamma, beta, logbeta, NaNMath.pow, expint]
+const previously_declared_for = Set([])
+
+const basic_monadic = [-, +]
+const basic_diadic = [+, -, *, /, //, \, ^]
+#######################################################
+
+@inline function safe_eltype(T::TypeT)
+    if T <: AbstractArray
+        T.parameters[1]::TypeT
+    else
+        T
+    end
+end
+
+@inline function promote_type_fast_path(T::TypeT, S::TypeT)
+    if T === S
+        return T
+    elseif T <: S
+        return S
+    elseif S <: T
+        return T
+    else
+        return promote_type(T, S)::TypeT
+    end
+end
+
+assert_like(@nospecialize(f), @nospecialize(T)) = nothing
+# a and b are objects, arguments gets recursively checked
+function assert_like(f, T, a, b...)
+    @nospecialize f T a b
+    islike(a, T) || throw(ArgumentError(LazyString(
+        "The function ", f, " cannot be applied to ", a,
+        " which is not a ", T, "-like object.",
+        " Define `islike(::", typeof(a), ", ::Type{", T,
+        "}) = true` to enable this.")))
+    assert_like(f, T, b...)
+end
+
+islike(a, T) = symtype(a) <: T
+
+# TODO: keep domains tighter than this
+function number_methods(T, rhs1, rhs2, options=nothing)
+    exprs = []
+
+    skip_basics = options !== nothing ? options == :skipbasics : false
+    only_basics = options !== nothing ? options == :onlybasics : false
+    skips = Meta.isexpr(options, [:vcat, :hcat, :vect]) ? Set(options.args) : []
+
+    rhs2 = :($assert_like(f, Number, a, b); $rhs2)
+    rhs1 = :($assert_like(f, Number, a); $rhs1)
+
+    for f in (skip_basics ? diadic : only_basics ? basic_diadic : vcat(basic_diadic, diadic))
+        nameof(f) in skips && continue
+        for S in previously_declared_for
+            push!(exprs, quote
+                      (f::$(typeof(f)))(a::$T, b::$S) = $rhs2
+                      (f::$(typeof(f)))(a::$S, b::$T) = $rhs2
+                  end)
+        end
+
+        # TODO: modularize and make another macro?
+        expr = quote
+            (f::$(typeof(f)))(a::$T, b::$T) = $rhs2
+            (f::$(typeof(f)))(a::$T, b::Real)   = $rhs2
+            (f::$(typeof(f)))(a::Real, b::$T)   = $rhs2
+            (f::$(typeof(f)))(a::$T, b::Number) = $rhs2
+            (f::$(typeof(f)))(a::Number, b::$T) = $rhs2
+        end
+
+        push!(exprs, expr)
+
+        # Fix method ambiguity error on NaNMath >= 1.0.2 and promotion of `Integer`s on NaNMath < 1.0.2
+        if f === NaNMath.pow
+            push!(exprs, :((f::$(typeof(f)))(a::$T, b::Integer) = a ^ b))
+        end
+    end
+
+    for f in (skip_basics ? monadic : only_basics ? basic_monadic : vcat(basic_monadic, monadic))
+        nameof(f) in skips && continue
+        if f === isfinite
+            push!(exprs, :((f::$(typeof(f)))(a::$T) = true))
+        else
+            push!(exprs, :((f::$(typeof(f)))(a::$T)   = $rhs1))
+        end
+    end
+    push!(exprs, :(push!($previously_declared_for, $T)))
+    Expr(:block, exprs...)
+end
+
+macro number_methods(T, rhs1, rhs2, options=nothing)
+    number_methods(T, rhs1, rhs2, options) |> esc
+end
+
+@number_methods(BasicSymbolic{SymReal},
+                Term{SymReal}(f, ArgsT{SymReal}((Const{SymReal}(a),)); type = promote_symtype(f, symtype(a))),
+                Term{SymReal}(f, ArgsT{SymReal}((Const{SymReal}(a), Const{SymReal}(b))); type = promote_symtype(f, symtype(a), symtype(b))),
+                # Avoid declaring for `exp` since matrix exponential method exists
+                [+, -, *, /, //, \, ^, exp])
+@number_methods(BasicSymbolic{TreeReal},
+                Term{TreeReal}(f, ArgsT{TreeReal}((Const{TreeReal}(a),)); type = promote_symtype(f, symtype(a))),
+                Term{TreeReal}(f, ArgsT{TreeReal}((Const{TreeReal}(a), Const{TreeReal}(b))); type = promote_symtype(f, symtype(a), symtype(b))))
+
+for f in vcat(diadic, [+, -, *, ^, Base.add_sum, Base.mul_prod])
+    @eval function promote_symtype(::$(typeof(f)), T::TypeT, S::TypeT)
+        if T === S
+            return T
+        elseif T <: S
+            return S
+        elseif S <: T
+            return T
+        elseif $(f === (*) || f === Base.mul_prod) && T <: AdjointOrTranspose &&
+                T.parameters[2]::TypeT <: AbstractVector && S <: AbstractVector
+            # `Adjoint` and `Transpose` need special handling since `x'x` is a scalar
+            return promote_symtype($f, T.parameters[1]::TypeT, S.parameters[1]::TypeT)
+        elseif $(f === (*) || f === Base.mul_prod) && T <: AdjointOrTranspose
+            wrapped_arr = T.parameters[2]::TypeT
+            if wrapped_arr.parameters[2]::Int == 1
+                # `AdjointOrTranspose{<:Vector} * anything` should stay an `Adjoint`
+                # This mimics the behavior of e.g. `rand(3)' * rand(3, 4)` being an `Adjoint`
+                pT = promote_symtype($f, wrapped_arr, S)
+                return LinearAlgebra.Adjoint{pT.parameters[1]::TypeT, pT}
+            else
+                return promote_symtype($f, wrapped_arr, S)
+            end
+        elseif $(f === (*) || f === Base.mul_prod) && T <: Number && S <: AdjointOrTranspose
+            # scalar * `AdjointOrTranspose` should retain the `Adjoint`
+            # This handles a multiplication chain with interspersed scalars
+            pT = promote_symtype($f, T, S.parameters[2]::TypeT)
+            return LinearAlgebra.Adjoint{pT.parameters[1]::TypeT, pT}
+        elseif T <: AbstractArray && !(T <: Array)
+            return promote_symtype($f, Array{eltype(T), ndims(T)::Int}, S)
+        elseif S <: AbstractArray && !(S <: Array)
+            return promote_symtype($f, T, Array{eltype(S), ndims(S)::Int})
+        elseif $(f === (*) || f === Base.mul_prod) && T <: AbstractVecOrMat && S <: AbstractVecOrMat
+            return Array{promote_symtype(*, T.parameters[1]::TypeT, S.parameters[1]::TypeT), S.parameters[2]::Int}
+        elseif $(f === (*) || f === Base.mul_prod) && T <: AbstractArray && S <: Number
+            return Array{promote_symtype(*, T.parameters[1]::TypeT, S), T.parameters[2]::Int}
+        elseif $(f === (*) || f === Base.mul_prod) && T <: Number && S <: AbstractArray
+            return Array{promote_symtype(*, T, S.parameters[1]::TypeT), S.parameters[2]::Int}
+        elseif $(f === (+) || f === Base.add_sum || f === (-)) && T <: AbstractArray && S <: AbstractArray
+            nd = T.parameters[2]::Int
+            @assert nd == S.parameters[2]::Int
+            return Array{promote_symtype(+, T.parameters[1]::TypeT, S.parameters[1]::TypeT), nd}
+        elseif $(f === (^)) && T <: Number && S <: AbstractArray
+            nd = S.parameters[2]::Int
+            @assert nd == 2
+            return Matrix{promote_symtype(^, T, S.parameters[1]::TypeT)}
+        elseif $(f === (^)) && T <: AbstractArray && S <: Number
+            nd = T.parameters[2]::Int
+            @assert nd == 2
+            if S <: Integer
+                return Matrix{T.parameters[1]::TypeT}
+            else
+                eT = promote_symtype(^, T.parameters[1]::TypeT, S)
+                if eT <: Complex
+                    return Matrix{eT}
+                elseif eT === Number
+                    return Matrix{Number}
+                else
+                    return Matrix{Complex{eT}}
+                end
+            end
+        elseif T === BigInt && S === BigFloat
+            return BigFloat
+        elseif T === BigFloat && S === BigInt
+            return BigFloat
+        elseif T === BigInt
+            return promote_symtype($f, Integer, S)
+        elseif S === BigInt
+            return promote_symtype($f, T, Integer)
+        elseif T === BigFloat
+            return promote_symtype($f, Real, S)
+        elseif S === BigFloat
+            return promote_symtype($f, T, Real)
+        elseif T <: Rational && S <: Integer
+            return Real
+        elseif T <: Integer && S <: Rational
+            return Real
+        elseif T <: Complex{<:Rational} && S <: Integer
+            return Complex{Real}
+        elseif T <: Integer && S <: Complex{<:Rational}
+            return Complex{Real}
+        else
+            return promote_type(T, S)::TypeT
+        end
+    end
+end
+
+for f in [/, \]
+    @eval function promote_symtype(::$(typeof(f)), T::TypeT, S::TypeT)
+        if T <: Integer && S <: Integer
+            return Real
+        elseif T <: Integer && S <: Rational
+            return Real
+        elseif T <: Rational && S <: Integer
+            return Real
+        elseif T <: AbstractArray && !(T <: Array)
+            return promote_symtype($f, Array{eltype(T), ndims(T)::Int}, S)
+        elseif S <: AbstractArray && !(S <: Array)
+            return promote_symtype($f, T, Array{eltype(S), ndims(S)::Int})
+        elseif $(f === (\)) && T <: Number && S <: AbstractArray
+            return Array{promote_symtype(/, T, S.parameters[1]::TypeT), S.parameters[2]::Int}
+        elseif $(f === (\)) && T <: AbstractVector && S <: AbstractVector
+            return promote_symtype(/, T.parameters[1]::TypeT, S.parameters[1]::TypeT)
+        elseif $(f === (\)) && T <: AbstractVecOrMat && S <: AbstractMatrix
+            return Matrix{promote_symtype(/, T.parameters[1]::TypeT, S.parameters[1]::TypeT)}
+        elseif $(f === (\)) && T <: AbstractMatrix && S <: AbstractVector
+            return Vector{promote_symtype(/, T.parameters[1]::TypeT, S.parameters[1]::TypeT)}
+        elseif $(f === (/)) && T <: AbstractVecOrMat && S <: AbstractVecOrMat
+            # we don't actually care about specifically making the Mat/Vec case error because
+            # `promote_shape` handles it with a much nicer error message than we can give here.
+            return Matrix{promote_symtype(/, T.parameters[1]::TypeT, S.parameters[1]::TypeT)}
+        elseif $(f === (/)) && T <: Number && S <: AbstractVector
+            return Matrix{promote_symtype(/, T, S.parameters[1]::TypeT)}
+        elseif $(f === (/)) && T <: AbstractArray && S <: Number
+            return Array{promote_symtype(/, T.parameters[1]::TypeT, S), T.parameters[2]::Int}
+        elseif T <: Complex && S <: Complex
+            return Complex{promote_symtype(/, T.parameters[1]::TypeT, S.parameters[1]::TypeT)}
+        elseif T <: Complex
+            eT = promote_symtype(/, T.parameters[1]::TypeT, S)
+            return eT === Number ? eT : Complex{eT}
+        elseif S <: Complex
+            eT = promote_symtype(/, T, S.parameters[1]::TypeT)
+            return eT === Number ? eT : Complex{eT}
+        else
+            return promote_type(promote_type(T, S)::TypeT, Real)::TypeT
+        end
+    end
+end
+
+promote_symtype(::typeof(identity), T::TypeT) = T
+promote_shape(::typeof(identity), @nospecialize(sh::ShapeT)) = sh
+
+function _sequential_promote(T::TypeT, Ts::TypeT...)
+    T = T === Nothing ? Union{} : T
+    for _T in Ts
+        _T === Nothing && continue
+        T = promote_type(T, _T)::TypeT
+    end
+    return T::TypeT
+end
+
+
+function promote_symtype(::typeof(tuple), Ts::TypeT...)
+    return Tuple{Ts...}::TypeT
+end
+function promote_shape(::typeof(tuple), @nospecialize(shs::ShapeT...))
+    return ShapeVecT((1:length(shs),))
+end
+
+function promote_symtype(::typeof(array_literal), Tp::TypeT, Ts::TypeT...)
+    @assert Tp <: Tuple
+    return Array{_sequential_promote(Ts...), length(Tp.parameters)}
+end
+
+function promote_symtype(::Type{T}, args::TypeT...) where {T <: StaticArraysCore.StaticArray}
+    # We don't gain anything by making the symtype `SArray`, just more cases to handle
+    return Array{_sequential_promote(args...), ndims(T)}
+end
+
+function promote_shape(::Type{T}, @nospecialize(shs::ShapeT...)) where {T <: StaticArraysCore.StaticArray}
+    return ShapeVecT((:).(1, size(T)))
+end
+
+promote_symtype(::typeof(rem2pi), T::TypeT, mode::TypeT) = T
+
+@noinline function _throw_array(f, shs...)
+    throw(ArgumentError(LazyString("Invalid shapes for ", f, ": ", shs, ".")))
+end
+
+for f in diadic
+    f === NaNMath.pow && continue
+    @eval function promote_shape(::$(typeof(f)), sh1::ShapeT, sh2::ShapeT)
+        @nospecialize sh1 sh2
+        is_array_shape(sh1) && _throw_array($f, sh1, sh2)
+        is_array_shape(sh2) && _throw_array($f, sh1, sh2)
+        return ShapeVecT()
+    end
+end
+promote_shape(::typeof(NaNMath.pow), @nospecialize(shs::ShapeT...)) = promote_shape(^, shs...)
+
+for f in monadic
+    if f === log || f === NaNMath.log
+        @eval function promote_shape(::$(typeof(f)), sh::ShapeT)
+            @nospecialize sh
+            if sh isa Unknown
+                sh.ndims == -1 && return sh
+                sh.ndims == 2 && return sh
+            elseif sh isa ShapeVecT
+                length(sh) == 0 && return sh
+                length(sh) == 2 && return sh
+            end
+            _throw_array($f, sh)
+        end
+    elseif f !== exp
+        @eval function promote_shape(::$(typeof(f)), sh::ShapeT)
+            @nospecialize sh
+            is_array_shape(sh) && _throw_array($f, sh)
+            return ShapeVecT()
+        end
+    end
+end
+
+function promote_symtype(::typeof(exp), T::TypeT)
+    if T === Real
+        return Real
+    elseif T === Number
+        return Number
+    elseif T <: Integer
+        return Real
+    elseif T <: Rational
+        return Real
+    elseif T <: Complex
+        return Complex{promote_symtype(exp, T.parameters[1]::TypeT)}
+    elseif T <: Number
+        return T
+    elseif T <: Array
+        eT = T.parameters[1]::TypeT
+        eT <: Number || error_f_symbolic(exp, T)
+        nd = T.parameters[2]::Int
+        nd == 2 || error_f_symbolic(exp, T)
+        return Array{promote_symtype(exp, eT), nd}
+    elseif T <: AdjointOrTranspose
+        eT = T.parameters[1]::TypeT
+        eT <: Number || error_f_symbolic(exp, T)
+        eT = promote_symtype(exp, eT)
+        # We can always assume the second type parameter is a matrix, since vectors aren't
+        # square and then `promote_shape` will error. The exception is 1-vectors, in which
+        # case this doesn't really matter since the `exp` is a `Matrix` so `exp(v')v` won't
+        # be a scalar anyway.
+        return LinearAlgebra.Adjoint{eT, Matrix{eT}}
+    elseif T <: AbstractMatrix
+        return Matrix{promote_symtype(exp, T.parameters[1]::TypeT)}
+    else
+        error_f_symbolic(exp, T)
+    end
+end
+
+@noinline function _throw_not_square(sh)
+    throw(ArgumentError(LazyString("Expected square matrix, got argument of shape ", sh)))
+end
+
+function promote_shape(::typeof(exp), sh::ShapeT)
+    @nospecialize sh
+    if sh isa Unknown
+        sh.ndims == -1 || sh.ndims == 2 || _throw_not_matrix(sh)
+        return sh
+    elseif sh isa ShapeVecT
+        length(sh) == 0 && return sh
+        length(sh) == 2 || _throw_not_matrix(sh)
+        length(sh[1]) == length(sh[2]) || _throw_not_square(sh)
+        return sh
+    end
+    _unreachable()
+end
+
+function Base.exp(x::BasicSymbolic{T}) where {T}
+    type = promote_symtype(exp, symtype(x))
+    sh = promote_shape(exp, shape(x))
+    return BSImpl.Term{T}(exp, ArgsT{T}((x,)); type, shape = sh)
+end
+
+error_f_symbolic(f, T) = error(LazyString(f, " is not defined for ", T, "."))
+
+function promote_shape(::typeof(rem2pi), sha::ShapeT, shb::ShapeT)
+    is_array_shape(sha) && _throw_array(rem2pi, sha, shb)
+    ShapeVecT()
+end
+function Base.rem2pi(x::BasicSymbolic{T}, mode::Base.RoundingMode) where {T}
+    type = symtype(x)
+    type <: Number || error_f_symbolic(rem2pi, type)
+    return Term{T}(rem2pi, ArgsT{T}((x, Const{T}(mode))); type)
+end
+
+function promote_symtype(::typeof(inv), T::TypeT)
+    if T <: Number
+        return promote_symtype(/, T, T)
+    elseif T <: AbstractMatrix
+        return Matrix{promote_symtype(/, T.parameters[1]::TypeT)}
+    else
+        error(LazyString("Cannot call `inv` on ", T, "."))
+    end
+end
+function promote_shape(::typeof(inv), sh::ShapeT)
+    @nospecialize sh
+    if sh isa Unknown
+        sh.ndims == -1 && return sh
+        sh.ndims == 2 && return sh
+    elseif sh isa ShapeVecT
+        length(sh) == 0 && return sh
+        length(sh) == 2 && return ShapeVecT((sh[2], sh[1]))
+    end
+    _throw_array(inv, sh)
+end
+
+# Specially handle inv and literal pow
+function Base.inv(x::BasicSymbolic{T}) where {T}
+    sh = shape(x)
+    type = promote_symtype(inv, symtype(x))
+    if is_array_shape(sh)
+        return Term{T}(inv, ArgsT{T}((x,)); type = type, shape = sh)
+    else
+        return x ^ (-1)
+    end
+end
+function Base.literal_pow(::typeof(^), x::BasicSymbolic{T}, ::Val{p}) where {T, p}
+    _numeric_or_arrnumeric_symtype(x) || error_f_symbolic(^, symtype(x))
+    return Const{T}(x ^ p)
+end
+function promote_symtype(::typeof(Base.literal_pow), ::TypeT, T::TypeT, ::Type{Val{S}}) where {S}
+    return promote_symtype(^, T, typeof(S))
+end
+
+promote_symtype(::Any, T) = promote_type(T, Real)
+for f in monadic
+    if f in [sign, signbit, ceil, floor, factorial, exp]
+        continue
+    end
+    @eval function promote_symtype(::$(typeof(f)), T::TypeT)
+        # equivalent to `promote_type(T, Real)`
+        if T === Number
+            return Number
+        elseif T === Real
+            return Real
+        elseif T <: Complex
+            return Complex{Real}
+        else
+            return Real
+        end
+    end
+end
+
+"""
+promote_symtype(f::ComposedFunction, arg_symtypes::TypeT...)
+
+Compute the symbolic type of applying a composed function to arguments.
+
+For a composed function `f ∘ g ∘ h`, this computes the result type by propagating
+type information from the innermost function outward:
+1. Apply `h` to the input argument types
+2. Use that result type as input to `g`
+3. Use that result type as input to `f`
+
+This implementation assumes each function returns a single value that becomes
+the argument to the next function. Multi-argument returns (tuples) are not
+currently supported but could be added if needed.
+"""
+function promote_symtype(f::Base.ComposedFunction, arg_symtypes::TypeT...)
+    inner_result = promote_symtype(f.inner, arg_symtypes...)
+    return promote_symtype(f.outer, inner_result)
+end
+
+for f in [one, zero, *, +, -]
+    @eval promote_symtype(::$(typeof(f)), T::TypeT) = T
+end
+
+for f in [real, imag]
+    @eval function promote_symtype(::$(typeof(f)), T::TypeT)
+        if T <: Complex
+            return T.parameters[1]::TypeT
+        else
+            return T
+        end
+    end
+end
+for f in [real, imag, conj]
+    @eval function promote_shape(::typeof($f), sh::ShapeT)
+        @nospecialize sh
+        return sh
+    end
+end
+function Base.real(s::BasicSymbolic{T}) where {T}
+    islike(s, Real) && return s
+    @match s begin
+        BSImpl.Const(; val) => Const{T}(real(val))
+        BSImpl.Term(; f, args) && if f === complex && length(args) == 2 end => args[1]
+        _ => Term{T}(real, ArgsT{T}((s,)); type = Real)
+    end
+end
+promote_symtype(::typeof(Base.conj), T::TypeT) = T
+function Base.conj(s::BasicSymbolic{T}) where {T}
+    eltype(symtype(s)) <: Real && return s
+    @match s begin
+        BSImpl.Const(; val) => Const{T}(conj(val))
+        BSImpl.Term(; f, args, type, shape) && if f === complex && length(args) == 2 end => begin
+            BSImpl.Term{T}(f, ArgsT{T}(args[1], -args[2]); type, shape)
+        end
+        _ => Term{T}(conj, ArgsT{T}((s,)); type = symtype(s), shape = shape(s))
+    end
+end
+function Base.imag(s::BasicSymbolic{T}) where {T}
+    islike(s, Real) && return zero_of_vartype(T)
+    @match s begin
+        BSImpl.Const(; val) => Const{T}(imag(val))
+        BSImpl.Term(; f, args) && if f === complex && length(args) == 2 end => args[2]
+        _ => Term{T}(imag, ArgsT{T}((s,)); type = Real)
+    end
+end
+
+function promote_symtype(::typeof(adjoint), T::TypeT)
+    if T <: Number
+        return T
+    elseif T <: AbstractVecOrMat
+        return LinearAlgebra.Adjoint{T.parameters[1]::TypeT, T}
+    else
+        error(LazyString("Invalid type ", T, " for `adjoint`"))
+    end
+end
+
+@noinline function _throw_adjont_vec_or_mat(sh)
+    throw(ArgumentError(LazyString("`adjoint` is only applicable to vectors and matrices - found argument of shape ", sh, ".")))
+end
+
+function promote_shape(::typeof(adjoint), @nospecialize(sh::ShapeT))
+    ndims = _ndims_from_shape(sh)
+    ndims > 2 && _throw_adjont_vec_or_mat(sh)
+    if sh isa Unknown
+        ndims == 0 && _throw_adjont_vec_or_mat(sh)
+        return Unknown(2)
+    elseif sh isa ShapeVecT
+        ndims == 0 && return ShapeVecT()
+        return ShapeVecT((ndims == 1 ? (1:1) : sh[2], sh[1]))
+    end
+end
+
+function Base.adjoint(s::BasicSymbolic{T}) where {T}
+    @match s begin
+        BSImpl.Const(; val) => return Const{T}(adjoint(val))
+        _ => nothing
+    end
+    sh = shape(s)
+    stype = symtype(s)
+    if is_array_shape(sh)
+        type = promote_symtype(adjoint, stype)
+        newsh = promote_shape(adjoint, sh)
+        return Term{T}(adjoint, ArgsT{T}((s,)); type, shape = newsh)
+    elseif stype <: Real
+        return s
+    else
+        return conj(s)
+    end
+end
+
+promote_symtype(::typeof(transpose), T::TypeT) = promote_symtype(adjoint, T)
+promote_shape(::typeof(transpose), @nospecialize(sh::ShapeT)) = promote_shape(adjoint, sh)
+
+function Base.transpose(s::BasicSymbolic{T}) where {T}
+    @match s begin
+        BSImpl.Const(; val) => return Const{T}(transpose(val))
+        _ => nothing
+    end
+    sh = shape(s)
+    stype = symtype(s)
+    if is_array_shape(sh)
+        type = promote_symtype(transpose, stype)
+        newsh = promote_shape(transpose, sh)
+        return Term{T}(transpose, ArgsT{T}((s,)); type, shape = newsh)
+    else
+        return s
+    end
+end
+
+## Booleans
+
+function promote_symtype(::typeof(==), T::TypeT, S::TypeT)
+    return Bool
+end
+function promote_shape(::typeof(==), sha::ShapeT, shb::ShapeT)
+    @nospecialize sha shb
+    return ShapeVecT()
+end
+function promote_symtype(::typeof(!=), T::TypeT, S::TypeT)
+    return Bool
+end
+function promote_shape(::typeof(!=), sha::ShapeT, shb::ShapeT)
+    @nospecialize sha shb
+    return ShapeVecT()
+end
+
+# binary ops that return Bool
+for (f, Domain) in [(==) => Number, (!=) => Number,
+                    (<=) => Real,   (>=) => Real,
+                    (isless) => Real,
+                    (<) => Real,
+                    (& ) => Bool,   (| ) => Bool,
+                    xor => Bool]
+    if f !== (==) && f !== (!=)
+        @eval begin
+            function promote_symtype(::$(typeof(f)), T::TypeT, S::TypeT)
+                @assert T <: $Domain
+                @assert S <: $Domain
+                return Bool
+            end
+            function promote_shape(::$(typeof(f)), sha::ShapeT, shb::ShapeT)
+                @nospecialize sha shb
+                is_array_shape(sha) && _throw_array($f, sha, shb)
+                is_array_shape(shb) && _throw_array($f, sha, shb)
+                return ShapeVecT()
+            end
+        end
+    end
+    @eval begin
+        function (::$(typeof(f)))(a::BasicSymbolic{T}, b::$Domain) where {T}
+            if !(symtype(a) <: $Domain)
+                throw(MethodError($f, (a, b)))
+            end
+            Term{T}($f, ArgsT{T}((a, Const{T}(b))); type = Bool)
+        end
+        function (::$(typeof(f)))(a::$Domain, b::BasicSymbolic{T}) where {T}
+                if !(symtype(b) <: $Domain)
+                    throw(MethodError($f, (a, b)))
+                end
+                Term{T}($f, ArgsT{T}((Const{T}(a), b)); type = Bool)
+        end
+        function (::$(typeof(f)))(a::BasicSymbolic{T}, b::BasicSymbolic{T}) where {T}
+                if !(symtype(b) <: $Domain) || !(symtype(a) <: $Domain)
+                    throw(MethodError($f, (a, b)))
+                end
+                Term{T}($f, ArgsT{T}((a, b)); type = Bool)
+        end
+    end
+end
+
+for f in [!, ~]
+    @eval begin
+        function promote_symtype(::$(typeof(f)), T::TypeT)
+            @assert T === Bool
+            Bool
+        end
+        function promote_shape(::$(typeof(f)), sha::ShapeT)
+            @nospecialize sha
+            is_array_shape(sha) && _throw_array($f, sha)
+            return ShapeVecT()
+        end
+        function (::$(typeof(f)))(s::BasicSymbolic{T}) where {T}
+            type = symtype(s)
+            if type !== Bool
+                throw(MethodError(!, (s,)))
+            end
+            Term{T}(!, ArgsT{T}((s,)); type)
+        end
+    end
+end
+
+
+# An ifelse node
+function Base.ifelse(_if::BasicSymbolic{T}, _then, _else) where {T}
+    type = promote_symtype(ifelse, symtype(_if), symtype(_then), symtype(_else))
+    sh = promote_shape(ifelse, shape(_if), shape(_then), shape(_else))
+    Term{T}(ifelse, ArgsT{T}((_if, _then, _else)); type, shape = sh)
+end
+function promote_symtype(::typeof(ifelse), C::TypeT, T::TypeT, S::TypeT)
+    C === Bool || throw(ArgumentError("Condition of `ifelse` must be a `Bool`"))
+    return promote_type_fast_path(T, S)
+end
+function promote_shape(::typeof(ifelse), shc::ShapeT, sht::ShapeT, shf::ShapeT)
+    @nospecialize shc sht shf
+    is_array_shape(shc) && error("Condition of `ifelse` cannot be an array.")
+    sht == shf || error("Both branches of `ifelse` must have the same shape.")
+    return sht
+end
+
+"""
+    ifelse_eager(cond, x, y)
+
+Conditional that builds the same kind of symbolic expression as `ifelse`, but **always lowers
+to an eager `ifelse` call** during code generation: both branches `x` and `y` are evaluated
+unconditionally and `cond` selects between the computed values.
+
+Use it when both branches are always valid to evaluate and branch-free code is desirable (e.g.
+to keep generated code vectorizable/SIMD-friendly or GPU-divergence-free). Contrast with
+[`ifelse_branching`](@ref), which never evaluates the untaken branch.
+
+`ifelse`, `ifelse_eager` and `ifelse_branching` differ only in how code generation lowers them;
+`ifelse` is the default and is intended to eventually pick a strategy via a cost heuristic.
+"""
+ifelse_eager(cond, x, y) = ifelse(cond, x, y)
+
+"""
+    ifelse_branching(cond, x, y)
+
+Conditional that builds the same kind of symbolic expression as `ifelse`, but **always lowers
+to an `if`/`else` branch** during code generation, so that only the taken branch is evaluated.
+The untaken branch's code is emitted inside the branch and is never executed when `cond`
+selects the other branch — even under common-subexpression elimination (`ifelse_branching`
+opts out of CSE for the conditional via [`cse_inside_expr`](@ref)).
+
+Use it when a branch is only valid to evaluate when its condition holds (it divides by a
+quantity that is zero otherwise, indexes into something that does not exist, errors, or
+produces `NaN`/`Inf`). Contrast with [`ifelse_eager`](@ref), which evaluates both branches.
+
+`ifelse`, `ifelse_eager` and `ifelse_branching` differ only in how code generation lowers them;
+`ifelse` is the default and is intended to eventually pick a strategy via a cost heuristic.
+
+!!! note
+    Opting the conditional out of CSE also means the `ifelse_branching` node itself is not
+    bound to a shared temporary, so when its result is referenced at multiple sites the
+    generated `if`/`else` is duplicated at each use (the branches stay lazy and the computed
+    values are unchanged).
+"""
+ifelse_branching(cond, x, y) = cond ? x : y
+
+# Symbolic nodes and type/shape promotion for the two variants mirror `ifelse`.
+for op in (:ifelse_eager, :ifelse_branching)
+    @eval begin
+        function $op(_if::BasicSymbolic{T}, _then, _else) where {T}
+            type = promote_symtype($op, symtype(_if), symtype(_then), symtype(_else))
+            sh = promote_shape($op, shape(_if), shape(_then), shape(_else))
+            Term{T}($op, ArgsT{T}((_if, _then, _else)); type, shape = sh)
+        end
+        function promote_symtype(::typeof($op), C::TypeT, T::TypeT, S::TypeT)
+            return promote_symtype(ifelse, C, T, S)
+        end
+        function promote_shape(::typeof($op), shc::ShapeT, sht::ShapeT, shf::ShapeT)
+            @nospecialize shc sht shf
+            return promote_shape(ifelse, shc, sht, shf)
+        end
+    end
+end
+
+# Array-like operations
+Base.IndexStyle(::Type{<:BasicSymbolic}) = Base.IndexCartesian()
+function _size_from_shape(shape::ShapeT)
+    @nospecialize shape
+    if shape isa Unknown
+        return shape
+    else
+        return Tuple(map(length, shape))
+    end
+end
+Base.size(x::BasicSymbolic) = _size_from_shape(shape(x))
+function Base.size(x::BasicSymbolic, i::Integer)
+    sh = shape(x)
+    if sh isa Unknown
+        return sh
+    elseif sh isa ShapeVecT
+        return length(sh[i])
+    end
+    _unreachable()
+end
+Base.axes(x::BasicSymbolic) = Tuple(shape(x))
+Base.axes(x::BasicSymbolic, i::Integer) = shape(x)[i]
+function _length_from_shape(sh::ShapeT)
+    @nospecialize sh
+    if sh isa Unknown
+        return sh
+    else
+        len = 1
+        for dim in sh
+            len *= length(dim)
+        end
+        return len
+    end
+end
+Base.length(x::BasicSymbolic) = _length_from_shape(shape(x))
+function _ndims_from_shape(sh::ShapeT)
+    @nospecialize sh
+    if sh isa Unknown
+        return sh.ndims
+    else
+        return length(sh)
+    end
+end
+Base.ndims(x::BasicSymbolic) = _ndims_from_shape(shape(x))
+Base.broadcastable(x::BasicSymbolic) = is_array_shape(shape(x)) ? x : Ref(x)
+function Base.eachindex(x::BasicSymbolic)
+    sh = shape(x)
+    if sh isa Unknown
+        throw(ArgumentError(LazyString("Indices of variable ", x, " with unknown shape ", sh, " are not defined.")))
+        # throw(ArgumentError("Indices of variable $x with unknown shape $sh are not defined."))
+    end
+    CartesianIndices(Tuple(sh))
+end
+
+"""
+    $TYPEDEF
+
+An iterator that produces [`StableIndex`](@ref) values representing all possible
+multi-dimensional indices for a given shape in a type-stable, allocation-efficient manner.
+
+This type is used to iterate over multi-dimensional index spaces where each
+dimension can have its own range (stored in `sh`). The iterator produces all
+combinations of indices in column-major order, similar to `CartesianIndices`,
+but with better type stability and allocation characteristics.
+
+This is similar to `CartesianIndices` for symbolic arrays, but avoids type-instability due
+to the type parameters of `CartesianIndices` being uninferrable. Note that iterator
+iterates over multidimensional indices, but is not a multidimensional iterator. In other
+words, `collect`ing this iterator will return a vector regardless of the number of
+dimensions it iterates over.
+
+# Fields
+$TYPEDFIELDS
+
+# Examples
+```julia
+sh = ShapeVecT([1:2, 1:3])
+indices = StableIndices(sh)
+for idx in indices
+    # idx is a StableIndex with values like [1,1], [1,2], [1,3], [2,1], [2,2], [2,3]
+end
+```
+
+# See also
+- [`StableIndex`](@ref): The index type produced by this iterator.
+- [`stable_eachindex`](@ref): Convenience function that returns a `StableIndices` iterator for a symbolic array.
+"""
+struct StableIndices
+    """
+    A small vector of `UnitRange{Int}` values, one for each dimension, defining the range
+    of valid indices for that dimension.
+    """
+    sh::ShapeVecT
+end
+
+Base.length(x::StableIndices) = prod(length, x.sh; init = 1)
+Base.eltype(::Type{StableIndices}) = StableIndex{Int}
+Base.keys(x::StableIndices) = Base.OneTo(length(x))
+
+function Base.iterate(x::StableIndices)
+    idx = SmallV{Int}()
+    resize!(idx, length(x.sh))
+    for i in eachindex(x.sh)
+        idx[i] = first(x.sh[i])
+    end
+    idx = StableIndex(idx)
+    return idx, idx
+end
+function Base.iterate(x::StableIndices, st::StableIndex)
+    idxs = st.idxs
+    buffer = copy(idxs)
+    i = 1
+    N = length(x.sh)
+    while i <= N
+        buffer[i] += 1
+        buffer[i] > last(x.sh[i]) || break
+        buffer[i] = first(x.sh[i])
+        i += 1
+    end
+    i <= N || return nothing
+    idxs = StableIndex(buffer)
+    return idxs, idxs
+end
+function Base.getindex(x::StableIndices, idx::Integer)
+    buffer = SmallV{Int}()
+    N = length(x.sh)
+    idx -= 1
+    for i in 1:N
+        push!(buffer, idx % length(x.sh[i]) + first(x.sh[i]))
+        idx ÷= length(x.sh[i])
+    end
+    return StableIndex(buffer)
+end
+
+"""
+    $TYPEDSIGNATURES
+
+Returns a type-stable iterator over all indices of a symbolic array `x`.
+
+This function provides an efficient, allocation-friendly way to iterate over
+multi-dimensional symbolic arrays. Unlike `Base.eachindex`, which returns
+`CartesianIndices` with type parameters that may be uninferrable for symbolic
+arrays, `stable_eachindex` returns a [`StableIndices`](@ref) iterator that
+produces [`StableIndex`](@ref) values in a fully type-stable manner.
+
+Note that the returned iterator does not match the shape of `x`. In other
+words, `collect(stable_eachindex(x))` will be a vector regardless of the shape
+of `x`.
+
+# Arguments
+- `x::BasicSymbolic`: A symbolic array expression with a known concrete shape.
+
+# Returns
+- `StableIndices`: An iterator that yields `StableIndex` values for each position in the array.
+
+# Throws
+- This function assumes `x` has a concrete shape (i.e., `shape(x)` is a `ShapeVecT`,
+  not `Unknown`). If the shape is unknown, it will error.
+
+# Examples
+```julia
+using SymbolicUtils
+
+# Create a symbolic 2×3 matrix
+@variables x[1:2, 1:3]
+
+# Iterate over all indices in a type-stable manner
+for idx in stable_eachindex(x)
+    println("Index: ", idx, " -> Value: ", x[idx])
+end
+
+# Compare with regular eachindex
+for idx in eachindex(x)  # Returns CartesianIndices
+    println("Index: ", idx, " -> Value: ", x[idx])
+end
+```
+
+# See also
+- [`StableIndices`](@ref): The iterator type returned by this function
+- [`StableIndex`](@ref): The index type produced by `StableIndices`
+- `Base.eachindex`: The standard Julia function for iterating over array indices
+"""
+function stable_eachindex(x::BasicSymbolic)
+    StableIndices(shape(x)::ShapeVecT)
+end
+function Base.collect(x::BasicSymbolic)
+    scalarize(x, Val{true}())
+end
+function Base.iterate(x::BasicSymbolic)
+    sh = shape(x)
+    is_array_shape(sh) || return x, nothing
+    idxs = eachindex(x)
+    idx, state = iterate(idxs)
+    return x[idx], (idxs, state)
+end
+function Base.iterate(x::BasicSymbolic, _state)
+    _state === nothing && return nothing
+    idxs, state = _state
+    innerstate = iterate(idxs, state)
+    innerstate === nothing && return nothing
+    idx, state = innerstate
+    return x[idx], (idxs, state)
+end
+function Base.isempty(x::BasicSymbolic)
+    sh = shape(x)
+    if sh isa Unknown
+        return false
+    elseif sh isa ShapeVecT
+        return _length_from_shape(sh) == 0
+    end
+    _unreachable()
+end
+
+promote_symtype(::Type{CartesianIndex}, xs::TypeT...) = CartesianIndex{length(xs)}
+promote_symtype(::Type{CartesianIndex{N}}, xs::Vararg{TypeT, N}) where {N} = CartesianIndex{N}
+function promote_shape(::Type{CartesianIndex}, xs::ShapeT...)
+    @nospecialize xs
+    @assert all(!is_array_shape, xs)
+    return ShapeVecT((1:length(xs),))
+end
+function promote_shape(::Type{CartesianIndex{N}}, xs::Vararg{ShapeT, N}) where {N}
+    @nospecialize xs
+    @assert all(!is_array_shape, xs)
+    return ShapeVecT((1:length(xs),))
+end
+function Base.CartesianIndex(x::BasicSymbolic{T}, xs::BasicSymbolic{T}...) where {T}
+    @assert symtype(x) <: Integer
+    @assert all(x -> symtype(x) <: Integer, xs)
+    type = promote_symtype(CartesianIndex, symtype(x), symtype.(xs)...)
+    sh = promote_shape(CartesianIndex, shape(x), shape.(xs)...)
+    BSImpl.Term{T}(CartesianIndex{length(xs) + 1}, ArgsT{T}((x, xs...)); type, shape = sh)
+end
+
+for (f, vT) in [(sign, Number), (ceil, Number), (floor, Number), (factorial, Integer)]
+    @eval function promote_symtype(::typeof($f), T::TypeT)
+        @assert T <: $vT
+        return T
+    end
+end
+
+function promote_symtype(::typeof(signbit), T::TypeT)
+    @assert T <: Number
+    return Bool
+end
+
+function promote_symtype(::typeof(clamp),
+                         T::TypeT,
+                         S::TypeT,
+                         R::TypeT)
+    if T <: Number && S <: Number && R <: Number
+        return promote_type_fast_path(T, promote_type_fast_path(S, R))
+    elseif T <: AbstractVector && S <: AbstractVector && R <: AbstractVector
+        return Vector{promote_symtype(clamp, T.parameters[1]::TypeT, S.parameters[1]::TypeT, R.parameters[1]::TypeT)}
+    else
+        error(LazyString("Invalid types for `clamp`: ", T, ", ", S, ", ", R, "."))
+    end
+end
+
+function promote_shape(::typeof(clamp), sh1::ShapeT, sh2::ShapeT, sh3::ShapeT)
+    @nospecialize sh1 sh2 sh3
+    nd1 = _ndims_from_shape(sh1)
+    nd2 = _ndims_from_shape(sh2)
+    nd3 = _ndims_from_shape(sh3)
+    maxd = max(nd1, nd2, nd3)
+    @assert maxd <= 1
+    if maxd >= 0
+        @assert nd1 == -1 || nd1 == maxd
+        @assert nd2 == -1 || nd2 == maxd
+        @assert nd3 == -1 || nd3 == maxd
+    end
+    if maxd == 0
+        return ShapeVecT()
+    elseif sh1 isa ShapeVecT
+        return ShapeVecT((1:length(sh1[1])))
+    elseif sh2 isa ShapeVecT
+        return ShapeVecT((1:length(sh2[1])))
+    elseif sh3 isa ShapeVecT
+        return ShapeVecT((1:length(sh3[1])))
+    else
+        return Unknown(1)
+    end
+end
+
+for valT in [Number, AbstractVector{<:Number}]
+    for (T1, T2, T3) in Iterators.product(Iterators.repeated((valT, :(BasicSymbolic{T})), 3)...)
+        if T1 == T2 == T3 == valT
+            continue
+        end
+        if valT != Number && T1 == T2 == T3
+            continue
+        end
+        @eval function Base.clamp(a::$T1, b::$T2, c::$T3) where {T}
+            isconst(a) && isconst(b) && isconst(c) && return Const{T}(clamp(unwrap_const(a), unwrap_const(b), unwrap_const(c)))
+            sh = promote_shape(clamp, shape(a), shape(b), shape(c))
+            type = promote_symtype(clamp, symtype(a), symtype(b), symtype(c))
+            return BSImpl.Term{T}(clamp, ArgsT{T}((Const{T}(a), Const{T}(b), Const{T}(c))); type, shape = sh)
+        end
+    end
+end
+
+struct SymBroadcast{T <: SymVariant} <: Broadcast.BroadcastStyle end
+Broadcast.BroadcastStyle(::Type{BasicSymbolic{T}}) where {T} = SymBroadcast{T}()
+Broadcast.BroadcastStyle(::SymBroadcast{T}, ::Broadcast.BroadcastStyle) where {T} = SymBroadcast{T}()
+Broadcast.BroadcastStyle(::SymBroadcast{T}, ::SymBroadcast{T}) where {T} = SymBroadcast{T}()
+function Broadcast.BroadcastStyle(::SymBroadcast{T}, ::SymBroadcast{R}) where {T, R}
+    throw(ArgumentError(LazyString("Cannot broadcast symbolics of different `vartype`s ", T, " and ", R, ".")))
+end
+
+mutable struct BroadcastBuffer{T}
+    canonical_args::Vector{BasicSymbolic{T}}
+    args::ArgsT{T}
+    getindex_args::ArgsT{T}
+end
+
+BroadcastBuffer{T}() where {T} = BroadcastBuffer{T}(BasicSymbolic{T}[], ArgsT{T}(), ArgsT{T}())
+
+function Base.empty!(bb::BroadcastBuffer)
+    empty!(bb.canonical_args)
+    empty!(bb.args)
+    empty!(bb.getindex_args)
+    return bb
+end
+
+function maybe_reallocate_getindex_buffer!(bb::BroadcastBuffer{T}, term::BasicSymbolic{T}) where {T}
+    @match term begin
+        BSImpl.Term(; args) && if args === bb.getindex_args end => begin
+            bb.getindex_args = ArgsT{T}()
+        end
+        _ => empty!(bb.getindex_args)
+    end
+    return nothing
+end
+function maybe_reallocate_args_buffer!(bb::BroadcastBuffer{T}, term::BasicSymbolic{T}) where {T}
+    @match term begin
+        BSImpl.Term(; args) && if args === bb.args end => begin
+            bb.args = ArgsT{T}()
+        end
+        _ => empty!(bb.args)
+    end
+    return nothing
+end
+
+const SYMREAL_BROADCAST_BUFFER = TaskLocalValue{BroadcastBuffer{SymReal}}(BroadcastBuffer{SymReal})
+const SAFEREAL_BROADCAST_BUFFER = TaskLocalValue{BroadcastBuffer{SafeReal}}(BroadcastBuffer{SafeReal})
+const TREEREAL_BROADCAST_BUFFER = TaskLocalValue{BroadcastBuffer{TreeReal}}(BroadcastBuffer{TreeReal})
+
+broadcast_buffer(::Type{SymReal}) = SYMREAL_BROADCAST_BUFFER[]
+broadcast_buffer(::Type{SafeReal}) = SAFEREAL_BROADCAST_BUFFER[]
+broadcast_buffer(::Type{TreeReal}) = TREEREAL_BROADCAST_BUFFER[]
+
+function Broadcast.copy(bc::Broadcast.Broadcasted{SymBroadcast{T}}) where {T}
+    buffer = broadcast_buffer(T)
+    empty!(buffer)
+    _copy_broadcast!(buffer, bc)
+end
+
+function _copy_broadcast!(buffer::BroadcastBuffer{T}, bc::Broadcast.Broadcasted{SymBroadcast{T}, A, typeof(Base.literal_pow), Tuple{Base.RefValue{typeof(^)}, B, Base.RefValue{Val{N}}}}) where {T, A, B, N}
+    _copy_broadcast!(buffer, Broadcast.Broadcasted{SymBroadcast{T}}(^, (bc.args[2], N), bc.axes))
+end
+
+function _copy_broadcast!(buffer::BroadcastBuffer{T}, bc::Broadcast.Broadcasted{SymBroadcast{T}}) where {T}
+    offset = length(buffer.canonical_args)
+    for arg in bc.args
+        if arg isa Broadcast.Broadcasted
+            push!(buffer.canonical_args, _copy_broadcast!(buffer, Broadcast.instantiate(arg)))
+        elseif arg isa Base.RefValue
+            push!(buffer.canonical_args, Const{T}(arg[]))
+        else
+            push!(buffer.canonical_args, Const{T}(arg))
+        end
+    end
+    canonical_args = view(buffer.canonical_args, (offset+1):(offset+length(bc.args)))
+    # Do the thing here
+    ndim = length(bc.axes)
+    if ndim == 0
+        return maketerm(BasicSymbolic{T}, bc.f, bc.args, nothing)
+    end
+    subscripts = idxs_for_arrayop(T)
+
+    args = buffer.args
+
+    for arg in canonical_args
+        sh = shape(arg)
+        is_arr = is_array_shape(sh)
+        if !is_arr
+            push!(args, arg)
+            continue
+        end
+        getindex_args = buffer.getindex_args
+        push!(getindex_args, arg)
+        if sh isa Unknown
+            # unknown ndims, assume full shape
+            limit = sh.ndims == -1 ? ndim : sh.ndims
+            for i in 1:limit
+                push!(getindex_args,  length(bc.axes[i]) == 1 ? one_of_vartype(T) : subscripts[i])
+            end
+        elseif sh isa ShapeVecT
+            for (i, (target_ax, cur_ax)) in enumerate(zip(bc.axes, sh))
+                len1 = length(cur_ax)
+                len2 = length(target_ax)
+                push!(getindex_args, len1 < len2 ? Const{T}(first(cur_ax)) : subscripts[i])
+            end
+        end
+        # manual construction is faster than calling `getindex`
+        indexed_arg = Term{T}(getindex, getindex_args; type = eltype(symtype(arg)), shape = ShapeVecT())
+        maybe_reallocate_getindex_buffer!(buffer, indexed_arg)
+        push!(args, indexed_arg)
+    end
+    output_idxs = OutIdxT{T}()
+    for (i, ax) in enumerate(bc.axes)
+        push!(output_idxs, length(ax) == 1 ? 1 : subscripts[i])
+    end
+    expr = maketerm(BasicSymbolic{T}, bc.f, args, nothing)
+    maybe_reallocate_args_buffer!(buffer, expr)
+    args = buffer.args
+    push!(args, Const{T}(bc.f))
+    for arg in canonical_args
+        push!(args, Const{T}(arg))
+    end
+    sh = ShapeVecT()
+    for ax in bc.axes
+        push!(sh, 1:length(ax))
+    end
+    type = Array{eltype(symtype(expr)), ndim}
+    term = Term{T}(broadcast, args; type, shape = sh)
+    maybe_reallocate_args_buffer!(buffer, term)
+    resize!(buffer.canonical_args, length(buffer.canonical_args) - length(bc.args))
+
+    return BSImpl.ArrayOp{T}(output_idxs, expr, +, term; type, shape = sh)
+end
+
+@noinline function _throw_unequal_lengths(x, y)
+    throw(ArgumentError(LazyString("Arguments must have equal lengths. Got arguments with shapes ", x, " and ", y, ".")))
+end
+
+function promote_shape(::typeof(LinearAlgebra.dot), sha::ShapeT, shb::ShapeT)
+    @nospecialize sha shb
+    if sha isa ShapeVecT && shb isa ShapeVecT
+        _length_from_shape(sha) == _length_from_shape(shb)
+    end
+    ShapeVecT()
+end
+
+function promote_symtype(::typeof(LinearAlgebra.dot), T::TypeT, S::TypeT)
+    if T <: Number && S <: Number
+        return promote_type_fast_path(T, S)
+    elseif T <: AbstractArray && S <: AbstractArray
+        return promote_symtype(LinearAlgebra.dot, T.parameters[1]::TypeT, S.parameters[1]::TypeT)
+    else
+        error(LazyString("Invalid types for `LinearAlgebra.dot`: ", T, ", ", S, "."))
+    end
+end
+
+function LinearAlgebra.dot(x::BasicSymbolic{T}, y::BasicSymbolic{T}) where {T}
+    shx = shape(x)
+    if is_array_shape(shx)
+        sh = promote_shape(LinearAlgebra.dot, shx, shape(y))
+        type = promote_symtype(LinearAlgebra.dot, symtype(x), symtype(y))
+        BSImpl.Term{T}(LinearAlgebra.dot, ArgsT{T}((x, y)); type, shape = sh)
+    else
+        conj(x) * y
+    end
+end
+function LinearAlgebra.dot(x::Number, y::BasicSymbolic{T}) where {T}
+    x = unwrap(x)
+    promote_shape(LinearAlgebra.dot, ShapeVecT(), shape(y))
+    return conj(x) * y
+end
+function LinearAlgebra.dot(x::BasicSymbolic{T}, y::Number) where {T}
+    y = unwrap(y)
+    promote_shape(LinearAlgebra.dot, shape(x), ShapeVecT())
+    return conj(x) * y
+end
+function LinearAlgebra.dot(x::AbstractArray, y::BasicSymbolic{T}) where {T}
+    LinearAlgebra.dot(Const{T}(x), y)
+end
+function LinearAlgebra.dot(x::BasicSymbolic{T}, y::AbstractArray) where {T}
+    LinearAlgebra.dot(x, Const{T}(y))
+end
+
+function promote_symtype(::typeof(LinearAlgebra.det), T::TypeT)
+    if T <: Number
+        return T
+    elseif T <: AbstractMatrix
+        return T.parameters[1]::TypeT
+    else
+        error(LazyString("Invalid type for `LinearAlgebra.det`: ", T, "."))
+    end
+end
+
+@noinline function _throw_not_matrix(x)
+    throw(ArgumentError(LazyString("Expected argument to be a matrix, got argument of shape ", x, ".")))
+end
+
+function promote_shape(::typeof(LinearAlgebra.det), sh::ShapeT)
+    @nospecialize sh
+    if sh isa Unknown
+        sh.ndims == -1 || sh.ndims == 2 || _throw_not_matrix(sh)
+    elseif sh isa ShapeVecT
+        length(sh) == 0 || length(sh) == 2 || _throw_not_matrix(sh)
+    end
+    return ShapeVecT()
+end
+
+function LinearAlgebra.det(A::BasicSymbolic{T}) where {T}
+    type = promote_symtype(LinearAlgebra.det, symtype(A))
+    sh = promote_shape(LinearAlgebra.det, shape(A))
+    BSImpl.Term{T}(LinearAlgebra.det, ArgsT{T}((A,)); type, shape = sh)
+end
+
+function promote_symtype(::typeof(LinearAlgebra.norm), T::TypeT)
+    if T <: Real
+        return T
+    elseif T <: Complex
+        return T.parameters[1]::TypeT
+    elseif T === Number
+        return T
+    elseif T <: AbstractArray
+        return promote_symtype(LinearAlgebra.norm, T.parameters[1]::TypeT)
+    else
+        error(LazyString("Invalid type for `LinearAlgebra.norm`: ", T))
+    end
+end
+function promote_symtype(::typeof(LinearAlgebra.norm), T::TypeT, S::TypeT)
+    @assert S <: Real
+    return promote_symtype(LinearAlgebra.norm, T)
+end
+function promote_shape(::typeof(LinearAlgebra.norm), sh::ShapeT)
+    @nospecialize sh
+    return ShapeVecT()
+end
+function promote_shape(::typeof(LinearAlgebra.norm), sh::ShapeT, sh2::ShapeT)
+    @nospecialize sh sh2
+    is_array_shape(sh2) && _throw_array(LinearAlgebra.norm, sh, sh2)
+    return ShapeVecT()
+end
+
+function LinearAlgebra.norm(x::BasicSymbolic{T}) where {T}
+    type = promote_symtype(LinearAlgebra.norm, symtype(x))
+    sh = promote_shape(LinearAlgebra.norm, shape(x))
+    return BSImpl.Term{T}(LinearAlgebra.norm, ArgsT{T}((x,)); type, shape = sh)
+end
+function LinearAlgebra.norm(x::BasicSymbolic{T}, y::Real) where {T}
+    type = promote_symtype(LinearAlgebra.norm, symtype(x))
+    sh = promote_shape(LinearAlgebra.norm, shape(x))
+    return BSImpl.Term{T}(LinearAlgebra.norm, ArgsT{T}((x, Const{T}(y))); type, shape = sh)
+end
+function LinearAlgebra.norm(x::Union{BasicSymbolic{T}, AbstractArray}, y::BasicSymbolic{T}) where {T}
+    x = Const{T}(x)
+    type = promote_symtype(LinearAlgebra.norm, symtype(x), symtype(y))
+    sh = promote_shape(LinearAlgebra.norm, shape(x), shape(y))
+    return BSImpl.Term{T}(LinearAlgebra.norm, ArgsT{T}((x, y)); type, shape = sh)
+end
+
+@noinline function _vec_throw_non_array(T::TypeT)
+    throw(ArgumentError(LazyString("`Base.vec` only accepts arrays. Got argument of type ", T, ".")))
+end
+@noinline function _vec_throw_non_array(@nospecialize(sh::ShapeT))
+    throw(ArgumentError(LazyString("`Base.vec` only accepts arrays. Got argument of shape ", sh, ".")))
+end
+
+function promote_symtype(::typeof(vec), T::TypeT)
+    if T <: AbstractArray
+        return Vector{safe_eltype(T)::TypeT}
+    end
+    _vec_throw_non_array(T)
+end
+
+function promote_shape(::typeof(vec), sh::ShapeT)
+    @nospecialize sh
+    is_array_shape(sh) || _vec_throw_non_array(sh)
+    if sh isa Unknown
+        return Unknown(1)
+    else
+        return ShapeVecT((1:(_length_from_shape(sh)::Int),))
+    end
+end
+
+function Base.vec(x::BasicSymbolic{T}) where {T}
+    sh = shape(x)
+    _ndims_from_shape(sh) == 1 && return x
+    type = promote_symtype(vec, symtype(x))
+    sh = promote_shape(vec, sh)
+    return BSImpl.Term{T}(vec, ArgsT{T}((x,)); type, shape = sh)
+end
+
+struct Mapper{F}
+    f::F
+end
+
+function (f::Mapper)(xs...)
+    map(f.f, xs...)
+end
+
+function __safe_ndims(@nospecialize(T::TypeT))
+    if T <: Array
+        return T.parameters[2]::Int
+    elseif T <: AbstractArray
+        return ndims(T)::Int
+    elseif T <: Tuple
+        return 1
+    else
+        return 0
+    end
+end
+
+@inline __getfirstparam(T::TypeT) = T.parameters[1]::TypeT
+# TODO: This method doesn't handle the case when all are tuples. Instead of
+# a tuple type, this will return a `Vector{..}`.
+function promote_symtype(f::Mapper, T::TypeT, Ts::TypeT...)
+    # If all `ndims` are the same, the result has the same `ndims` (assuming sizes are
+    # equal). If they're unequal, the result is a `Vector`.
+    ndims_1 = __safe_ndims(T)
+    all_same_ndims = true
+    for Ti in Ts
+        ndims_i = __safe_ndims(Ti)
+        # They're all same if they're all equal to the first element
+        all_same_ndims &= ndims_i == ndims_1
+        all_same_ndims || break
+    end
+    Ts = ntuple(safe_eltype ∘ Base.Fix1(getindex, Ts), Val{length(Ts)}())::NTuple{length(Ts), TypeT}
+    mappedT = promote_symtype(f.f, safe_eltype(T)::TypeT, Ts...)::TypeT
+    # all scalars
+    if all_same_ndims
+        return ndims_1 == 0 ? mappedT : Array{mappedT, ndims_1}
+    else
+        return Vector{mappedT}
+    end
+end
+
+@noinline function _throw_map_unequal_shapes_same_ndims(shs::ShapeT...)
+    throw(ArgumentError(LazyString(
+        "If all arguments to `map` have the same `ndims`,",
+        " they must have the same shape.",
+        " Found arguments of shapes ", shs, ".")))
+end
+
+function promote_shape(::Mapper, sh::ShapeT, shs::ShapeT...)
+    @nospecialize sh shs
+    all_known_shapes_equal = true
+    all_same_ndims = true
+    ndims_1 = _ndims_from_shape(sh)
+    first_known_shape::Union{Nothing, ShapeVecT} = sh isa ShapeVecT ? sh : nothing
+    min_length = sh isa ShapeVecT ? _length_from_shape(sh)::Int : typemax(Int)
+    any_unknown = sh isa Unknown
+
+    for shi in shs
+        ndims_i = _ndims_from_shape(shi)
+        all_same_ndims &= ndims_i == ndims_1
+        if shi isa ShapeVecT
+            first_known_shape = @something(first_known_shape, shi)
+            all_known_shapes_equal &= first_known_shape == shi
+            min_length = min(min_length, _length_from_shape(shi)::Int)
+        else
+            any_unknown = true
+        end
+    end
+
+    if all_known_shapes_equal && all_same_ndims
+        return @something(first_known_shape, Unknown(ndims_1))
+    elseif all_same_ndims && ndims_1 != 1
+        _throw_map_unequal_shapes_same_ndims(sh, shs...)
+    elseif min_length == typemax(Int)
+        return Unknown(1)
+    else
+        return ShapeVecT((1:min_length,))
+    end
+end
+
+__safe_vec(x) = is_array_shape(shape(x)) ? vec(x) : x
+
+function __index_args(::Type{T}, nd::Int, xs...) where {T}
+    idxsym = idxs_for_arrayop(T)
+    if nd == 1
+        stable_idx = StableIndex(ArgsT{T}((idxsym[1],)))
+        fn = Base.Fix2(getindex, stable_idx) ∘ __safe_vec ∘ Base.Fix1(getindex, xs)
+        indexed = ntuple(fn, Val(length(xs)))
+    else
+        _idxs = ArgsT{T}()
+        sizehint!(_idxs, nd)
+        for i in 1:nd
+            push!(_idxs, idxsym[i])
+        end
+        stable_idx = StableIndex(_idxs)
+        indexed = ntuple(Base.Fix2(getindex, stable_idx) ∘ Base.Fix1(getindex, xs), Val(length(xs)))
+    end
+    return indexed
+end
+
+
+function _map(::Type{T}, f, xs...) where {T}
+    f = Mapper(f)
+    xs = Const{T}.(xs)
+    type = promote_symtype(f, symtype.(xs)...)
+    sh = promote_shape(f, shape.(xs)...)
+    nd = _ndims_from_shape(sh)
+    term = BSImpl.Term{T}(f, ArgsT{T}(xs); type, shape = sh)
+    indexed = __index_args(T, nd, xs...)
+    idxsym = idxs_for_arrayop(T)
+    idxs = OutIdxT{T}()
+    sizehint!(idxs, nd)
+    for i in 1:nd
+        push!(idxs, idxsym[i])
+    end
+    ranges = RangesT{T}()
+    if nd == 1 && sh isa ShapeVecT
+        ranges[idxsym[1]] = 1:1:(_length_from_shape(sh)::Int)
+    end
+    exp = BSImpl.Term{T}(f.f, ArgsT{T}(indexed); type = eltype(type)::TypeT, shape = ShapeVecT())
+    return BSImpl.ArrayOp{T}(idxs, exp, +, term, ranges; type = type, shape = sh)
+end
+
+function Base.map(f::BasicSymbolic{T}, xs...) where {T}
+    _map(T, f, xs...)
+end
+function Base.map(f::BasicSymbolic{T}, x::AbstractArray, xs...) where {T}
+    _map(T, f, x, xs...)
+end
+
+for fT in [Any, :(BasicSymbolic{T})]
+    @eval function Base.map(f::$fT, x::BasicSymbolic{T}, xs...) where {T}
+        _map(T, f, x, xs...)
+    end
+    for x1T in [Any, :(BasicSymbolic{T})]
+        @eval function Base.map(f::$fT, x1::$x1T, x::BasicSymbolic{T}, xs...) where {T}
+            _map(T, f, x1, x, xs...)
+        end
+    end
+end
+
+macro map_methods(T, arg_f, result_f)
+    quote
+        function (::$(typeof(Base.map)))(f, x::$T, xs...)
+            $result_f($map(f, $arg_f(x), xs...))
+        end
+        function (::$(typeof(Base.map)))(f::$BasicSymbolic, x::$T, xs...)
+            $result_f($map(f, $arg_f(x), xs...))
+        end
+        function (::$(typeof(Base.map)))(f, x1, x::$T, xs...)
+            $result_f($map(f, x1, $arg_f(x), xs...))
+        end
+        function (::$(typeof(Base.map)))(f::$BasicSymbolic{V}, x1::$BasicSymbolic{V}, x::$T, xs...) where {V}
+            $result_f($map(f, x1, $arg_f(x), xs...))
+        end
+    end |> esc
+end
+
+struct Mapreducer{F, R, D <: Union{Int, Colon}, I}
+    f::F
+    reduce::R
+    dims::D
+    init::I
+end
+
+function (f::Mapreducer{F, R, D, I})(xs...) where {F, R, D, I}
+    if I === Nothing
+        mapreduce(f.f, f.reduce, xs...; dims = f.dims)
+    else
+        mapreduce(f.f, f.reduce, xs...; dims = f.dims, init = f.init)
+    end
+end
+
+function promote_symtype(f::Mapreducer, T::TypeT, Ts::TypeT...)
+    mappedArrT = promote_symtype(Mapper(f.f), T, Ts...)
+    mappedT = safe_eltype(mappedArrT)::TypeT
+    mapped_ndims = __safe_ndims(mappedArrT)
+    reducedT = if f.init === nothing
+        promote_symtype(f.reduce, mappedT, mappedT)
+    else
+        promote_symtype(f.reduce, typeof(f.init)::TypeT, mappedT)
+    end
+    if f.dims isa Colon
+        return reducedT
+    else
+        return Array{reducedT, mapped_ndims}
+    end
+end
+
+function promote_shape(f::Mapreducer, shs::ShapeT...)
+    @nospecialize shs
+    mapped_shape = promote_shape(Mapper(f.f), shs...)
+    if f.dims isa Colon
+        return ShapeVecT()
+    elseif mapped_shape isa Unknown
+        return mapped_shape
+    else
+        ax = mapped_shape[f.dims]
+        mapped_shape[f.dims] = first(ax):first(ax)
+        return mapped_shape
+    end
+end
+
+function _mapreduce(::Type{T}, f, red, xs...; dims = :, init = nothing) where {T}
+    f = Mapreducer(f, red, dims, init)
+    xs = Const{T}.(xs)
+    shs = shape.(xs)
+    type = promote_symtype(f, symtype.(xs)...)
+    sh = promote_shape(f, shs...)
+    term = BSImpl.Term{T}(f, ArgsT{T}(xs); type, shape = sh)
+    idxs = OutIdxT{T}()
+    _map_sh = promote_shape(Mapper(f), shs...)
+    nd = _ndims_from_shape(_map_sh)
+
+    indexed = __index_args(T, nd, xs...)::NTuple{length(xs), BasicSymbolic{T}}
+    if f.f === identity
+        exp = indexed[1]
+    else
+        exp = BSImpl.Term{T}(f.f, ArgsT{T}(indexed); type = eltype(type)::TypeT, shape = ShapeVecT())
+    end
+    ranges = RangesT{T}()
+    if nd == 1 && _map_sh isa ShapeVecT
+        ranges[idxs_for_arrayop(T)[1]] = 1:1:(_length_from_shape(_map_sh)::Int)
+    end
+    return BSImpl.ArrayOp{T}(idxs, exp, red, term; type = type, shape = sh)
+end
+
+for (Tf, Tr) in Iterators.product([:(BasicSymbolic{T}), Any], [:(BasicSymbolic{T}), Any])
+    if Tf != Any || Tr != Any
+        @eval function Base.mapreduce(f::$Tf, red::$Tr, xs...; kw...) where {T}
+            return _mapreduce(T, f, red, xs...; kw...)
+        end
+        @eval function Base.mapreduce(f::$Tf, red::$Tr, x::AbstractArray, xs...; kw...) where {T}
+            return _mapreduce(T, f, red, x, xs...; kw...)
+        end
+    end
+    @eval function Base.mapreduce(f::$Tf, red::$Tr, x::BasicSymbolic{T}, xs...; kw...) where {T}
+        _mapreduce(T, f, red, x, xs...; kw...)
+    end
+    for x1T in [Any, :(BasicSymbolic{T})]
+        @eval function Base.mapreduce(f::$Tf, red::$Tr, x1::$x1T, x::BasicSymbolic{T}, xs...; kw...) where {T}
+            _mapreduce(T, f, red, x1, x, xs...; kw...)
+        end
+    end
+end
+
+function _mapreduce_method(fT, redT, xTs...; splat = true, kw...)
+    args = [:(f::$fT), :(red::$redT)]
+    for (i, xT) in enumerate(xTs)
+        name = Symbol(:x, i)
+        push!(args, :($name::$xT))
+    end
+    splat && push!(args, :(xs::Vararg))
+    EL.codegen_ast(EL.JLFunction(; name = :(::$(typeof(mapreduce))), args, kwargs = [:(kw...)], kw...))
+end
+
+macro mapreduce_methods(T, arg_f, result_f)
+    result = Expr(:block)
+
+    Ts = [:($BasicSymbolic{T}), Any]
+    for (Tf, Tred) in Iterators.product(Ts, Ts)
+        whereparams = if Tf != Any || Tred != Any
+            [:T]
+        else
+            nothing
+        end
+
+        body = :($result_f($mapreduce(f, red, $arg_f(x1); kw...)))
+        push!(result.args, _mapreduce_method(Tf, Tred, T; splat = false, body, whereparams))
+        body = :($result_f($mapreduce(f, red, $arg_f(x1), xs...; kw...)))
+        push!(result.args, _mapreduce_method(Tf, Tred, T; body, whereparams))
+        body = :($result_f($mapreduce(f, red, x1, $arg_f(x2), xs...; kw...)))
+        push!(result.args, _mapreduce_method(Tf, Tred, Any, T; body, whereparams))
+        push!(result.args, _mapreduce_method(Tf, Tred, BasicSymbolic, T; body, whereparams))
+    end
+    return esc(result)
+end
+
+function operator_to_term(::Operator, ex::BasicSymbolic{T}) where {T}
+    return ex
+end
+
+function Base.Symbol(ex::BasicSymbolic{T}) where {T}
+    @match ex begin
+        BSImpl.Term(; f) && if f isa Operator end => Symbol(string(operator_to_term(f, ex)::BasicSymbolic{T}))
+        _ => Symbol(string(ex))
+    end
+end
+
+function promote_symtype(::typeof(in), T::TypeT, S::TypeT)
+    return Bool
+end
+function promote_shape(::typeof(in), sha::ShapeT, shb::ShapeT)
+    @nospecialize sha shb
+    @assert is_array_shape(shb) || throw(ArgumentError("Symbolic `in` requires an array as the second argument."))
+    return ShapeVecT()
+end
+
+for T1 in [Real, :(BasicSymbolic{T})], T2 in [AbstractArray, :(BasicSymbolic{T})]
+    if !(T1 isa Expr) && !(T2 isa Expr)
+        continue
+    end
+    @eval function Base.in(a::$T1, b::$T2) where {T}
+        sh = promote_shape(in, shape(a), shape(b))
+        return BSImpl.Term{T}(in, ArgsT{T}((Const{T}(a), Const{T}(b))); type = Bool, shape = sh)
+    end
+end
+
+function promote_symtype(::typeof(issubset), T::TypeT, S::TypeT)
+    Bool
+end
+function promote_shape(::typeof(issubset), sha::ShapeT, shb::ShapeT)
+    @nospecialize sha shb
+    @assert is_array_shape(sha) || throw(ArgumentError("Symbolic `issubset` requires arrays as both arguments."))
+    @assert is_array_shape(shb) || throw(ArgumentError("Symbolic `issubset` requires arrays as both arguments."))
+    return ShapeVecT()
+end
+
+for T1 in [AbstractArray, :(BasicSymbolic{T})], T2 in [AbstractArray, :(BasicSymbolic{T})]
+    if !(T1 isa Expr) && !(T2 isa Expr)
+        continue
+    end
+    @eval function Base.issubset(a::$T1, b::$T2) where {T}
+        sh = promote_shape(issubset, shape(a), shape(b))
+        return BSImpl.Term{T}(issubset, ArgsT{T}((Const{T}(a), Const{T}(b))); type = Bool, shape = sh)
+    end
+end
+
+for f in [union, intersect]
+    @eval function promote_symtype(::$(typeof(f)), T::TypeT,
+                             S::TypeT)
+        return Vector{promote_type(T.parameters[1]::TypeT, S.parameters[1]::TypeT)}
+    end
+    @eval function promote_shape(::$(typeof(f)), sha::ShapeT, shb::ShapeT)
+        @nospecialize sha shb
+        @assert is_array_shape(sha) || throw(ArgumentError("Symbolic `$($f)` requires arrays as both arguments."))
+        @assert is_array_shape(shb) || throw(ArgumentError("Symbolic `$($f)` requires arrays as both arguments."))
+        return Unknown(1)
+    end
+    for T1 in [AbstractArray, :(BasicSymbolic{T})], T2 in [AbstractArray, :(BasicSymbolic{T})]
+        if !(T1 isa Expr) && !(T2 isa Expr)
+            continue
+        end
+        @eval function (::$(typeof(f)))(a::$T1, b::$T2) where {T}
+            sh = promote_shape($f, shape(a), shape(b))
+            type = promote_type($f, symtype(a), symtype(b))
+            return BSImpl.Term{T}($f, ArgsT{T}((Const{T}(a), Const{T}(b))); type, shape = sh)
+        end
+    end
+end
+
+function promote_symtype(::typeof(complex), T::TypeT)
+    if T <: Real
+        return Complex{T}
+    elseif T <: Number
+        return T
+    else
+        error(LazyString("Invalid type for `complex`: ", T, "."))
+    end
+end
+function promote_symtype(::typeof(complex), T::TypeT, S::TypeT)
+    @assert T <: Real
+    @assert S <: Real
+    Complex{promote_type_fast_path(T, S)}
+end
+
+function promote_symtype(::typeof(binomial), T::TypeT, S::TypeT)
+    @assert T <: Number
+    @assert S <: Integer
+    return T
+end
+function promote_shape(::typeof(binomial), sha::ShapeT, shb::ShapeT)
+    @nospecialize sha shb
+    is_array_shape(sha) && _throw_array(sha)
+    is_array_shape(shb) && _throw_array(shb)
+
+    return ShapeVecT()
+end
+
+for T1 in [Number, :(BasicSymbolic{T})], T2 in [Integer, :(BasicSymbolic{T})]
+    if !(T1 isa Expr) && !(T2 isa Expr)
+        continue
+    end
+    @eval function Base.binomial(a::$T1, b::$T2) where {T}
+        sh = promote_shape(binomial, shape(a), shape(b))
+        return BSImpl.Term{T}(binomial, ArgsT{T}((Const{T}(a), Const{T}(b))); type = symtype(a), shape = sh)
+    end
+end
+
+function promote_symtype(::typeof(LinearAlgebra.cross), x::TypeT, y::TypeT)
+    x <: AbstractVector || error("`LinearAlgebra.cross` expects vectors. Got value of symtype $x.")
+    y <: AbstractVector || error("`LinearAlgebra.cross` expects vectors. Got value of symtype $y.")
+    Vector{promote_symtype(*, x.parameters[1]::TypeT, y.parameters[1]::TypeT)}
+end
+
+function promote_shape(::typeof(LinearAlgebra.cross), shx::ShapeT, shy::ShapeT)
+    @nospecialize shx shy
+
+    if shx isa Unknown
+        shx.ndims == 1 || shx.ndims == -1 || error(LazyString("`LinearAlgebra.cross` expects vectors. Got argument of shape ", shx, "."))
+    else
+        length(shx) == 1 && length(shx[1]) == 3 || error(LazyString("`LinearAlgebra.cross` expects a 3-vector. Got argument of shape ", shx, "."))
+    end
+    if shy isa Unknown
+        shy.ndims == 1 || shy.ndims == -1 || error(LazyString("`LinearAlgebra.cross` expects vectors. Got argument of shape ", shy, "."))
+    else
+        length(shy) == 1 && length(shy[1]) == 3 || error(LazyString("`LinearAlgebra.cross` expects a 3-vector. Got argument of shape ", shy, "."))
+    end
+
+    return ShapeVecT((1:3,))
+end
+
+function _cross_product(::Type{T}, x, y) where {T}
+    BSImpl.Const{T}(ArgsT{T}((x[2] * y[3] - x[3] * y[2], -x[1] * y[3] + x[3] * y[1], x[1] * y[2] - x[2] * y[1])))
+end
+function LinearAlgebra.cross(x::BasicSymbolic{T}, y::Union{BasicSymbolic{T}, AbstractVector{<:Number}, AbstractVector{BasicSymbolic{T}}}) where {T}
+    if y isa Vector{BasicSymbolic{T}}
+        st_y = symtype(BSImpl.Const{T}(y))
+    else
+        st_y = symtype(y)
+    end
+    promote_symtype(LinearAlgebra.cross, symtype(x), st_y)
+    promote_shape(LinearAlgebra.cross, shape(x), shape(y))
+    _cross_product(T, x, y)
+end
+function LinearAlgebra.cross(x::Union{AbstractVector{<:Number}, AbstractVector{BasicSymbolic{T}}}, y::BasicSymbolic{T}) where {T}
+    if x isa Vector{BasicSymbolic{T}}
+        st_y = symtype(BSImpl.Const{T}(x))
+    else
+        st_y = symtype(x)
+    end
+    promote_symtype(LinearAlgebra.cross, symtype(x), symtype(y))
+    promote_shape(LinearAlgebra.cross, shape(x), shape(y))
+    _cross_product(T, x, y)
+end
+
+struct Fill
+    sh::ShapeVecT
+end
+
+function (f::Fill)(x::BasicSymbolic{T}) where {T}
+    term = BSImpl.Term{T}(
+        f, ArgsT{T}((x,)); type = promote_symtype(f, symtype(x)), shape = promote_shape(f, shape(x))
+    )
+    out_idxs = OutIdxT{T}()
+    ranges = RangesT{T}()
+    idx = idxs_for_arrayop(T)
+    for i in eachindex(f.sh)
+        idxi = idx[i]
+        push!(out_idxs, idxi)
+        ranges[idxi] = f.sh[i]
+    end
+    return BSImpl.ArrayOp{T}(out_idxs, x, +, term, ranges; type = term.type, shape = term.shape)
+end
+
+function (f::Fill)(x)
+    ux = unwrap(x)
+    if ux !== x
+        return f(ux)
+    end
+    return fill(x, map(length, f.sh)...)
+end
+
+function promote_symtype(f::Fill, T::TypeT)
+    return Array{T, length(f.sh)}
+end
+
+function promote_shape(f::Fill, ::ShapeT)
+    @nospecialize sh
+    return f.sh
+end
+
+struct SymbolicRound{T, R <: RoundingMode}
+    mode::R
+end
+
+function promote_symtype(::SymbolicRound{T}, ::TypeT) where {T}
+    return T::TypeT
+end
+
+function promote_shape(::SymbolicRound{T}, sh::ShapeT) where {T}
+    @nospecialize sh
+    return sh
+end
+
+function (fn::SymbolicRound{T})(ex::BasicSymbolic{R}) where {T, R}
+    return BSImpl.Term{R}(fn, ArgsT{R}((ex,)); type = T, shape = shape(ex))
+end
+function (fn::SymbolicRound{T})(val) where {T}
+    uval = unwrap(val)
+    if uval === val
+        return round(T, uval, fn.mode)
+    end
+    return fn(uval)
+end
+
+function Base.round(::Type{T}, ex::BasicSymbolic{R}, mode::Base.RoundingMode) where {T, R}
+    SymbolicRound{T, typeof(mode)}(mode)(ex)
+end
+
+function promote_symtype(::Type{T}, R::TypeT) where {T <: Returns}
+    return FnType{Tuple, R, Nothing}
+end
+
+function promote_shape(::Type{T}, @nospecialize(sh::ShapeT)) where {T <: Returns}
+    return sh
+end
+
+function promote_symtype(::Type{SparseMatrixCSC}, Tm::TypeT, Tn::TypeT, TI::TypeT, TJ::TypeT, TV::TypeT)
+    return Matrix{TV.parameters[1]::TypeT}
+end

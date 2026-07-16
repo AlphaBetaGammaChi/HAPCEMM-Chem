@@ -35,68 +35,68 @@ namespace YamlInputReader{
         try {
             readSimMenu(input, data["SIMULATION MENU"]);
         }
+        catch (const std::exception& e) {
+            std::cout << "Something went wrong in reading the SIMULATION MENU: " << e.what() << std::endl;
+            exit(1);
+        }
         catch (...) {
-            std::cout << "Something went wrong in reading the SIMULATION MENU! Please double-check your input file with the reference in SampleRunDir!";
+            std::cout << "Something went wrong in reading the SIMULATION MENU! Please double-check your input file with the reference in SampleRunDir!" << std::endl;
             exit(1);
         }
 
         try {
             readParamMenu(input, data["PARAMETER MENU"]);
         }
-        catch (...) {
-            std::cout << "Something went wrong in reading the PARAMETER MENU! Please double-check your input file with the reference in SampleRunDir!";
+        catch (const std::exception& e) {
+            std::cout << "Something went wrong in reading the PARAMETER MENU: " << e.what() << std::endl;
             exit(1);
         }
 
         try {
             readTransportMenu(input, data["TRANSPORT MENU"]);
         }
-        catch (...) {
-            std::cout << "Something went wrong in reading the TRANSPORT MENU! Please double-check your input file with the reference in SampleRunDir!";
+        catch (const std::exception& e) {
+            std::cout << "Something went wrong in reading the TRANSPORT MENU: " << e.what() << std::endl;
             exit(1);
         }
         
         try {
             readChemMenu(input, data["CHEMISTRY MENU"]);
         }
-        catch (...) {
-            std::cout << "Something went wrong in reading the CHEMISTRY MENU! Please double-check your input file with the reference in SampleRunDir!";
+        catch (const std::exception& e) {
+            std::cout << "Something went wrong in reading the CHEMISTRY MENU: " << e.what() << std::endl;
             exit(1);
         }
 
         try {
             readAeroMenu(input, data["AEROSOL MENU"]);  
         }
-        catch (...) {
-            std::cout << "Something went wrong in reading the AEROSOL MENU! Please double-check your input file with the reference in SampleRunDir!";
+        catch (const std::exception& e) {
+            std::cout << "Something went wrong in reading the AEROSOL MENU: " << e.what() << std::endl;
             exit(1);
         }
 
         try {
-            readMetMenu(input, data["METEOROLOGY MENU"]);
+            readMetMenu(input, data["METEOROLOGY MENU"], data["PARAMETER MENU"]);
         }
-        catch (const std::invalid_argument& e) {
-            std::cerr << "ERROR: " << e.what() << std::endl;
-            exit(1);
-        }
-        catch (...) {
-            std::cout << "Something went wrong in reading the METEOROLOGY MENU! Please double-check your input file with the reference in SampleRunDir!";
+        catch (const std::exception& e) {
+            std::cout << "Something went wrong in reading the METEOROLOGY MENU: " << e.what() << std::endl;
             exit(1);
         }
 
         try {
             readDiagMenu(input, data["DIAGNOSTIC MENU"]);
         }
-        catch (...) {
-            std::cout << "Something went wrong in reading the DIAGNOSTIC MENU! Please double-check your input file with the reference in SampleRunDir!";
+        catch (const std::exception& e) {
+            std::cout << "Something went wrong in reading the DIAGNOSTIC MENU: " << e.what() << std::endl;
             exit(1);
         }
 
         try {
             readAdvancedMenu(input, data["ADVANCED OPTIONS MENU"]);
         }
-        catch (...) {
-            std::cout << "Something went wrong in reading the ADVANCED OPTIONS MENU! Please double-check your input file with the reference in SampleRunDir!";
+        catch (const std::exception& e) {
+            std::cout << "Something went wrong in reading the ADVANCED OPTIONS MENU: " << e.what() << std::endl;
             exit(1);
         }
     }
@@ -148,9 +148,19 @@ namespace YamlInputReader{
         input.SIMULATION_BOX_FILENAME = boxModelSubmenu["netCDF filename format (string)"].as<string>();
         input.SIMULATION_BOXMODEL_MODE = boxModelSubmenu["Box model mode (int)"] ? boxModelSubmenu["Box model mode (int)"].as<int>() : 1;
         input.SIMULATION_BOXMODEL_THREADS = boxModelSubmenu["Box model threads (int)"] ? boxModelSubmenu["Box model threads (int)"].as<int>() : 1;
+        input.SIMULATION_BOX_DURATION = boxModelSubmenu["Box model duration [hr] (double)"] ? boxModelSubmenu["Box model duration [hr] (double)"].as<double>() : 24.0;
         // Reverted temporarily
         input.SIMULATION_FUEL = (boxModelSubmenu && boxModelSubmenu["Fuel"]) ? boxModelSubmenu["Fuel"].as<std::string>() : "C12H24";
-        
+        if (input.SIMULATION_FUEL == "custom") {
+            if (boxModelSubmenu && boxModelSubmenu["Custom Species"]) { 
+                input.SIMULATION_CUSTOM_SPECIES = boxModelSubmenu["Custom Species"].as<std::vector<std::string>>(); 
+            }
+            if (boxModelSubmenu && boxModelSubmenu["Custom Fuel EIs"]) { 
+                input.SIMULATION_CUSTOM_EIS = boxModelSubmenu["Custom Fuel EIs"].as<std::vector<double>>(); 
+            } 
+        } 
+			
+
         // Box model coupling flag - only relevant if box model is enabled
         if (boxModelSubmenu["Box model coupling (T/F)"]) {
             input.SIMULATION_BOXMODEL_COUPLING = parseBoolString(
@@ -160,6 +170,74 @@ namespace YamlInputReader{
             input.SIMULATION_BOXMODEL_COUPLING = false;  // Default: false
         }
 
+        if (boxModelSubmenu && boxModelSubmenu["Output variables (string)"]) {
+            input.BOX_OUTPUT_VARIABLES = boxModelSubmenu["Output variables (string)"].as<std::string>();
+        } else {
+            input.BOX_OUTPUT_VARIABLES = "all";
+        }
+
+
+        /* Chemistry solver + adjoint settings */
+        {
+            YAML::Node chemNode = simNode[std::string("CHEMISTRY SOLVER SUBMENU")];
+            if (chemNode) {
+                YAML::Node sv = chemNode[std::string("Chemistry solver (string)")];
+                std::string sv_str = sv ? sv.as<std::string>() : "kpp";
+                if (sv_str == "micm" || sv_str == "MICM") {
+                    input.CHEMISTRY_SOLVER = ChemistrySolver::MICM;
+                } else if (sv_str == "test" || sv_str == "TEST") {
+                    input.CHEMISTRY_SOLVER = ChemistrySolver::TEST;
+                } else if (sv_str == "kpp" || sv_str == "KPP") {
+                    input.CHEMISTRY_SOLVER = ChemistrySolver::KPP;
+                } else {
+                    std::cout << "Warning: Unknown Chemistry solver '" << sv_str << "', defaulting to KPP." << std::endl;
+                    input.CHEMISTRY_SOLVER = ChemistrySolver::KPP;
+                }
+                YAML::Node mp = chemNode[std::string("MICM mechanism path (string)")];
+                input.MICM_MECHANISM_PATH = mp ? mp.as<std::string>() : std::string("./mechanism/");
+                YAML::Node mu = chemNode[std::string("MICM use KPP photolysis (T/F)")];
+                std::string muFlag = mu ? mu.as<std::string>() : std::string("T");
+                input.MICM_USE_KPP_PHOTOL = (muFlag=="T"||muFlag=="true"||muFlag=="1"||muFlag=="True");
+                YAML::Node mh = chemNode[std::string("MICM use KPP hetchem (T/F)")];
+                std::string mhFlag = mh ? mh.as<std::string>() : std::string("T");
+                input.MICM_USE_KPP_HETCHEM = (mhFlag=="T"||mhFlag=="true"||mhFlag=="1"||mhFlag=="True");
+                YAML::Node ed = chemNode[std::string("Enable dilution (T/F)")];
+                std::string edFlag = ed ? ed.as<std::string>() : std::string("F");
+                input.ENABLE_DILUTION = (edFlag=="T"||edFlag=="true"||edFlag=="1"||edFlag=="True");
+                YAML::Node ee = chemNode[std::string("Enable entrainment (T/F)")];
+                std::string eeFlag = ee ? ee.as<std::string>() : std::string("F");
+                input.ENABLE_ENTRAINMENT = (eeFlag=="T"||eeFlag=="true"||eeFlag=="1"||eeFlag=="True");
+                
+                YAML::Node ss = chemNode[std::string("Enable Strang Splitting (T/F)")];
+                std::string ssFlag = ss ? ss.as<std::string>() : std::string("F");
+                input.ENABLE_STRANG_SPLITTING = (ssFlag=="T"||ssFlag=="true"||ssFlag=="1"||ssFlag=="True");
+                YAML::Node adjNode = chemNode[std::string("ADJOINT SUBMENU")];
+                if (adjNode) {
+                    YAML::Node en = adjNode[std::string("Enable adjoint (T/F)")];
+                    std::string flag = en ? en.as<std::string>() : std::string("F");
+                    input.ADJOINT_ENABLE = (flag=="T"||flag=="true"||flag=="1");
+                    YAML::Node am = adjNode[std::string("Adjoint mode (string)")];
+                    input.ADJOINT_MODE = am ? am.as<std::string>() : std::string("all");
+                    YAML::Node at = adjNode[std::string("Adjoint target name (string)")];
+                    input.ADJOINT_TARGET_NAME = at ? at.as<std::string>() : std::string("");
+                } else {
+                    input.ADJOINT_ENABLE = false;
+                    input.ADJOINT_MODE = std::string("all");
+                    input.ADJOINT_TARGET_NAME = std::string("");
+                }
+            } else {
+                input.CHEMISTRY_SOLVER = ChemistrySolver::KPP;
+                input.MICM_MECHANISM_PATH = std::string("./mechanism/");
+                input.MICM_USE_KPP_PHOTOL = true;
+                input.MICM_USE_KPP_HETCHEM = true;
+                input.ENABLE_DILUTION = false;
+                input.ENABLE_ENTRAINMENT = false;
+                input.ENABLE_STRANG_SPLITTING = false;
+                input.ADJOINT_ENABLE = false;
+                input.ADJOINT_MODE = std::string("all");
+                input.ADJOINT_TARGET_NAME = std::string("");
+            }
+        }
         if (simNode["RANDOM NUMBER GENERATION SUBMENU"]){
             YAML::Node seedSubmenu = simNode["RANDOM NUMBER GENERATION SUBMENU"];
             input.SIMULATION_FORCE_SEED = parseBoolString(seedSubmenu["Force seed value (T/F)"].as<string>(), "Force seed value (T/F)");
@@ -193,8 +271,10 @@ namespace YamlInputReader{
     void readParamMenu(OptInput& input, const YAML::Node& paramNode){
 
         input.PARAMETER_PARAM_MAP["PLUMEPROCESS"] = parseParamSweepInput(paramNode["Plume Process [hr] (double)"].as<string>(), "Plume Process [hr] (double)");
+ 
 
         YAML::Node metParamSubmenu = paramNode["METEOROLOGICAL PARAMETERS SUBMENU"];
+        input.PARAMETER_PARAM_MAP["TEMP"] = parseParamSweepInput(metParamSubmenu["Temperature [K] (double)"].as<string>(), "Temperature [K] (double)");
         input.PARAMETER_PARAM_MAP["PRESSURE"] = parseParamSweepInput(metParamSubmenu["Pressure [hPa] (double)"].as<string>(), "Pressure [hPa] (double)");
         input.PARAMETER_PARAM_MAP["DH"] = parseParamSweepInput(metParamSubmenu["Horiz. diff. coeff. [m^2/s] (double)"].as<string>(), "Horiz. diff. coeff. [m^2/s] (double)");
         input.PARAMETER_PARAM_MAP["DV"] = parseParamSweepInput(metParamSubmenu["Verti. diff. [m^2/s] (double)"].as<string>(), "Verti. diff. [m^2/s] (double)");
@@ -214,15 +294,50 @@ namespace YamlInputReader{
         input.PARAMETER_PARAM_MAP["BACKG_CH4"] = parseParamSweepInput(backMixRatioSubmenu["CH4 [ppm] (double)"].as<string>(), "CH4 [ppm] (double)");
         input.PARAMETER_PARAM_MAP["BACKG_SO2"] = parseParamSweepInput(backMixRatioSubmenu["SO2 [ppt] (double)"].as<string>(), "SO2 [ppt] (double)");
 
+        /* --- Geoengineering particle parameters --- */
+        YAML::Node geoSubmenu = paramNode["GEOENGINEERING SUBMENU"];
+        if (geoSubmenu) {
+            auto parseGeo = [&](const std::string& key, const std::string& label) {
+                if (geoSubmenu[label]) {
+                    try {
+                        input.PARAMETER_PARAM_MAP[key] =
+                            parseParamSweepInput(geoSubmenu[label].as<std::string>(), label);
+                    } catch (...) {
+                        input.PARAMETER_PARAM_MAP[key] =
+                            parseParamSweepInput(std::to_string(geoSubmenu[label].as<double>()), label);
+                    }
+                }
+            };
+            parseGeo("Background_Geoengineering_Type",          "Background_Geoengineering_Type (int)");
+            parseGeo("Background_Geoengineering_Rho",           "Background_Geoengineering_Rho (double)");
+            parseGeo("Background_Geoengineering_Number_Density","Background_Geoengineering_Number_Density (double)");
+            parseGeo("Background_Geoengineering_Radius",        "Background_Geoengineering_Radius (double)");
+            parseGeo("Background_Geoengineering_Gamma",         "Background_Geoengineering_Gamma (double)");
+            parseGeo("Background_Geoengineering_Shape_Factor",  "Background_Geoengineering_Shape_Factor (double)");
+            parseGeo("Background_Geoengineering_ContactAngle",  "Background_Geoengineering_ContactAngle (double)");
+            parseGeo("Background_Geoengineering_Wettability",   "Background_Geoengineering_Wettability (double)");
+        }
+
+
         YAML::Node eiSubmenu = paramNode["EMISSION INDICES SUBMENU"];
         input.PARAMETER_PARAM_MAP["EI_NOX"] = parseParamSweepInput(eiSubmenu["NOx [g(NO2)/kg_fuel] (double)"].as<string>(), "NOx [g(NO2)/kg_fuel] (double)");
         input.PARAMETER_PARAM_MAP["EI_CO"] = parseParamSweepInput(eiSubmenu["CO [g/kg_fuel] (double)"].as<string>(), "CO [g/kg_fuel] (double)");
         input.PARAMETER_PARAM_MAP["EI_UHC"] = parseParamSweepInput(eiSubmenu["UHC [g/kg_fuel] (double)"].as<string>(), "UHC [g/kg_fuel] (double)");
-        input.PARAMETER_PARAM_MAP["EI_H2"] = parseParamSweepInput(eiSubmenu["H2 [g/kg_fuel] (double)"].as<string>(), "H2 [g/kg_fuel] (double)");
-        input.PARAMETER_PARAM_MAP["EI_H2O2"] = parseParamSweepInput(eiSubmenu["H2O2 [g/kg_fuel] (double)"].as<string>(), "H2O2 [g/kg_fuel] (double)");
-        input.PARAMETER_PARAM_MAP["EI_NH3"] = parseParamSweepInput(eiSubmenu["NH3 [g/kg_fuel] (double)"].as<string>(), "NH3 [g/kg_fuel] (double)");
-        input.PARAMETER_PARAM_MAP["EI_N2O"] = parseParamSweepInput(eiSubmenu["N2O [g/kg_fuel] (double)"].as<string>(), "N2O [g/kg_fuel] (double)");
-        input.PARAMETER_PARAM_MAP["EI_LUB"] = parseParamSweepInput(eiSubmenu["Lube oil [g/kg_fuel] (double)"].as<string>(), "Lube oil [g/kg_fuel] (double)");
+
+        auto parseOptionalEI = [&](const string& key, const string& label, const string& defaultVal) {
+            if (eiSubmenu[label]) {
+                input.PARAMETER_PARAM_MAP[key] = parseParamSweepInput(eiSubmenu[label].as<string>(), label);
+            } else {
+                input.PARAMETER_PARAM_MAP[key] = parseParamSweepInput(defaultVal, label);
+            }
+        };
+
+        parseOptionalEI("EI_H2", "H2 [g/kg_fuel] (double)", "0.0");
+        parseOptionalEI("EI_H2O2", "H2O2 [g/kg_fuel] (double)", "0.0");
+        parseOptionalEI("EI_NH3", "NH3 [g/kg_fuel] (double)", "0.0");
+        parseOptionalEI("EI_N2O", "N2O [g/kg_fuel] (double)", "0.0");
+        parseOptionalEI("EI_LUB", "Lube oil [g/kg_fuel] (double)", "0.0");
+
         input.PARAMETER_PARAM_MAP["EI_SO2"] = parseParamSweepInput(eiSubmenu["SO2 [g/kg_fuel] (double)"].as<string>(), "SO2 [g/kg_fuel] (double)");
         input.PARAMETER_PARAM_MAP["EI_SO2TOSO4"] =  parseParamSweepInput(eiSubmenu["SO2 to SO4 conv [%] (double)"].as<string>(), "SO2 to SO4 conv [%] (double)");
         input.PARAMETER_PARAM_MAP["EI_SOOT"] = parseParamSweepInput(eiSubmenu["Soot [g/kg_fuel] (double)"].as<string>(), "Soot [g/kg_fuel] (double)");
@@ -269,11 +384,18 @@ namespace YamlInputReader{
         input.AEROSOL_ICE_GROWTH = parseBoolString(aeroNode["Turn on ice growth (T/F)"].as<string>(), "Turn on ice growth (T/F)");
         input.AEROSOL_ICE_GROWTH_TIMESTEP = parseDoubleString(aeroNode["Ice growth timestep [min] (double)"].as<string>(), "Ice growth timestep [min] (double)");
     }
-    void readMetMenu(OptInput& input, const YAML::Node& metNode){
-        input.MET_TEMP = (metNode["METEOROLOGICAL PARAMETERS SUBMENU"] && metNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Temperature [K] (double)"]) ? metNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Temperature [K] (double)"].as<double>() : 223.0;
-        input.MET_RHW = (metNode["METEOROLOGICAL PARAMETERS SUBMENU"] && metNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Relative Humidity [%] (double)"]) ? metNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Relative Humidity [%] (double)"].as<double>() : 50.0;
+    void readMetMenu(OptInput& input, const YAML::Node& metNode, const YAML::Node& paramNode){
+        bool impMoist = metNode["IMPOSE MOIST LAYER DEPTH SUBMENU"] && metNode["IMPOSE MOIST LAYER DEPTH SUBMENU"]["Impose moist layer depth (T/F)"] && parseBoolString(metNode["IMPOSE MOIST LAYER DEPTH SUBMENU"]["Impose moist layer depth (T/F)"].as<string>(), "Impose moist layer depth (T/F)");
+        bool impLapse = metNode["IMPOSE LAPSE RATE SUBMENU"] && metNode["IMPOSE LAPSE RATE SUBMENU"]["Impose lapse rate (T/F)"] && parseBoolString(metNode["IMPOSE LAPSE RATE SUBMENU"]["Impose lapse rate (T/F)"].as<string>(), "Impose lapse rate (T/F)");
         YAML::Node metInputSubmenu = metNode["METEOROLOGICAL INPUT SUBMENU"];
-        input.MET_LOADMET = parseBoolString(metInputSubmenu["Use met. input (T/F)"].as<string>(), "Use met. input (T/F)");
+        bool loadMet = metInputSubmenu && metInputSubmenu["Use met. input (T/F)"] && parseBoolString(metInputSubmenu["Use met. input (T/F)"].as<string>(), "Use met. input (T/F)");
+        if (!loadMet && impMoist && impLapse) {
+            throw std::invalid_argument("Cannot fix both moist layer depth and lapse rate");
+        }
+
+        input.MET_TEMP = (paramNode["METEOROLOGICAL PARAMETERS SUBMENU"] && paramNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Temperature [K] (double)"]) ? paramNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Temperature [K] (double)"].as<double>() : 223.0;
+        input.MET_RHW = (paramNode["METEOROLOGICAL PARAMETERS SUBMENU"] && paramNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Relative Humidity [%] (double)"]) ? paramNode["METEOROLOGICAL PARAMETERS SUBMENU"]["Relative Humidity [%] (double)"].as<double>() : 50.0;
+        input.MET_LOADMET = loadMet;
         input.MET_FILENAME = parseFileSystemPath(metInputSubmenu["Met input file path (string)"].as<string>());
         input.MET_DT = parseDoubleString(metInputSubmenu["Time series data timestep [hr] (double)"].as<string>(), "Time series data timestep [hr] (double)");
         input.MET_LOADTEMP = parseBoolString(metInputSubmenu["Init temp. from met. (T/F)"].as<string>(), "Init temp. from met. (T/F)");
@@ -362,9 +484,9 @@ namespace YamlInputReader{
             input.ADV_SAVE_PSD_GRID = parseBoolString(advancedNode["Save gridded particle size distribution (T/F)"].as<string>(), "Save gridded particle size distribution (T/F)");
         } else {
             input.ADV_SAVE_PSD_GRID = false;
+        }
         input.ADV_SOLAR_DIMMING_FACTOR = 0.0;
         input.ADV_USE_JULIA_CHEMISTRY = false;
-        }
     }
 
     vector<std::unordered_map<string, double>> generateCasesHelper(vector<std::unordered_map<string, double>>& allCases, const vector<std::pair<string, Vector_1D>>& params, const std::size_t row){
@@ -400,6 +522,9 @@ namespace YamlInputReader{
 
         //Convert parameter map to vector, each row of the vector represents one parameter
         vector<std::pair<string, Vector_1D>> params;
+        if (input.SIMULATION_BOX_DURATION > 0) {
+            params.push_back({"BOX_DURATION", {input.SIMULATION_BOX_DURATION}});
+        }
         for (const auto& p: input.PARAMETER_PARAM_MAP){
             params.push_back(p);
         }

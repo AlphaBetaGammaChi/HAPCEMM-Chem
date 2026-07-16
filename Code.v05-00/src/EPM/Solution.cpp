@@ -21,6 +21,7 @@
 #include "Core/SZA.hpp"
 #include "EPM/Solution.hpp"
 #include "Util/PhysConstant.hpp"
+#include "Util/PhysFunction.hpp"
 
 using physConst::PI, physConst::kB;
 
@@ -54,6 +55,11 @@ void Solution::Initialize(std::string fileName,
     readInputBackgroundConditions(input, amb_Value, aer_Value, fileName);
     setAmbientConcentrations(input, amb_Value);
 
+    if ( ind_H2O >= NSPEC ) {
+        double H2Oval = (input.relHumidity_w()/((double) 100.0) * \
+                          physFunc::pSat_H2Ol( input.temperature_K() ) / ( kB * input.temperature_K() )) / 1.00E+06;
+        amb_Value[ind_H2O] = H2Oval / airDens;
+    }
     const double AMBIENT_VALID_TIME = 8.0; //hours
     SpinUp(amb_Value, input, Input_Opt, airDens, AMBIENT_VALID_TIME, varSpeciesArray);
 
@@ -406,6 +412,9 @@ void Solution::SpinUp(Vector_1D &amb_Value, const Input &input, const OptInput &
     /* Initialize arrays */
     for ( UInt iVar = 0; iVar < NVAR; iVar++ )
         varSpeciesArray[iVar] = amb_Value[iVar] * airDens;
+    if ( ind_H2O >= NVAR && ind_H2O < varSpeciesArray.size() ) {
+        varSpeciesArray[ind_H2O] = amb_Value[ind_H2O] * airDens;
+    }
 
     Vector_1D fixSpeciesArray(NFIX);
     for ( UInt iFix = 0; iFix < NFIX; iFix++ )
@@ -469,7 +478,7 @@ if (false) {
 
 
 
-        int type = 0;  // Default: no geoengineering
+        int type = input.backgroundGeoengineeringType();  // Read from input
 	switch (type) {
 	  case 0: /* None*/
 	   std::cout << " Geoengineering: None selected." << std::endl;
@@ -477,6 +486,7 @@ if (false) {
 
 	  case 1: /* NACL*/
 	   spinup_NACL_SAD = SAD_cgs;
+	   spinup_NACL_RAD = R_geo;
 	   varSpeciesArray[ind_NACL] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
 	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
@@ -503,8 +513,9 @@ if (false) {
 
 	  case 4: /* AL2O3*/
 	   std::cout << " Geoengineering: AL2O3 selected." << std::endl;
-	   spinup_NACL_SAD = SAD_cgs;
-	   varSpeciesArray[ind_NACL] = N_geo;
+	   spinup_AL2O3_SAD = SAD_cgs;
+	   spinup_AL2O3_RAD = R_geo;
+	   varSpeciesArray[ind_AL2O3] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
 	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
 	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;
@@ -512,8 +523,9 @@ if (false) {
 
 	  case 5: /* CACO3*/
 	   std::cout << " Geoengineering: CACO3 selected." << std::endl;
-	   spinup_NACL_SAD = SAD_cgs;
-	   varSpeciesArray[ind_NACL] = N_geo;
+	   spinup_CACO3_SAD = SAD_cgs;
+	   spinup_CACO3_RAD = R_geo;
+	   varSpeciesArray[ind_CACO3] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
 	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
 	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;
@@ -521,8 +533,9 @@ if (false) {
 
 	  case 6: /* DIAMOND*/
 	   std::cout << " Geoengineering: DIAMOND selected." << std::endl;
-	   spinup_NACL_SAD = SAD_cgs;
-	   varSpeciesArray[ind_NACL] = N_geo;
+	   spinup_DIAMOND_SAD = SAD_cgs;
+	   spinup_GEO_SAD     = SAD_cgs;
+	   /* Diamond: no dedicated KPP species index */
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
 	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
 	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;
@@ -530,8 +543,9 @@ if (false) {
 
 	  case 7: /* DUST*/
 	   std::cout << " Geoengineering: DUST selected." << std::endl;
-	   spinup_NACL_SAD = SAD_cgs;
-	   varSpeciesArray[ind_NACL] = N_geo;
+	   spinup_DUST_SAD = SAD_cgs;
+	   spinup_DUST_RAD = R_geo;
+	   varSpeciesArray[ind_DUST] = N_geo;
 	   std::cout << " Geoengineering: NACL selected." << std::endl;
 	   std::cout << " -Concentration: " << N_geo << " cm3" << std::endl;
 	   std::cout << " - Surface Area: " << SAD_cgs << " [cm2/cm2]" << std::endl;

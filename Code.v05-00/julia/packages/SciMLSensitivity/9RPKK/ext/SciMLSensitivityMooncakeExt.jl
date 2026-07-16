@@ -1,0 +1,242 @@
+module SciMLSensitivityMooncakeExt
+
+using SciMLSensitivity: SciMLSensitivity, FakeIntegrator
+using Mooncake: Mooncake
+import SciMLSensitivity: get_paramjac_config, get_cb_paramjac_config, mooncake_run_ad,
+    MooncakeVJP, MooncakeLoaded,
+    DiffEqBase, MooncakeAdjoint, _init_originator_gradient
+using SciMLSensitivity: SciMLBase, SciMLStructures, canonicalize, Tunable, isscimlstructure,
+    SciMLStructuresCompatibilityError, convert_tspan,
+    has_continuous_callback,
+    unwrapped_f, state_values, current_time
+using SciMLSensitivity: FunctionWrappersWrappers, ODEFunction
+using ChainRulesCore: NoTangent, ZeroTangent, Tangent, unthunk
+using Accessors: @reset
+
+# Mooncake-native gradient for the DAE/ODE init path. Avoids pulling Zygote
+# into the rrule when the user is differentiating with Mooncake. The default
+# (Zygote-based) implementation lives in src/concrete_solve.jl.
+function _init_originator_gradient(
+        ::SciMLBase.MooncakeOriginator, f, tunables,
+    )
+    rule = Mooncake.build_rrule(f, tunables)
+    _, (_, igs) = Mooncake.value_and_gradient!!(rule, f, tunables)
+    return igs
+end
+
+function get_paramjac_config(::MooncakeLoaded, ::MooncakeVJP, pf, p, f, y, _t)
+    dy_mem = zero(y)
+    λ_mem = zero(y)
+    cache = Mooncake.prepare_pullback_cache(pf, dy_mem, y, p, _t)
+    # Pre-allocate buffer for tangent_to_primal!! conversion of struct-based
+    # array types (e.g. ComponentArray) whose Mooncake tangent is Mooncake.Tangent.
+    # (Mooncake.Config(friendly_tangents=true) would avoid this, but currently
+    # fails on complex closure types captured by pf.)
+    p_grad_buf = p isa AbstractArray && !(p isa Array) ? similar(p) : nothing
+    return cache, pf, λ_mem, dy_mem, p_grad_buf
+end
+
+"""
+    get_cb_paramjac_config(::MooncakeLoaded, ::MooncakeVJP, raw_affect, event_idx, y, p, _t, mode)
+
+Build a Mooncake pullback cache for a tracked callback affect function. Mirrors
+the `get_cb_paramjac_config(::ReactantLoaded, ::ReactantVJP, ...)` entry point:
+`raw_affect` is extracted upfront (`get_affect!(cb, pos_neg)` at the call site)
+so the Mooncake-traced closure does not need to recursively unwrap
+`TrackedAffect`, which would otherwise trip on the `Base.argument_datatype`
+ccall surfaced by that dispatch.
+
+`mode === :state` builds a cache for the state-affect closure (state-sized
+output); `mode === :param` builds one for the parameter-affect closure
+(parameter-sized output) so its Mooncake cotangent/output buffers match the
+flat tunables shape rather than the state shape. The returned 5-tuple has the
+same layout as `get_paramjac_config(::MooncakeLoaded, ::MooncakeVJP, ...)` so
+`_vecjacobian!(::MooncakeVJP)` / `mooncake_run_ad` can consume it unchanged.
+"""
+function get_cb_paramjac_config(
+        ::MooncakeLoaded, ::MooncakeVJP, raw_affect, event_idx, y, p, _t, mode
+    )
+    has_event_idx = event_idx !== nothing
+    tprev0 = _t
+
+    if mode === :state
+        pf = let raw = raw_affect, ev = event_idx, tprev = tprev0, has_ev = has_event_idx
+            (out, u, p, t) -> begin
+                fakeinteg = FakeIntegrator(copy(u), copy(p), t, tprev)
+                if has_ev
+                    raw(fakeinteg, ev)
+                else
+                    raw(fakeinteg)
+                end
+                copyto!(out, fakeinteg.u)
+                return out
+            end
+        end
+        out_sample = y
+    elseif mode === :param
+        pf = let raw = raw_affect, ev = event_idx, tprev = tprev0, has_ev = has_event_idx
+            (out, u, p, t) -> begin
+                fakeinteg = FakeIntegrator(copy(u), copy(p), t, tprev)
+                if has_ev
+                    raw(fakeinteg, ev)
+                else
+                    raw(fakeinteg)
+                end
+                copyto!(out, fakeinteg.p)
+                return out
+            end
+        end
+        out_sample = p
+    else
+        error("get_cb_paramjac_config: unknown mode $(mode); expected :state or :param")
+    end
+
+    dy_mem = zero(out_sample)
+    λ_mem = zero(out_sample)
+    cache = Mooncake.prepare_pullback_cache(pf, dy_mem, y, p, _t)
+    p_grad_buf = p isa AbstractArray && !(p isa Array) ? similar(p) : nothing
+    return cache, pf, λ_mem, dy_mem, p_grad_buf
+end
+
+function mooncake_run_ad(paramjac_config::Tuple, y, p, t, λ)
+    cache, pf, λ_mem, dy_mem, p_grad_buf = paramjac_config
+    λ_mem .= λ
+    # The Mooncake cache is built with flat tunables (Vector), but callers like
+    # _vecjacobian! and vec_pjac! may pass the full structured parameter object.
+    # Extract flat tunables when p is a structured type to match the cache.
+    _p = if !(p isa AbstractArray) && p !== nothing && !(p isa SciMLBase.NullParameters)
+        first(canonicalize(Tunable(), p))
+    else
+        p
+    end
+    dy, _ = Mooncake.value_and_pullback!!(cache, λ_mem, pf, dy_mem, y, _p, t)
+    y_grad = cache.tangents[3]
+    p_grad_raw = cache.tangents[4]
+    p_grad = if p_grad_buf !== nothing && p_grad_raw isa Mooncake.Tangent
+        Mooncake.tangent_to_primal!!(p_grad_buf, p_grad_raw)
+    else
+        p_grad_raw
+    end
+    return dy, y_grad, p_grad
+end
+
+function SciMLBase._concrete_solve_adjoint(
+        prob::Union{
+            SciMLBase.AbstractDiscreteProblem,
+            SciMLBase.AbstractODEProblem,
+            SciMLBase.AbstractDAEProblem,
+            SciMLBase.AbstractDDEProblem,
+            SciMLBase.AbstractSDEProblem,
+            SciMLBase.AbstractSDDEProblem,
+            SciMLBase.AbstractRODEProblem,
+        },
+        alg, sensealg::MooncakeAdjoint,
+        u0, p, originator::SciMLBase.ADOriginator,
+        args...;
+        kwargs...
+    )
+    if !(p === nothing || p isa SciMLBase.NullParameters)
+        if !isscimlstructure(p)
+            throw(SciMLStructuresCompatibilityError())
+        end
+    end
+
+    if p === nothing || p isa SciMLBase.NullParameters
+        tunables, repack = p, identity
+    else
+        tunables, repack, _ = canonicalize(Tunable(), p)
+    end
+
+    function mooncake_adjoint_forwardpass(_u0, _p)
+        if (
+                convert_tspan(sensealg) === nothing &&
+                    ((haskey(kwargs, :callback) && has_continuous_callback(kwargs[:callback])))
+            ) ||
+                (convert_tspan(sensealg) !== nothing && convert_tspan(sensealg))
+            _tspan = convert.(eltype(_p), prob.tspan)
+        else
+            _tspan = prob.tspan
+        end
+
+        if DiffEqBase.isinplace(prob)
+            if prob.f isa ODEFunction &&
+                    (
+                    prob.f.f isa FunctionWrappersWrappers.FunctionWrappersWrapper ||
+                        SciMLBase.specialization(prob.f) === SciMLBase.AutoSpecialize
+                )
+                f = ODEFunction{isinplace(prob), SciMLBase.FullSpecialize}(unwrapped_f(prob.f))
+                _prob = remake(
+                    prob, f = f, u0 = _u0, p = _p, tspan = _tspan, callback = nothing
+                )
+            else
+                _prob = remake(prob, u0 = _u0, p = _p, tspan = _tspan, callback = nothing)
+            end
+        else
+            _prob = remake(
+                prob, u0 = _u0, p = SciMLStructures.replace(Tunable(), p, _p),
+                tspan = _tspan, callback = nothing
+            )
+        end
+
+        kwargs_filtered = NamedTuple(filter(x -> x[1] != :sensealg, kwargs))
+        sol = solve(
+            _prob, alg, args...; sensealg = DiffEqBase.SensitivityADPassThrough(),
+            kwargs_filtered...
+        )
+        sol = SciMLBase.sensitivity_solution(sol, state_values(sol), current_time(sol))
+        @reset sol.prob = prob
+        return sol
+    end
+
+    out,
+        pullback = Mooncake.value_and_pullback!!(
+        Mooncake.CoDual(mooncake_adjoint_forwardpass, Mooncake.NoFData()),
+        Mooncake.CoDual(u0, Mooncake.zero_rdata(u0)),
+        Mooncake.CoDual(tunables, Mooncake.zero_rdata(tunables))
+    )
+
+    function mooncake_adjoint_backpass(ybar)
+        tmp = if eltype(ybar) <: Number && u0 isa Array
+            Array(ybar)
+        elseif eltype(ybar) <: Number
+            ybar
+        elseif ybar isa Tangent
+            ut = unthunk.(ybar.u)
+            ut_ = map(ut) do u
+                (u isa ZeroTangent || u isa NoTangent) ? zero(u0) : u
+            end
+            reduce(hcat, ut_)
+        elseif ybar[1] isa Array
+            return Array(ybar)
+        else
+            tmp = vec(ybar.u[1])
+            for i in 2:length(ybar.u)
+                tmp = hcat(tmp, vec(ybar.u[i]))
+            end
+            return reshape(tmp, size(ybar.u[1])..., length(ybar.u))
+        end
+
+        _, u0bar, pbar = pullback(tmp)
+        _u0bar = u0bar
+
+        return if originator isa SciMLBase.TrackerOriginator ||
+                originator isa SciMLBase.ReverseDiffOriginator
+            (
+                NoTangent(), NoTangent(), _u0bar, pbar, NoTangent(),
+                ntuple(_ -> NoTangent(), length(args))...,
+            )
+        else
+            (
+                NoTangent(), NoTangent(), NoTangent(),
+                _u0bar, pbar, NoTangent(),
+                ntuple(_ -> NoTangent(), length(args))...,
+            )
+        end
+    end
+
+    u = state_values(out)
+    return SciMLBase.sensitivity_solution(out, u, current_time(out)),
+        mooncake_adjoint_backpass
+end
+
+end

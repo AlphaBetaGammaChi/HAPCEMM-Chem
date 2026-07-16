@@ -20,6 +20,7 @@
 #include "Util/ForwardDecl.hpp"
 
 enum class epm_type { EPM_ORIGINAL, EPM_EXTERNAL, EPM_NEW_PHYSICS };
+enum class ChemistrySolver { KPP, MICM, TEST };
 
 struct OptInput
 {
@@ -75,9 +76,12 @@ struct OptInput
     /* ========================================== */
 
     bool        CHEMISTRY_CHEMISTRY;
+    bool 	CHEMISTRY_ISOTOPE_ON;
     bool        CHEMISTRY_HETCHEM;
     double      CHEMISTRY_TIMESTEP;
     std::string CHEMISTRY_JRATE_FOLDER;
+    std::vector<std::string> SIMULATION_CUSTOM_SPECIES;
+    std::vector<double>      SIMULATION_CUSTOM_EIS;
 
     /* ========================================== */
     /* ---- AEROSOL MENU ------------------------ */
@@ -161,11 +165,27 @@ struct OptInput
     double ADV_EP_N_POSTJET;
     bool ADV_SAVE_PSD_GRID;
     double ADV_SOLAR_DIMMING_FACTOR;
+    ChemistrySolver CHEMISTRY_SOLVER;          /*!< "kpp" or "micm" */
+    bool MICM_USE_KPP_PHOTOL;              /*!< Toggle to use KPP PHOTOL in MICM */
+    bool MICM_USE_KPP_HETCHEM;             /*!< Toggle to use KPP HETCHEM in MICM */
+    bool ENABLE_DILUTION;                  /*!< Toggle box model dilution */
+    bool ENABLE_ENTRAINMENT;               /*!< Toggle box model entrainment */
+    std::string MICM_MECHANISM_PATH;       /*!< Path to MICM JSON mechanism directory */
+    bool ENABLE_STRANG_SPLITTING;          /*!< Toggle Strang Splitting for chemistry-microphysics */
+
+    /* Enzyme.jl adjoint sensitivity settings */
+    bool        ADJOINT_ENABLE;            /*!< Enable Enzyme reverse-mode adjoint pass */
+    std::string ADJOINT_MODE;              /*!< "species", "parameter", or "all" */
+    std::string ADJOINT_TARGET_NAME;       /*!< Target species/rate name for non-all modes */
+
     bool ADV_USE_JULIA_CHEMISTRY;
     int SIMULATION_BOXMODEL_MODE;
+    int SIMULATION_CHEMISTRY_RESOLUTION;
     int SIMULATION_BOXMODEL_THREADS;
+    double SIMULATION_BOX_DURATION;
     double MET_TEMP;
     double MET_RHW;
+    std::string BOX_OUTPUT_VARIABLES;
 
 };
 

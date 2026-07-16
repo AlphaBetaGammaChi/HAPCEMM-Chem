@@ -20,9 +20,9 @@ namespace util
 {
     double* vect2double( const std::vector<std::vector<double>> &vals, unsigned int N, unsigned int M );
 
-    float* vect2float( const std::vector<std::vector<std::vector<double>>> &vals, unsigned int N1, unsigned int N2, unsigned int N3 );
-    float* vect2float( const std::vector<std::vector<double>> &vals, unsigned int N, unsigned int M );
-    float* vect2float( const std::vector<double> &vals, unsigned int N );
+    std::vector<float> vect2float( const std::vector<std::vector<std::vector<double>>> &vals, unsigned int N1, unsigned int N2, unsigned int N3 );
+    std::vector<float> vect2float( const std::vector<std::vector<double>> &vals, unsigned int N, unsigned int M );
+    std::vector<float> vect2float( const std::vector<double> &vals, unsigned int N );
 }
 
 #endif /* UTIL_H_INCLUDED */

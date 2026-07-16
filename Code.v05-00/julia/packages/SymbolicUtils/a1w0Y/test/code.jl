@@ -1,0 +1,461 @@
+using Test, SymbolicUtils
+using NaNMath
+using SymbolicUtils.Code
+using SymbolicUtils.Code: LazyState
+using StaticArrays
+using LabelledArrays
+using SparseArrays
+using ReverseDiff
+using LinearAlgebra
+using SymbolicUtils: Const
+
+test_repr(a, b) = @test repr(Base.remove_linenums!(a)) == repr(Base.remove_linenums!(b))
+nanmath_st = Code.NameState()
+nanmath_st.rewrites[:nanmath] = true
+
+@testset "Code" begin
+    @syms a b c d e p q t x(t) y(t) z(t)
+    @test toexpr(Assignment(a, b)) == :(a = b)
+    @test toexpr(a ← b) == :(a = b)
+    @test toexpr(a+b) == :($(+)(a, b))
+    @test toexpr(a*b*c*d*e) == :($(*)($(*)($(*)($(*)(a, b), c), d), e))
+    @test toexpr(a+b+c+d+e) == :($(+)($(+)($(+)($(+)(a, b), c), d), e))
+    @test toexpr(a+b) == :($(+)(a, b))
+    newsym = eval(quote
+        let x = $x, y = $y, t = $t
+            $(toexpr(x(t)+y(t)))
+        end
+    end)
+    @test operation(newsym) === (+) && issetequal(arguments(newsym), [x(t), y(t)])
+    newsym = eval(quote
+        let x = $x, y = $y, t = $t
+            $(toexpr(x(t)+y(t)+x(t+1)))
+        end
+    end)
+    @test operation(newsym) === (+) && issetequal(arguments(newsym), [x(t), y(t), x(1+t)])
+    s = LazyState()
+    Code.union_rewrites!(s.rewrites, [x(t), y(t)])
+    newsym = eval(quote
+        let var"x(t)" = $(x(t)), x = $x, var"y(t)" = $(y(t)), t = $t
+            $(toexpr(x(t)+y(t)+x(t+1), s))
+        end
+    end)
+    @test operation(newsym) === (+) && issetequal(arguments(newsym), [x(t), x(1+t), y(t)])
+
+    ex = :(let a = 3, b = $(+)(1,a)
+               $(+)(a, b)
+           end)
+
+    test_repr(toexpr(Let([a ← 3, b ← 1+a], a + b)), ex)
+
+    test_repr(toexpr(Func([],[], a+b)) |>Base.remove_linenums!, :(function ()
+            $(+)(a, b)
+        end))
+
+    newf = eval(toexpr(Func([x(t), x, a, t],[b ← a+2, y(t) ← b], x(t)+x(t+1)+b+y(t))))
+    newsym = newf(x(t), x, a, t; var"y(t)" = y(t))
+    @test operation(newsym) === (+) && issetequal(arguments(newsym), [x(t), x(1+t), a, y(t), Const{SymReal}(2)])
+
+    fexpr1 = toexpr(Func([DestructuredArgs([x, x(t), t], :state),
+                           DestructuredArgs((a, b), :params)], [],
+                          x(t+1) + x(t) + a  + b))
+    newf = eval(fexpr1)
+    newsym = newf([x, x(t), t], [a, b])
+    @test operation(newsym) === (+) && issetequal(arguments(newsym), [x(t+1), x(t), a, b])
+
+    fexpr2 = toexpr(Func([DestructuredArgs([x, x(t), t], :state, create_bindings=false),
+                           DestructuredArgs((a, b), :params, create_bindings=false)], [],
+                          x(t+1) + x(t) + a  + b))
+    newf = eval(fexpr2)
+    newsym = newf([x, x(t), t], [a, b])
+    @test operation(newsym) === (+) && issetequal(arguments(newsym), [x(t+1), x(t), a, b])
+    @test fexpr1 != fexpr2
+
+    fexpr = toexpr(Func([],[],:(rand()), [Expr(:meta, :inline)]))
+    @test any(isequal(Expr(:meta, :inline)), fexpr.args[2].args)
+
+    ex = toexpr(Func([DestructuredArgs([x, x(t)], :state, inbounds=true)], [], x(t+1) + x(t)))
+    ex = Base.remove_linenums!(ex)
+    for e ∈ ex.args[2].args[1].args[1:2]
+        @test e.args[2].head == :macrocall
+    end
+
+    test_repr(toexpr(SetArray(false, a, [x(t), AtIndex(9, b), c])),
+              quote
+                  a[1] = x(t)
+                  a[9] = b
+                  a[3] = c
+                  nothing
+              end)
+    @test toexpr(SetArray(true, a, [x(t), AtIndex(9, b), c])).head == :macrocall
+
+    for fname in (:sin, :cos, :tan, :asin, :acos, :acosh, :atanh, :log, :log2, :log10, :log1p, :sqrt)
+        f = getproperty(Base, fname)
+        @test toexpr(f(a)) == :($f(a))
+        @test toexpr(f(a), nanmath_st) == :($(GlobalRef(NaNMath, fname))(a))
+
+        nanmath_f = getproperty(NaNMath, fname)
+        @test toexpr(nanmath_f(a)) == :($nanmath_f(a))
+        @test toexpr(nanmath_f(a), nanmath_st) == :($nanmath_f(a))
+    end
+
+    @test toexpr(a^b) == :($(^)(a, b))
+    @test toexpr(a^b, nanmath_st) == :($(NaNMath.pow)(a, b))
+    @test toexpr(NaNMath.pow(a, b)) == :($(NaNMath.pow)(a, b))
+    @test toexpr(NaNMath.pow(a, b), nanmath_st) == :($(NaNMath.pow)(a, b))
+
+    @test toexpr(a^2) == :($(^)(a, 2))
+    @test toexpr(a^2, nanmath_st) == :($(^)(a, 2))
+    @test toexpr(NaNMath.pow(a, 2)) == :($(^)(a, 2))
+    @test toexpr(NaNMath.pow(a, 2), nanmath_st) == :($(^)(a, 2))
+
+    @test toexpr(a^-1) == :($(/)(1, a))
+    @test toexpr(a^-1, nanmath_st) == :($(/)(1, a))
+    @test toexpr(NaNMath.pow(a, -1)) == :($(/)(1, a))
+    @test toexpr(NaNMath.pow(a, -1), nanmath_st) == :($(/)(1, a))
+
+    @test toexpr(a^-2) == :($(/)(1, $(^)(a, 2)))
+    @test toexpr(a^-2, nanmath_st) == :($(/)(1, $(^)(a, 2)))
+    @test toexpr(NaNMath.pow(a, -2)) == :($(/)(1, $(^)(a, 2)))
+    @test toexpr(NaNMath.pow(a, -2), nanmath_st) == :($(/)(1, $(^)(a, 2)))
+
+    f = GlobalRef(NaNMath, :sin)
+    test_repr(toexpr(LiteralExpr(:(let x=1, y=2
+                                       $(sin(a+b))
+                                   end)), nanmath_st),
+              :(let x = 1, y = 2
+                    $(f)($(+)(a, b))
+                end))
+    test_repr(toexpr(LiteralExpr(:(let x=1, y=2
+                                       $(sin(a+b))
+                                   end))),
+              :(let x = 1, y = 2
+                    $(sin)($(+)(a, b))
+                end))
+
+    test_repr(toexpr(MakeArray([a,b,a+b], :arr)),
+              quote
+                  $(SymbolicUtils.Code.create_array)(typeof(arr), nothing, Val{1}(), Val{(3,)}(), a, b, $(+)(a, b))
+              end)
+
+    toexpr(Let([a ← 1, b ← 2, :arr ← [1,2]],
+               MakeArray([a,b,a+b,a/b], :arr)))
+
+    test_repr(toexpr(Let([DestructuredArgs([x(t),b,c], :foo) ← [3,3,[1,4]],
+                          DestructuredArgs([p,q], c)],
+                         x(t)+a+b+c)),
+              :(let foo = Any[3, 3, [1, 4]],
+                    var"x(t)" = foo[1], b = foo[2], c = foo[3],
+                    p = c[1], q = c[2]
+                    $(+)($(+)($(+)(a, b), c), var"x(t)")
+                end))
+
+    test_repr(toexpr(Func([DestructuredArgs([a,b],c,inds=[:a, :b])], [],
+                          a + b)),
+              :(function (c,)
+                    begin
+                        a = c.a
+                        b = c.b
+                        $(+)(a, b)
+                    end
+                end))
+    @syms arr
+
+    @test eval(toexpr(Let([a ← 1, b ← 2, arr ← [1,2]],
+                          MakeArray([a,b,a+b,a/b], arr)))) == [1, 2, 3, 1/2]
+
+    @test eval(toexpr(Let([a ← 1, b ← 2, arr ← [1,2]],
+                          MakeArray(view([a,b,a+b,a/b], :), arr)))) == [1, 2, 3, 1/2]
+
+    @test eval(toexpr(Let([a ← 1, b ← 2, arr ← [1,2]],
+                          MakeArray(PermutedDimsArray([a b;a+b a/b], (1,2)), arr)))) == [1 2 ; 3  1/2]
+
+    @test eval(toexpr(Let([a ← 1, b ← 2, arr ← [1,2]],
+                          MakeArray(transpose([a b;a+b a/b]), arr)))) == [1 3;2 1/2]
+
+    @test eval(toexpr(Let([a ← 1, b ← 2, arr ← [1,2]],
+                          MakeArray(UpperTriangular([a b;a+b a/b]), arr)))) == [1 2;0 1/2]
+
+    @test eval(toexpr(Let([a ← 1, b ← 2, arr ← [1,2]],
+                          MakeArray([a b;a+b a/b], arr)))) == [1 2; 3 1/2]
+
+    @test eval(toexpr(Let([a ← 1, b ← 2, arr ← @SVector([1,2])],
+                          MakeArray([a,b,a+b,a/b], arr)))) === @SVector [1, 2, 3, 1/2]
+
+    @test eval(toexpr(Let([a ← 1, b ← 2, arr ← @SVector([1,2])],
+                          MakeArray([a b;a+b a/b], arr)))) === @SMatrix [1 2; 3 1/2]
+
+    @test eval(toexpr(Let([a ← 1, b ← 2, arr ← @SLVector((:a, :b))(@SVector[1,2])],
+                          MakeArray([a+b,a/b], arr)))) === @SLVector((:a, :b))(@SVector [3, 1/2])
+
+    trackedarr = eval(toexpr(Let([a ← ReverseDiff.track(1.0), b ← 2, arr ← ReverseDiff.track(ones(2))],
+                          MakeArray([a+b,a/b], arr))))
+    @test trackedarr isa ReverseDiff.TrackedArray
+    @test trackedarr == [3, 1/2]
+
+    trackedarr = eval(toexpr(Let([a ← ReverseDiff.track(1.0), b ← 2, arr ← ReverseDiff.track(ones(2))],
+                          MakeArray([a b; a+b a/b], arr))))
+    @test trackedarr isa ReverseDiff.TrackedArray
+    @test trackedarr == [1 2; 3 1/2]
+
+
+    R1 = eval(toexpr(Let([a ← 1, b ← 2, arr ← @MVector([1,2])],MakeArray([a,b,a+b,a/b], arr))))
+    @test R1 == (@MVector [1, 2, 3, 1/2]) && R1 isa MVector
+
+    R2 = eval(toexpr(Let([a ← 1, b ← 2, arr ← @MVector([1,2])],MakeArray([a b;a+b a/b], arr))))
+    @test R2 == (@MArray [1 2; 3 1/2]) && R2 isa MMatrix
+
+    mksp = MakeSparseArray(sparse([1,2,31,32,2],
+                                  [1,2,31,32,2],
+                                  [a, b, a+b, a/b, a-b+e]))
+    reference = sparse([1,2,31,32],
+                     [1,2,31,32],
+                     [a, a+e, a+b, a/b])
+
+    test_repr(mksp.array, reference)
+
+    test_repr(toexpr(mksp),
+              :(SparseMatrixCSC(32, 32,
+                                $(reference.colptr),
+                                $(reference.rowval),
+                                [$(map(toexpr, reference.nzval)...)])))
+
+
+    spvec = sparsevec([5], [a], 10)
+
+    test_repr(toexpr(MakeSparseArray(spvec)),
+              :(SparseVector(10, $(spvec.nzind), [a])))
+    test_repr(toexpr(MakeTuple((a, b, a+b))),
+              :((a,b,$(+)(a,b))))
+
+    @test SpawnFetch{Multithreaded}([()->1,()->2],vcat)|>toexpr|>eval == [1,2]
+    @test @elapsed(SpawnFetch{Multithreaded}([:(()->sleep(2)),
+                                              Func([:x],
+                                                   [],
+                                                   :(sleep(x)))],
+                                             [(),
+                                              (2,)],
+                                             vcat)|>toexpr|>eval) < 3
+
+    let
+        @syms a b
+
+        f = eval(toexpr(Func([a+b], [], a+b)))
+        @test @invokelatest(f(1)) == 1
+        @test @invokelatest(f(2)) == 2
+
+        f = eval(toexpr(Func([a, b], [], sqrt(a - b)), nanmath_st))
+        @test isnan(@invokelatest f(0, 10))
+        @test @invokelatest(f(10, 2)) ≈ sqrt(8)
+    end
+
+    let
+        io = IOBuffer()
+        twoπ = Base.Irrational{:twoπ}()
+        for q ∈ Base.Irrational[Base.MathConstants.catalan, Base.MathConstants.γ, π, Base.MathConstants.φ, ℯ, twoπ]
+            Base.show(io, q)
+            s1 = String(take!(io))
+            SymbolicUtils.show_term(io, SymbolicUtils.Term{SymReal}(identity, [q]))
+            s2 = String(take!(io))
+            @test s1 == s2
+        end
+    end
+
+    let
+        @syms a b
+
+        t = term(sum, [a, b, a + b, 3a + 2b, sqrt(b)]; type = Number)
+        f = eval(toexpr(Func([a, b], [], t)))
+        @test @invokelatest(f(1.0, 2.0)) ≈ 13.0 + sqrt(2)
+    end
+end
+
+@testset "Sparse array CSE" begin
+    @syms x y z
+    arr = [x^2 + y^2 0 0; 0 sin(y^2 + z^2) 0; 0 0 z^2 + x^2]
+    sarr = sparse(arr);
+    fn = eval(toexpr(Func([x, y, z], [], Code.cse(sarr))))
+
+    expected = eval(toexpr(Let([x ← 1, y ← 2, z ← 3], sarr)))
+    @test fn(1, 2, 3) ≈ expected
+end
+
+function foo(args...) end
+
+SymbolicUtils.Code.cse_inside_expr(sym, ::typeof(foo), args...) = false
+
+@testset "`cse_inside_expr`" begin
+    @syms x y
+    ex1 = (x^2 + y^2)
+    exfoo = term(foo, ex1; type = Real)
+    ex2 = ex1 + exfoo
+    letblock = cse(ex2)
+    ex3 = Code.rhs(last(letblock.pairs))
+    @test any(isequal(exfoo), arguments(ex3))
+end
+
+@testset "CSE does not alias constants with function arguments" begin
+    # When build_function is given argument arrays containing constants (e.g., zeros
+    # from erased cache variables), CSE should not replace identical constants in the
+    # expression body with references to those argument positions. This is a regression
+    # test for https://github.com/JuliaSymbolics/Symbolics.jl/issues/1811.
+    @syms x1 x2 x3 x4 x5 x6
+    x_vars = [x1, x2, x3, x4, x5, x6]
+    # A sparse diagonal jacobian-like expression
+    ZERO = SymbolicUtils.Const{SymReal}(0)
+    expr = fill(ZERO, 12, 6)
+    for i in 1:6
+        expr[i, i] = cos(x_vars[i])
+        expr[i + 6, i] = -sin(x_vars[i])
+    end
+    # Second argument is all-zeros (simulating erased cache variables passed to build_function)
+    zero_args = [SymbolicUtils.Const{SymReal}(0) for _ in 1:12]
+    f_cse = eval(toexpr(Func([DestructuredArgs(x_vars, :arg1, inbounds = true, create_bindings = false),
+                               DestructuredArgs(zero_args, :arg2, inbounds = true, create_bindings = false)],
+                              [], Code.cse(MakeArray(expr, Array)))))
+    # Call with non-zero values for arg2 to expose incorrect aliasing
+    result = @invokelatest f_cse(collect(1.0:6.0), ones(12) * 99.0)
+    @test result[1, 2] == 0.0  # off-diagonal should be 0, NOT 99.0
+    @test result[2, 1] == 0.0
+    @test result[1, 1] ≈ cos(1.0)
+    @test result[2, 2] ≈ cos(2.0)
+end
+
+@testset "`AtIndex` with symbolic index" begin
+    @syms a b c::Matrix{Int}
+    ex = SetArray(false, c, [AtIndex(MakeArray([a, b], Array), [a + b, a - b])])
+    expr = quote
+        let a = 1, b = 2, c = zeros(Int, 3, 3)
+            $(toexpr(ex))
+            c
+        end
+    end
+    arr = eval(expr)
+    @test arr[1] == 3
+    @test arr[2] == -1
+    for i in 3:length(arr)
+        @test arr[i] == 0
+    end
+end
+
+@testset "`ForLoop`" begin
+    @syms a b c::Vector{Int}
+    ex = ForLoop(a, term(range, b^2, b^2 + 3), SetArray(false, c, [AtIndex(a, a + 1)]))
+    expr = quote
+        let b = 2, c = zeros(Int, 10)
+            $(toexpr(ex))
+            c
+        end
+    end
+    arr = eval(expr)
+    @test arr[4] == 5
+    @test arr[5] == 6
+    @test arr[6] == 7
+    @test arr[7] == 8
+    @test all(iszero, arr[1:3])
+    @test all(iszero, arr[8:end])
+end
+
+@testset "`SetArray` with `return_arr`" begin
+    @syms a b c::Vector{Int}
+    ex = SetArray(false, c, [3, 2, 1], false)
+    expr = quote
+        let b = 2, c = zeros(Int, 3)
+            $(toexpr(ex))
+        end
+    end
+    @test eval(expr) === nothing
+    ex = SetArray(false, c, [3, 2, 1], true)
+    expr = quote
+        let b = 2, c = zeros(Int, 3)
+            $(toexpr(ex))
+        end
+    end
+    @test eval(expr) == [3, 2, 1]
+end
+
+@testset "`create_array` creating single-element SArray of SArray" begin
+    val = Code.create_array(SArray, nothing, Val(1), Val((1,)), Code.create_array(SArray, nothing, Val(1), Val((1,)), 1.0))
+    @test val == SA[SA[1.0]]
+end
+
+@testset "`cse` retains shape information" begin
+    @syms x[1:3, 1:3] y[1:3, 1:3]
+    ex = (x*y)^2 + (x*y)^3
+    block = cse(ex)
+    @test SymbolicUtils.shape(block.pairs[1].lhs) == [1:3, 1:3]
+end
+
+@testset "`with_allocator`" begin
+    @testset "`array_literal`" begin
+        @syms x y z
+        arr = SymbolicUtils.Const{SymReal}([x, y + 2x^2 + sin(z), 2z + 1])
+        wrapped = Code.with_allocator(ones, arr)
+        @test isequal(collect(arr), collect(wrapped))
+        test_repr(
+            toexpr(wrapped), quote
+                __array_literal_allocator = ones
+                __array_literal_result = __array_literal_allocator((3,))
+                $(setindex!)(__array_literal_result, x, 1)
+                $(setindex!)(__array_literal_result, $(+)($(+)(y, $(sin)(z)), $(*)(2, $(^)(x, 2))), 2)
+                $(setindex!)(__array_literal_result, $(+)(1, $(*)(2, z)), 3)
+                __array_literal_result
+            end
+        )
+
+        reference = eval(
+            quote
+                let x = 1, y = 2, z = 3
+                    $(toexpr(arr))
+                end
+            end
+        )
+        value = eval(
+            quote
+                let x = 1, y = 2, z = 3
+                    $(toexpr(wrapped))
+                end
+            end
+        )
+        @test isequal(reference, value)
+
+        value = eval(
+            quote
+                let x = 1, y = 2, z = 3
+                    $(toexpr(Code.cse(wrapped)))
+                end
+            end
+        )
+        @test isequal(reference, value)
+    end
+
+    @testset "`@arrayop`" begin
+        @syms x[1:3] y[1:3]
+        arr = @arrayop (i,) x[i] * y[i]
+        wrapped = Code.with_allocator(ones, arr)
+        @test isequal(collect(arr), collect(wrapped))
+        test_repr(
+            toexpr(wrapped), (
+                quote
+                    let _out = $(ones)((3,))
+                        var"%_out" = for _1 in 1:1:3
+                            begin
+                                _out[$(CartesianIndex)(_1)] = $(+)($(getindex)(_out, _1), $(*)($(getindex)(x, _1), $(getindex)(y, _1)))
+                                nothing
+                            end
+                        end
+                        _out
+                    end
+                end
+            ).args[2]
+        )
+    end
+end
+
+@testset "`create_array` with `ReshapedArray`" begin
+    v = rand(5)
+    r = reshape(view(v, 1:4), 2, 2)
+    @test r isa Base.ReshapedArray
+    a = Code.create_array(typeof(r), nothing, Val(2), Val((2, 2)), r...)
+    @test a isa Matrix{Float64}
+end

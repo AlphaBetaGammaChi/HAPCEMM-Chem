@@ -1,0 +1,18 @@
+name = "aws_c_http_jll"
+uuid = "3254fc65-9028-534d-aa9d-d76d128babc6"
+version = "0.10.13+0"
+
+[deps]
+JLLWrappers = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
+aws_c_compression_jll = "73a04cd5-f3d7-5bac-9290-e8adb709f224"
+aws_c_io_jll = "13c41daa-f319-5298-b5eb-5754e0170d52"
+Libdl = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+Artifacts = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+
+[compat]
+JLLWrappers = "1.7.0"
+julia = "1.6"
+aws_c_compression_jll = "0.3.2"
+aws_c_io_jll = "0.26.3"
+Libdl = "< 0.0.1, 1"
+Artifacts = "< 0.0.1, 1"

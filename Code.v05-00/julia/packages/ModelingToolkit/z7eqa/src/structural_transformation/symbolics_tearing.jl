@@ -1,0 +1,85 @@
+function tearing(
+        state::TearingState;
+        tearing_alg::StateSelection.TearingAlgorithm = StateSelection.DummyDerivativeTearing(),
+        kwargs...
+    )
+    state.structure.solvable_graph === nothing && StateSelection.find_solvables!(state; kwargs...)
+    StateSelection.complete!(state.structure)
+    return tearing_alg(state.structure)
+end
+
+"""
+    tearing(sys)
+
+Tear the nonlinear equations in system. When `simplify=true`, we simplify the
+new residual equations after tearing. End users are encouraged to call [`mtkcompile`](@ref)
+instead, which calls this function internally.
+"""
+function tearing(
+        sys::AbstractSystem, state = TearingState(sys); mm = nothing,
+        reassemble_alg::ReassembleAlgorithm = DefaultReassembleAlgorithm(),
+        fully_determined = true, kwargs...
+    )
+    tearing_result, extras = tearing(state; kwargs...)
+    return invalidate_cache!(reassemble_alg(state, tearing_result, mm; fully_determined, kwargs...))
+end
+
+function safe_isinteger(@nospecialize(x::Number))
+    if x isa Int64
+        return true
+    elseif x isa Int32
+        return true
+    elseif x isa BigInt
+        return typemin(Int) <= x <= typemax(Int)
+    elseif x isa Float64
+        return isinteger(x) && typemin(Int) <= x <= typemax(Int)
+    elseif x isa Float32
+        return isinteger(x) && typemin(Int) <= x <= typemax(Int)
+    elseif x isa BigFloat
+        return isinteger(x) && typemin(Int) <= x <= typemax(Int)
+    elseif x isa Rational{Int64}
+        return isinteger(x) && typemin(Int) <= x <= typemax(Int)
+    elseif x isa Rational{Int32}
+        return isinteger(x) && typemin(Int) <= x <= typemax(Int)
+    elseif x isa Rational{BigInt}
+        return isinteger(x) && typemin(Int) <= x <= typemax(Int)
+    else
+        return isinteger(x)::Bool && (typemin(Int) <= x)::Bool && (x <= typemax(Int))::Bool
+    end
+end
+
+"""
+    dummy_derivative(sys)
+
+Perform index reduction and use the dummy derivative technique to ensure that
+the system is balanced.
+"""
+function dummy_derivative(
+        sys, state = TearingState(sys);
+        reassemble_alg::ReassembleAlgorithm = DefaultReassembleAlgorithm(),
+        mm = nothing, fully_determined = true, kwargs...
+    )
+    jac = let state = state
+        (eqs, vars) -> begin
+            symeqs = equations(state)[eqs]
+            _J = Symbolics.jacobian((x -> x.rhs).(symeqs), state.fullvars[vars])
+            J = similar(_J, Int)
+            for i in eachindex(_J)
+                el = _J[i]
+                Moshi.Match.@match el begin
+                    BSImpl.Const(; val) && if val isa Number end => begin
+                        safe_isinteger(val)|| return nothing
+                        J[i] = convert(Int, val)::Int
+                    end
+                    _ => return nothing
+                end
+            end
+            return J
+        end
+    end
+    state_priority = Base.Fix1(getindex, state.structure.state_priorities)
+    tearing_result, extras = StateSelection.dummy_derivative_graph!(
+        state, jac; state_priority, kwargs...
+    )
+    return reassemble_alg(state, tearing_result, mm; fully_determined, kwargs...)
+end

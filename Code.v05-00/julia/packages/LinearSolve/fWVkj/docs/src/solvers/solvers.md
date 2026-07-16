@@ -1,0 +1,906 @@
+# [Linear System Solvers](@id linearsystemsolvers)
+
+`LS.solve(prob::LS.LinearProblem,alg;kwargs)`
+
+Solves for ``Au=b`` in the problem defined by `prob` using the algorithm
+`alg`. If no algorithm is given, a default algorithm will be chosen.
+
+## Recommended Methods
+
+### Dense Matrices
+
+The default algorithm `nothing` is good for picking an algorithm that will work,
+but one may need to change this to receive more performance or precision. If
+more precision is necessary, `LS.QRFactorization()` and `LS.SVDFactorization()` are
+the best choices, with SVD being the slowest but most precise.
+
+For efficiency, `RFLUFactorization` is the fastest for dense LU-factorizations until around
+150x150 matrices, though this can be dependent on the exact details of the hardware. After this
+point, `MKLLUFactorization` is usually faster on most hardware. Note that on Mac computers
+that `AppleAccelerateLUFactorization` is generally always the fastest. `OpenBLASLUFactorization` 
+provides direct OpenBLAS calls without going through libblastrampoline and can be faster than 
+`LUFactorization` in some configurations. `LUFactorization` will use your base system BLAS which 
+can be fast or slow depending on the hardware configuration. `SimpleLUFactorization` will be fast 
+only on very small matrices but can cut down on compile times.
+
+For very large dense factorizations, offloading to the GPU can be preferred. Metal.jl can be used
+on Mac hardware to offload, and has a cutoff point of being faster at around size 20,000 x 20,000
+matrices (and only supports Float32). `CudaOffloadLUFactorization` and `CudaOffloadQRFactorization` 
+can be more efficient at a much smaller cutoff, possibly around size 1,000 x 1,000 matrices, though 
+this is highly dependent on the chosen GPU hardware. These algorithms require a CUDA-compatible NVIDIA GPU.
+CUDA offload supports Float64 but most consumer GPU hardware will be much faster on Float32
+(many are >32x faster for Float32 operations than Float64 operations) and thus for most hardware
+this is only recommended for Float32 matrices. Choose `CudaOffloadLUFactorization` for better 
+performance on well-conditioned problems, or `CudaOffloadQRFactorization` for better numerical 
+stability on ill-conditioned problems.
+
+#### Mixed Precision Methods
+
+For large well-conditioned problems where memory bandwidth is the bottleneck, mixed precision 
+methods can provide significant speedups (up to 2x) by performing the factorization in Float32 
+while maintaining Float64 interfaces. These methods are particularly effective for:
+- Large dense matrices (> 1000x1000)
+- Well-conditioned problems (condition number < 10^4)
+- Hardware with good Float32 performance
+
+Available mixed precision solvers:
+- `MKL32MixedLUFactorization` - CPUs with MKL
+- `AppleAccelerate32MixedLUFactorization` - Apple CPUs with Accelerate
+- `CUDAOffload32MixedLUFactorization` - NVIDIA GPUs with CUDA
+- `MetalOffload32MixedLUFactorization` - Apple GPUs with Metal
+
+These methods automatically handle the precision conversion, making them easy drop-in replacements
+when reduced precision is acceptable for the factorization step.
+
+!!! note
+    
+    Performance details for dense LU-factorizations can be highly dependent on the hardware configuration.
+    For details see [this issue](https://github.com/SciML/LinearSolve.jl/issues/357).
+    If one is looking to best optimize their system, we suggest running the performance
+    tuning benchmark.
+
+### Sparse Matrices
+
+For sparse LU-factorizations, `PureKLUFactorization` (a pure-Julia KLU with no
+SuiteSparse dependency, the default) if there is less structure to the sparsity
+pattern and `UMFPACKFactorization` if there is more structure. The SuiteSparse-backed
+`KLUFactorization` remains available as an explicit alternative.
+For sparse QR-factorizations (used for non-square, rank-deficient, or least-squares
+systems, and as the fallback when the sparse LU hits a (near-)singular matrix), the
+same less-structure/more-structure split as the LU case applies:
+`SparseColumnPivotedQRFactorization` (a pure-Julia, rank-revealing column-pivoted
+sparse QR with no SuiteSparse dependency, the default) if there is less structure to
+the sparsity pattern, and SPQR — the SuiteSparse-backed sparse QR, used by
+`QRFactorization()` on a sparse matrix — if there is more structure. This mirrors the
+`PureKLUFactorization`/`UMFPACKFactorization` choice for LU:
+`SparseColumnPivotedQRFactorization` is the KLU-style default and SPQR
+(`QRFactorization`) is the more-structured alternative.
+`ParUFactorization` (from SuiteSparse's ParU library) provides a parallel
+alternative to `UMFPACKFactorization` that exploits OpenMP task parallelism
+for the numeric factorization phase, which can give speedups on multicore systems
+for larger sparse problems.
+`MUMPSFactorization` provides a sparse direct alternative through `MUMPS.jl`
+for users who want MUMPS's distributed-memory-capable direct solver interface
+through the standard LinearSolve caching API.
+`STRUMPACKFactorization` provides a sparse direct alternative that can be tuned
+with approximate low-rank compression options (for example HSS/HODLR modes,
+compression tolerances, and rank/leaf-size controls) when supported by the
+installed STRUMPACK build.
+Pardiso.jl's methods are also known to be very efficient sparse linear solvers.
+
+For GPU-accelerated sparse LU-factorizations, there are two high-performance options.
+When using CuSparseMatrixCSR arrays with CUDSS.jl loaded, `LUFactorization()` will
+automatically use NVIDIA's cuDSS library. Alternatively, `CUSOLVERRFFactorization`
+provides access to NVIDIA's cusolverRF library. Both offer significant performance
+improvements for sparse systems on CUDA-capable GPUs and are particularly effective
+for large sparse matrices that can benefit from GPU parallelization. `CUDSS` is more
+for `Float32` while `CUSOLVERRFFactorization` is for `Float64`.
+
+While these sparse factorizations are based on implementations in other languages,
+and therefore constrained to standard number types (`Float64`,  `Float32` and
+their complex counterparts),  `SparspakFactorization` is able to handle general
+number types, e.g. defined by `ForwardDiff.jl`, `MultiFloats.jl`,
+or `IntervalArithmetics.jl`.
+
+As sparse matrices get larger, iterative solvers tend to get more efficient than
+factorization methods if a lower tolerance of the solution is required.
+
+Krylov.jl generally outperforms IterativeSolvers.jl and KrylovKit.jl, and is compatible
+with CPUs and GPUs, and thus is the generally preferred form for Krylov methods. The
+choice of Krylov method should be the one most constrained to the type of operator one
+has, for example if positive definite then `KrylovJL_CG()`, but if no good properties then
+use `KrylovJL_GMRES()`.
+
+Finally, a user can pass a custom function for handling the linear solve using
+`LS.LinearSolveFunction()` if existing solvers are not optimally suited for their application.
+The interface is detailed [here](@ref custom).
+
+### Lazy SciMLOperators
+
+If the linear operator is given as a lazy non-concrete operator, such as a `FunctionOperator`,
+then using a Krylov method is preferred in order to not concretize the matrix.
+Krylov.jl generally outperforms IterativeSolvers.jl and KrylovKit.jl, and is compatible
+with CPUs and GPUs, and thus is the generally preferred form for Krylov methods. The
+choice of Krylov method should be the one most constrained to the type of operator one
+has, for example if positive definite then `KrylovJL_CG()`, but if no good properties then
+use `KrylovJL_GMRES()`.
+
+!!! tip
+    
+    If your materialized operator is a uniform block diagonal matrix, then you can use
+    `SimpleGMRES(; blocksize = <known block size>)` to further improve performance.
+    This often shows up in Neural Networks where the Jacobian wrt the Inputs (almost always)
+    is a Uniform Block Diagonal matrix of Block Size = size of the input divided by the
+    batch size.
+
+## Full List of Methods
+
+### Polyalgorithms
+
+```@docs
+LinearSolve.DefaultLinearSolver
+```
+
+### RecursiveFactorization.jl
+
+!!! note
+    
+    Using this solver requires adding the package RecursiveFactorization.jl, i.e. `using RecursiveFactorization`
+
+```@docs
+RFLUFactorization
+```
+
+### SpecializingFactorizations.jl
+
+!!! note
+    
+    Using this solver requires adding the package SpecializingFactorizations.jl, i.e. `using SpecializingFactorizations`
+
+```@docs
+SpecializedLUFactorization
+SpecializedQRFactorization
+```
+
+### Base.LinearAlgebra
+
+These overloads tend to work for many array types, such as `CuArrays` for GPU-accelerated
+solving, using the overloads provided by the respective packages. Given that this can be
+customized per-package, details given below describe a subset of important arrays
+(`Matrix`, `SparseMatrixCSC`, `CuMatrix`, etc.)
+
+```@docs
+LUFactorization
+GenericLUFactorization
+QRFactorization
+SVDFactorization
+CholeskyFactorization
+BunchKaufmanFactorization
+CHOLMODFactorization
+NormalCholeskyFactorization
+NormalBunchKaufmanFactorization
+```
+
+### LinearSolve.jl
+
+LinearSolve.jl contains some linear solvers built in for specialized cases.
+
+```@docs
+SimpleLUFactorization
+DiagonalFactorization
+SimpleGMRES
+DirectLdiv!
+LinearSolveFunction
+```
+
+### FastLapackInterface.jl
+
+FastLapackInterface.jl is a package that allows for a lower-level interface to the LAPACK
+calls to allow for preallocating workspaces to decrease the overhead of the wrappers.
+LinearSolve.jl provides a wrapper to these routines in a way where an initialized solver
+has a non-allocating LU factorization. In theory, this post-initialized solve should always
+be faster than the Base.LinearAlgebra version. In practice, with the way we wrap the solvers,
+we do not see a performance benefit and in fact benchmarks tend to show this inhibits
+performance.
+
+!!! note
+    
+    Using this solver requires adding the package FastLapackInterface.jl, i.e. `using FastLapackInterface`
+
+```@docs
+FastLUFactorization
+FastQRFactorization
+```
+
+### SuiteSparse.jl
+
+!!! note
+    
+    Using this solver requires adding the package SparseArrays.jl, i.e. `using SparseArrays`
+
+```@docs
+KLUFactorization
+PureKLUFactorization
+UMFPACKFactorization
+SparseColumnPivotedQRFactorization
+```
+
+!!! note
+    
+    `PureKLUFactorization` is a pure-Julia KLU (from PureKLU.jl, no SuiteSparse
+    dependency) and is the default sparse LU for "less structured" sparsity
+    patterns, replacing the SuiteSparse-backed `KLUFactorization` in the default
+    polyalgorithm.
+
+!!! note
+    
+    `SparseColumnPivotedQRFactorization` is a pure-Julia, rank-revealing
+    column-pivoted sparse QR (from SparseColumnPivotedQR.jl, no SuiteSparse
+    dependency). It is the default sparse QR: the polyalgorithm selects it for
+    non-square sparse systems and falls back to it from the sparse LU
+    (`PureKLUFactorization`/`UMFPACKFactorization`) when the matrix is
+    (near-)singular — the sparse, KLU-style analog of using a column-pivoted QR
+    for rank-deficient dense systems.
+
+### ParU (SuiteSparse)
+
+!!! note
+    
+    Using this solver requires loading `ParU_jll` (available on Julia ≥ 1.12):
+    ```julia
+    import ParU_jll
+    using LinearSolve, SparseArrays
+    ```
+
+```@docs
+ParUFactorization
+```
+
+### MUMPS.jl
+
+!!! note
+
+    Using this solver requires loading `MUMPS.jl`, `SparseArrays`, and `MPI`,
+    and calling `MPI.Init()` before constructing the solver.
+
+!!! warning
+
+    Call `cleanup_mumps_cache!` explicitly through the extension before
+    `MPI.Finalize()`:
+    ```julia
+    MUMPSExt = Base.get_extension(LinearSolve, :LinearSolveMUMPSExt)
+    MUMPSExt.cleanup_mumps_cache!(sol)
+    ```
+
+```@docs
+MUMPSFactorization
+```
+
+### Sparspak.jl
+
+!!! note
+    
+    Using this solver requires adding the package Sparspak.jl, i.e. `using Sparspak`
+
+```@docs
+SparspakFactorization
+```
+
+### STRUMPACK
+
+!!! note
+
+    Using this solver requires `using SparseArrays` and loading `STRUMPACK_jll` (for example `import STRUMPACK_jll`).
+
+The following convenience keywords map to STRUMPACK runtime options:
+
+- `compression` -> `--sp_compression`
+- `rel_tol` -> `--sp_rel_tol`
+- `abs_tol` -> `--sp_abs_tol`
+- `max_rank` -> `--sp_max_rank`
+- `leaf_size` -> `--sp_leaf_size`
+- `reordering` -> `--sp_reordering_method`
+- `matching` -> `--sp_enable_matching`
+
+You can also pass raw STRUMPACK flags via `options = ["--flag", "value", ...]`.
+
+```@docs
+STRUMPACKFactorization
+```
+
+### CliqueTrees.jl
+
+!!! note
+    
+    Using this solver requires adding the package CliqueTrees.jl, i.e. `using CliqueTrees`
+
+```@docs
+CliqueTreesFactorization
+```
+
+### Krylov.jl
+
+```@docs
+KrylovJL_CG
+KrylovJL_MINRES
+KrylovJL_GMRES
+KrylovJL_BICGSTAB
+KrylovJL_LSMR
+KrylovJL_CRAIGMR
+KrylovJL
+```
+
+### MKL.jl
+
+```@docs
+MKLLUFactorization
+MKL32MixedLUFactorization
+```
+
+### OpenBLAS
+
+```@docs
+OpenBLASLUFactorization
+```
+
+### AppleAccelerate.jl
+
+!!! note
+    
+    Using this solver requires a Mac with Apple Accelerate. This should come standard in most "modern" Mac computers.
+
+```@docs
+AppleAccelerateLUFactorization
+AppleAccelerate32MixedLUFactorization
+```
+
+### Metal.jl
+
+!!! note
+    
+    Using this solver requires adding the package Metal.jl, i.e. `using Metal`. This package is only compatible with Mac M-Series computers with a Metal-compatible GPU.
+
+```@docs
+MetalLUFactorization
+MetalOffload32MixedLUFactorization
+```
+
+### Pardiso.jl
+
+!!! note
+    
+    Using this solver requires adding the package Pardiso.jl, i.e. `using Pardiso`
+
+```@docs
+MKLPardisoFactorize
+MKLPardisoIterate
+LinearSolve.PardisoJL
+```
+
+### CUDA.jl
+
+Note that `CuArrays` are supported by `GenericFactorization` in the "normal" way.
+The following are non-standard GPU factorization routines.
+
+!!! note
+    
+    Using these solvers requires adding the package CUDA.jl, i.e. `using CUDA`
+
+```@docs
+CudaOffloadLUFactorization
+CudaOffloadQRFactorization
+CUDAOffload32MixedLUFactorization
+```
+
+### AMDGPU.jl
+
+The following are GPU factorization routines for AMD GPUs using the ROCm stack.
+
+!!! note
+    
+    Using these solvers requires adding the package AMDGPU.jl, i.e. `using AMDGPU`
+
+```@docs
+AMDGPUOffloadLUFactorization
+AMDGPUOffloadQRFactorization
+```
+
+### CUSOLVERRF.jl
+
+!!! note
+    
+    Using this solver requires adding the package CUSOLVERRF.jl, i.e. `using CUSOLVERRF`
+
+```@docs
+CUSOLVERRFFactorization
+```
+
+### IterativeSolvers.jl
+
+!!! note
+    
+    Using these solvers requires adding the package IterativeSolvers.jl, i.e. `using IterativeSolvers`
+
+```@docs
+IterativeSolversJL_CG
+IterativeSolversJL_GMRES
+IterativeSolversJL_BICGSTAB
+IterativeSolversJL_MINRES
+IterativeSolversJL_IDRS
+IterativeSolversJL
+```
+
+### KrylovKit.jl
+
+!!! note
+    
+    Using these solvers requires adding the package KrylovKit.jl, i.e. `using KrylovKit`
+
+```@docs
+KrylovKitJL_CG
+KrylovKitJL_GMRES
+KrylovKitJL
+```
+
+### HYPRE.jl
+
+!!! note
+    
+    Using HYPRE solvers requires Julia version 1.9 or higher, and that the package HYPRE.jl
+    is installed.
+
+!!! note
+
+    Initialize HYPRE before solving:
+    ```julia
+    using HYPRE
+    HYPRE.Init()
+    ```
+
+[HYPRE.jl](https://github.com/fredrikekre/HYPRE.jl) is the Julia interface to
+[hypre](https://computing.llnl.gov/projects/hypre-scalable-linear-solvers-multigrid-methods).
+It targets large sparse linear systems and is especially useful when the solve itself should
+run across multiple MPI ranks.
+
+`HYPREAlgorithm` supports two workflows:
+
+- Serial auto-conversion: pass ordinary Julia sparse matrices and vectors and let
+  LinearSolve construct `HYPREMatrix` / `HYPREVector` values automatically.
+- MPI auto-construction: pass a communicator with `comm = MPI.COMM_WORLD` (or another MPI
+  communicator), and LinearSolve will split a plain Julia matrix/vector into contiguous local
+  row blocks before constructing distributed HYPRE objects.
+
+For the MPI workflow, `sol.u` is a distributed `HYPREVector` holding the owned local rows on
+each rank. Unlike the PETSc `SparseMatrixCSC` MPI path, the full Julia solution is not
+replicated back onto every rank automatically.
+
+
+```@docs
+HYPREAlgorithm
+```
+
+### PartitionedSolvers.jl
+
+!!! note
+
+    Using this integration requires loading `LinearSolve.jl`, `PartitionedArrays.jl`, and the
+    `PartitionedSolvers` subproject:
+    ```julia
+    using LinearSolve, PartitionedArrays, PartitionedSolvers
+    ```
+
+The `PartitionedSolversAlgorithm` extension is intended for
+`PSparseMatrix` / `PVector` inputs from `PartitionedArrays.jl`. It delegates solves to the
+local `PartitionedSolvers` solver constructors, supports repeated `solve!` reuse through the
+cached solver object, and provides a typed `defaultalg` dispatch for square `PSparseMatrix`
+problems.
+
+The integration is solver-agnostic: it forwards only the convergence keywords that the chosen
+solver constructor accepts, so different PartitionedSolvers solvers can be used directly. The
+CG-backed Krylov path is the default,
+
+```julia
+using LinearSolve, PartitionedArrays, PartitionedSolvers
+
+alg = PartitionedSolversAlgorithm(PartitionedSolvers.cg)
+sol = solve(prob, alg; abstol = 1.0e-10, reltol = 1.0e-10)
+```
+
+but other distributed solvers such as the stationary Jacobi iteration work the same way:
+
+```julia
+alg = PartitionedSolversAlgorithm(PartitionedSolvers.jacobi)
+sol = solve(prob, alg; maxiters = 50)
+```
+
+```@docs
+PartitionedSolversAlgorithm
+```
+
+### Ginkgo.jl
+
+!!! note
+    
+    Using these solvers requires adding the package Ginkgo.jl, i.e. `using Ginkgo`.
+    Ginkgo.jl currently only supports `Float32` element types with `Int32` sparse indices.
+
+```@docs
+GinkgoJL
+GinkgoJL_CG
+GinkgoJL_GMRES
+```
+
+### PETSc.jl
+
+!!! note
+
+    Using this solver requires loading PETSc.jl, MPI.jl, and SparseMatricesCSR.jl,
+    and initialising MPI:
+    ```julia
+    using PETSc, MPI, SparseMatricesCSR
+    MPI.Init()
+    ```
+
+[PETSc](https://petsc.org) (Portable, Extensible Toolkit for Scientific Computation) is a
+library for the parallel numerical solution of scientific applications.  Its KSP
+component provides a comprehensive suite of Krylov iterative solvers paired with a large
+selection of preconditioners.
+
+`PETScAlgorithm` wraps PETSc's KSP solvers via [PETSc.jl](https://github.com/JuliaParallel/PETSc.jl)
+and exposes the full preconditioner interface.  It works with **dense matrices**,
+**`SparseMatrixCSC`**, and **`SparseMatrixCSR`** (from
+[SparseMatricesCSR.jl](https://github.com/gridap/SparseMatricesCSR.jl)).
+
+**When to choose PETSc over the pure-Julia Krylov solvers:**
+- You want to test a wide variety of Krylov methods and preconditioners without needing to add multiple Julia packages.
+- You want direct access to PETSc's Options Database to fine-tune solver behavior at runtime
+  without recompiling.
+- You want to solve large sparse systems in parallel using MPI, with PETSc handling the communication and load balancing.
+
+#### Solver type
+
+The first positional argument selects the KSP algorithm. Any string accepted by
+[`KSPSetType`](https://petsc.org/release/manualpages/KSP/KSPSetType/) can be passed as a `Symbol`.
+The most commonly used options are:
+
+| Symbol | Method | Notes |
+| :--- | :--- | :--- |
+| `:gmres` (default) | GMRES | General non-symmetric systems |
+| `:fgmres` | Flexible GMRES | Allows variable preconditioner |
+| `:lgmres` | LGMRES | Augmented GMRES, better for restarting |
+| `:cg` | Conjugate Gradient | SPD systems only |
+| `:fcg` | Flexible CG | CG with variable preconditioner |
+| `:minres` | MINRES | Symmetric indefinite systems |
+| `:symmlq` | SYMMLQ | Symmetric indefinite systems |
+| `:bcgs` | BiCGStab | Non-symmetric, more stable than BiCG |
+| `:fbcgs` | Flexible BiCGStab | BiCGStab with variable preconditioner |
+| `:bcgsl` | BiCGStab(ℓ) | Stabilised BiCGStab variant |
+| `:bicg` | BiConjugate Gradient | Non-symmetric |
+| `:cgs` | CGS | Non-symmetric, faster but less stable |
+| `:tfqmr` | TFQMR | Transpose-free QMR |
+| `:tcqmr` | TCQMR | Transpose-free QMR variant |
+| `:cr` | Conjugate Residuals | Symmetric systems |
+| `:gcr` | GCR | Generalized CR, flexible preconditioner |
+| `:chebyshev` | Chebyshev iteration | Requires eigenvalue bounds; good for smoothing |
+| `:richardson` | Richardson iteration | Stationary; mainly used as smoother |
+| `:lsqr` | LSQR | Least-squares problems |
+| `:cgls` | CGLS | Least-squares problems |
+| `:preonly` | Preconditioner only | Use with `:lu` for a direct solve |
+| `:none` | No solver | Identity; useful for debugging |
+
+#### Preconditioners
+
+Preconditioners are selected via the `pc_type` keyword. Any string accepted by
+[`PCSetType`](https://petsc.org/release/manualpages/PC/PCSetType/) can be passed as a `Symbol`.
+The most commonly used options are:
+
+| Symbol | Preconditioner | Notes |
+| :--- | :--- | :--- |
+| `:none` (default) | No preconditioner | Useful for well-conditioned problems |
+| `:jacobi` | Diagonal (Jacobi) scaling | Cheap; good for diagonally dominant systems |
+| `:pbjacobi` | Point Block Jacobi | Fixed-size dense blocks along the diagonal |
+| `:sor` | SOR / Gauss-Seidel | Successive over-relaxation |
+| `:eisenstat` | Eisenstat SSOR | Symmetric SOR; cheaper than a full SSOR sweep |
+| `:ilu` | Incomplete LU | General sparse systems |
+| `:icc` | Incomplete Cholesky | SPD systems; symmetric analogue of ILU |
+| `:lu` | Exact LU (direct) | Use with `:preonly` for a direct solve |
+| `:cholesky` | Exact Cholesky (direct) | SPD systems; use with `:preonly` |
+| `:bjacobi` | Block Jacobi | Applies an independent ILU/LU solve per block |
+| `:asm` | Additive Schwarz | Overlapping domain decomposition |
+| `:gasm` | Generalized Additive Schwarz | Multi-level ASM variant |
+| `:gamg` | Algebraic Multigrid (GAMG) | No hierarchy needed; good for PDEs |
+| `:hypre` | Hypre BoomerAMG | Excellent AMG for large ill-conditioned systems |
+| `:kaczmarz` | Kaczmarz | Row-projection smoother |
+
+A separate matrix for building the preconditioner can be supplied via `prec_matrix`:
+
+```julia
+PETScAlgorithm(:gmres; prec_matrix = P)
+```
+
+#### Matrix format recommendations
+
+PETSc operates internally on 0-based CSR arrays. The recommended matrix format is
+**`SparseMatrixCSR{0}`** (from SparseMatricesCSR.jl), which matches PETSc's native layout
+exactly:
+
+- **`SparseMatrixCSR{0}`** — *fastest*: zero-copy path on construction; direct `copyto!`
+  on value-only updates.
+- **`SparseMatrixCSR{1}`** — slightly slower than `{0}` on construction (index shift on
+  cold start), same fast value-update path.
+- **`SparseMatrixCSC`** — supported, but requires a CSC→CSR permutation and scatter on
+  every value update.
+- **Dense `Matrix`** — supported via `MatSeqDense`; works out of the box.
+
+```julia
+using SparseMatricesCSR, SparseArrays
+
+A_csc = spdiagm(-1 => -ones(n-1), 0 => 2ones(n), 1 => -ones(n-1))
+
+# Recommended: one-liner to build SparseMatrixCSR{0} from a CSC matrix.
+# Note: this mutates A_csc's internal storage (colptr/rowvals are shifted in-place).
+# Use a copy if you need to keep A_csc usable afterwards.
+A = SparseMatrixCSR{0}(transpose(sparse(transpose(A_csc))))
+```
+
+#### Basic usage
+
+```julia
+using LinearSolve, PETSc, MPI, SparseArrays, LinearAlgebra
+MPI.Init()
+
+n = 200
+A = sprand(n, n, 0.05); A = A + A' + 20I
+b = rand(n)
+
+# Simple one-shot solve with ILU preconditioner
+sol = solve(LinearProblem(A, b), PETScAlgorithm(:gmres; pc_type = :ilu))
+@show norm(A * sol.u - b) / norm(b)
+```
+
+#### Repeated solves (same sparsity pattern, values change)
+
+When the sparsity pattern is fixed across calls,
+the KSP is reused and only the matrix values are updated.
+
+```julia
+using LinearSolve, PETSc, MPI, SparseArrays, SparseMatricesCSR, LinearAlgebra
+import SciMLBase
+MPI.Init()
+
+n = 200
+A_csc = sprand(n, n, 0.05); A_csc = A_csc + A_csc' + 20I
+b = rand(n)
+
+# Convert to SparseMatrixCSR{0} once — getrowptr/getcolval require a CSR matrix
+A = SparseMatrixCSR{0}(transpose(sparse(transpose(A_csc))))
+
+cache = SciMLBase.init(LinearProblem(A, b), PETScAlgorithm(:gmres; pc_type = :ilu))
+solve!(cache)
+
+# Extract the fixed sparsity structure once (0-based row pointers and column indices)
+rowptr0 = copy(SparseMatricesCSR.getrowptr(A))
+colval0 = copy(SparseMatricesCSR.getcolval(A))
+
+# Iterate: only nzval changes, sparsity pattern is fixed
+for t in 1:10
+    new_vals = A.nzval .* (1 + 0.1 * t)   # e.g. time-varying coefficients
+    A_new = SparseMatrixCSR{0}(n, n, rowptr0, colval0, new_vals)
+    SciMLBase.reinit!(cache; A = A_new, b = rand(n))
+    solve!(cache)
+end
+```
+
+#### Extra PETSc options
+
+Any PETSc Options Database key can be forwarded via `ksp_options`:
+
+```julia
+PETScAlgorithm(:gmres;
+    pc_type     = :ilu,
+    ksp_options = (ksp_monitor = "", ksp_rtol = 1e-12, pc_factor_levels = 2))
+```
+
+#### Memory management
+
+PETSc objects live in C-managed memory outside Julia's GC.  Call
+`cleanup_petsc_cache!` explicitly when finished to release resources promptly:
+
+```julia
+PETScExt = Base.get_extension(LinearSolve, :LinearSolvePETScExt)
+PETScExt.cleanup_petsc_cache!(sol)   # after solve(...)
+PETScExt.cleanup_petsc_cache!(cache) # after init/solve! cycle
+```
+
+A GC finalizer is registered as a safety net, but explicit cleanup is strongly preferred.
+
+#### MPI-parallel solves
+
+`PETScAlgorithm` supports two MPI-parallel workflows:
+
+- **Replicated Julia matrices/vectors**: pass a plain `SparseMatrixCSC` (or dense Julia
+  matrix) together with `comm = MPI.COMM_WORLD` or another multi-rank communicator.
+  Each rank assembles only its owned row interval into PETSc, PETSc solves the
+  distributed system, and the full solution is gathered back into the ordinary Julia
+  vector `sol.u` on every rank.
+- **PartitionedArrays inputs**: use `PSparseMatrix` and `PVector` from
+  [PartitionedArrays.jl](https://github.com/PartitionedArrays/PartitionedArrays.jl). Each MPI rank
+  contributes its owned rows; PETSc assembles and solves the global system in parallel,
+  and the owned portion of the `PVector` solution is updated on each rank.
+
+For the replicated Julia-matrix/vector workflow, load:
+
+```julia
+using LinearSolve, PETSc, MPI, SparseMatricesCSR
+MPI.Init()
+```
+
+For the PartitionedArrays workflow, load all four trigger packages:
+
+```julia
+using LinearSolve, PETSc, MPI
+using PartitionedArrays, SparseArrays, SparseMatricesCSR
+MPI.Init()
+```
+
+!!! note
+
+    Run scripts with `mpiexecjl -n <P> julia --project script.jl`.
+    For single-process testing without MPI, use `with_debug()` instead of `with_mpi()`;
+    it runs the same code sequentially using `DebugArray` as the backend.
+
+##### Replicated SparseMatrixCSC solve
+
+```julia
+using LinearSolve, PETSc, MPI, SparseArrays, SparseMatricesCSR, LinearAlgebra
+MPI.Init()
+
+n = 12
+A = spdiagm(-1 => -ones(n - 1), 0 => 4.0 .* ones(n), 1 => -ones(n - 1))
+b = ones(n)
+
+sol = solve(
+    LinearProblem(A, b),
+    PETScAlgorithm(:gmres; comm = MPI.COMM_WORLD);
+    abstol = 1e-10,
+    reltol = 1e-10
+)
+
+# sol.u is the full replicated solution on every rank.
+@show norm(A * sol.u - b) / norm(b)
+```
+
+##### Repeated replicated solves
+
+```julia
+using LinearSolve, PETSc, MPI, SparseArrays, SparseMatricesCSR, LinearAlgebra
+import SciMLBase
+
+MPI.Init()
+
+n = 12
+A = spdiagm(-1 => -ones(n - 1), 0 => 4.0 .* ones(n), 1 => -ones(n - 1))
+b = ones(n)
+
+cache = SciMLBase.init(
+    LinearProblem(A, b),
+    PETScAlgorithm(:gmres; comm = MPI.COMM_WORLD);
+    abstol = 1e-10,
+    reltol = 1e-10
+)
+solve!(cache)
+
+for rhs_scale in (2.0, 3.0, 4.0)
+    SciMLBase.reinit!(cache; b = rhs_scale .* b)
+    solve!(cache)
+end
+
+PETScExt = Base.get_extension(LinearSolve, :LinearSolvePETScExt)
+PETScExt.cleanup_petsc_cache!(cache)
+```
+
+##### Basic parallel solve with PartitionedArrays
+
+```julia
+using LinearSolve, PETSc, MPI
+using PartitionedArrays, PartitionedArrays: PSparseMatrix, PVector,
+    uniform_partition, partition, tuple_of_arrays
+using SparseArrays, SparseMatricesCSR
+MPI.Init()
+
+# Build a simple diagonal system distributed across all ranks.
+# A[i,i] = i,  b[i] = i  →  exact solution u[i] = 1 everywhere.
+n = 100
+with_mpi() do distribute
+    parts = distribute(LinearIndices((MPI.Comm_size(MPI.COMM_WORLD),)))
+    row_partition = uniform_partition(parts, n)
+
+    I_v, J_v, V_v = map(row_partition) do rng
+        collect(Int, rng), collect(Int, rng), Float64.(rng)
+    end |> tuple_of_arrays
+    A = psparse(I_v, J_v, V_v, row_partition, row_partition) |> fetch
+
+    b = PVector(map(rng -> Float64.(collect(rng)), row_partition), row_partition)
+    u = PVector(map(rng -> zeros(length(rng)), row_partition), row_partition)
+
+    sol = solve(LinearProblem(A, b; u0 = u), PETScAlgorithm(:gmres); abstol = 1e-12)
+    # sol.u is a PVector whose owned DOFs contain the solution on each rank.
+    # Ghost values are stale after the solve; call consistent!(sol.u) if needed.
+end
+```
+
+##### Repeated parallel solves (same sparsity pattern, values change)
+
+For `SparseMatrixCSR{0}` local matrices, if the sparsity pattern
+is unchanged between `reinit!` calls the KSP is reused and only the matrix values
+are updated no reallocation of PETSc objects.
+
+```julia
+with_mpi() do distribute
+    parts = distribute(LinearIndices((MPI.Comm_size(MPI.COMM_WORLD),)))
+    row_partition = uniform_partition(parts, n)
+
+    function build_csr_diag(row_partition, scale)
+        csr_part = map(row_partition) do rng
+            m = length(rng)
+            sp = sparse(1:m, 1:m, scale .* Float64.(collect(rng)), m, m)
+            convert(SparseMatrixCSR{0, Float64, Int64}, sp)
+        end
+        A = PSparseMatrix(csr_part, row_partition, row_partition, true)
+        b = PVector(map(rng -> scale .* Float64.(collect(rng)), row_partition), row_partition)
+        u = PVector(map(rng -> zeros(length(rng)), row_partition), row_partition)
+        A, b, u
+    end
+
+    A1, b1, u1 = build_csr_diag(row_partition, 1.0)
+    cache = SciMLBase.init(LinearProblem(A1, b1; u0 = u1), PETScAlgorithm(:gmres))
+    solve!(cache)
+
+    for scale in [2.0, 3.0, 4.0]
+        A_new, b_new, _ = build_csr_diag(row_partition, scale)
+        SciMLBase.reinit!(cache; A = A_new, b = b_new)
+        solve!(cache)   # KSP reused; only values updated
+    end
+
+    PETScExt = Base.get_extension(LinearSolve, :LinearSolvePETScExt)
+    PETScExt.cleanup_petsc_cache!(cache)
+end
+```
+
+!!! note "Ghost synchronisation"
+
+    After the solve, only the **owned** degrees of freedom in `sol.u` are updated.
+    Ghost values remain stale.  If subsequent operations (e.g. the next matrix–vector
+    product) need ghost values, call:
+    ```julia
+    PartitionedArrays.consistent!(sol.u)
+    ```
+
+#### MPI test coverage
+
+The PETSc MPI suite is verified for both `mpiexecjl -n 2` and `mpiexecjl -n 4`.
+Coverage includes:
+
+- replicated `SparseMatrixCSC` ownership and MPI assembly
+- replicated `SparseMatrixCSC` distributed solves and repeated `solve!` reuse
+- `PSparseMatrix` / `PVector` solves on MPI and DebugArray backends
+- explicit PETSc retcode and a posteriori safety-check coverage on the MPI paths
+
+```@docs
+PETScAlgorithm
+```
+
+### LinearSolvePyAMG.jl
+
+!!! note
+
+    `LinearSolvePyAMG` is a sub-library of LinearSolve.jl. Using these solvers
+    requires adding it: `using LinearSolvePyAMG`. The Python
+    [PyAMG](https://pyamg.readthedocs.io) library is installed automatically via
+    CondaPkg.jl; no manual Python setup is required.
+
+`PyAMG(; method = :RugeStuben, accel = nothing, kwargs...)` — Algebraic Multigrid
+solver. `method` can be `:RugeStuben` (default) or `:SmoothedAggregation`. The optional
+`accel` keyword (`"cg"`, `"gmres"`, `"bicgstab"`, …) wraps the AMG cycle in a Krylov
+solver. Convenience constructors `PyAMG_RugeStuben` and `PyAMG_SmoothedAggregation`
+are also provided.

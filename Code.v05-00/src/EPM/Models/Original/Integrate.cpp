@@ -143,9 +143,30 @@ namespace EPM::Models
 
         /* Create coagulation kernels */
         const AIM::Coagulation Kernel( "liquid", SO4_rJ, SO4_vJ, RHO_SULF, temperature_K, simVars_.pressure_Pa );
-        const AIM::Coagulation Kernel_SO4_Soot( "liquid", SO4_rJ, RHO_SULF, EI_.getSootRad(), RHO_SOOT, temperature_K, simVars_.pressure_Pa );
+	const AIM::Coagulation Kernel_SootOnly( "liquid", SO4_rJ, RHO_SULF, EI_.getSootRad(), RHO_SOOT, temperature_K, simVars_.pressure_Pa );
+	double rho_geo = input_.backgroundGeoengineeringRho();
+	double rad_geo = input_.backgroundGeoengineeringRadius();
+	const AIM::Coagulation Kernel_GeoOnly( "liquid" , SO4_rJ, RHO_SULF, rad_geo, rho_geo, temperature_K, simVars_.pressure_Pa );
+        
 
-        const Vector_1D KernelSO4Soot = Kernel_SO4_Soot.getKernel_1D();
+        Vector_1D K_Soot_Vec          = Kernel_SootOnly.getKernel_1D();
+	const Vector_1D K_Geo_Vec = Kernel_GeoOnly.getKernel_1D();
+
+	if (K_Soot_Vec.size()!= K_Geo_Vec.size()) { std::cerr << "Error: Kernel vector size mismatch" << std::endl; 
+		exit (1);
+	}
+        
+	double n_soot_emit = EI_.getSootNum() * aircraft_.FuelFlow() / double(aircraft_.EngNumber()) / aircraft_.VFlight() / Ab0 * 1.00E-06;
+	if (n_soot_emit < 1.0e-5) { n_soot_emit = 1.0e-24;} //Eplison of 1.0e-24 used to prevent numerical error if soot and geo enigneering = 0
+	
+        double geo_conc = input_.backgroundGeoengineeringNumber();
+	double n_total_cores = n_soot_emit + geo_conc;
+
+        for(size_t i = 0; i < K_Soot_Vec.size(); i++) {
+	    K_Soot_Vec[i] = (K_Soot_Vec[i] * n_soot_emit + K_Geo_Vec[i] * geo_conc) / n_total_cores;  //weighted average of soot and geoeingeering particles
+	}
+
+	const Vector_1D KernelSO4Soot = K_Soot_Vec;
 
         /* Create SO4 aerosol number distribution.
          * We allocate the PDF with a very small number of existing particles */
@@ -165,22 +186,15 @@ namespace EPM::Models
 
 
         /* Store ambient concentrations */
-        double H2O_amb  = VAR_[ind_H2O]/n_air_amb;     /* [molec/cm^3] */
-        double SO4_amb  = VAR_[ind_SO4]/n_air_amb;     /* [molec/cm^3] */
+        double H2O_amb  = met_.rhwRef() / 100.0 * pSat_H2Ol( temperature_K ) / simVars_.pressure_Pa;     /* mixing ratio */
+        double SO4_amb  = (ind_SO4 == ind_H2O) ? 1.0e-11 : VAR_[ind_SO4]/n_air_amb;     /* mixing ratio */
         double SO4l_amb, SO4g_amb;               /* [molec/cm^3] */
         double HNO3_amb = VAR_[ind_HNO3]/n_air_amb;    /* [molec/cm^3] */
         double Soot_amb = sootDensity/n_air_amb; ///n_air_amb; /* [#/cm^3] */
 
         /* Add emissions of one engine to concentration arrays */
-        VAR_[ind_H2O] += EI_.getH2O() / ( MW_H2O  * 1.0E+03 ) * aircraft_.FuelFlow() / double(aircraft_.EngNumber()) / aircraft_.VFlight() * Na / Ab0     * 1.00E-06 ;
-        /* [ molec/cm^3 ] += [ g/kgf ]   / [ kg/mol ] * [ g/kg ] * [ kgf/s ]                                  / [ m/s ]      * [ molec/mol ] / [ m^2 ] * [ m^3/cm^3 ]
-         *                += [ molec/cm^3 ] */
-
-        VAR_[ind_H2O] = VAR_[ind_H2O] / n_air_eng ;
-
-        /* Variable SO2 */
-        VAR_[ind_SO4] += EI_.getSO2toSO4() * EI_.getSO2() / ( MW_H2SO4  * 1.0E+03 ) * aircraft_.FuelFlow() / double(aircraft_.EngNumber()) / aircraft_.VFlight() * Na / Ab0 * 1.00E-06;
-        VAR_[ind_SO4] = VAR_[ind_SO4] / n_air_eng;
+        double plume_H2O = H2O_amb + ( EI_.getH2O() / ( MW_H2O  * 1.0E+03 ) * aircraft_.FuelFlow() / double(aircraft_.EngNumber()) / aircraft_.VFlight() * Na / Ab0     * 1.00E-06 ) / n_air_eng;
+        double plume_SO4 = SO4_amb + ( EI_.getSO2toSO4() * EI_.getSO2() / ( MW_H2SO4  * 1.0E+03 ) * aircraft_.FuelFlow() / double(aircraft_.EngNumber()) / aircraft_.VFlight() * Na / Ab0 * 1.00E-06 ) / n_air_eng;
 
         double varSoot = Soot_amb + EI_.getSoot() / ( 4.0 / double(3.0) * PI * RHO_SOOT * 1.00E+03 * EI_.getSootRad() * EI_.getSootRad() * EI_.getSootRad() ) * aircraft_.FuelFlow() / double(aircraft_.EngNumber()) / aircraft_.VFlight() / Ab0 * 1.00E-06 ; /* [ #/cm^3 ] */
         varSoot = varSoot / n_air_eng;
@@ -237,12 +251,12 @@ namespace EPM::Models
         x[EPM_ind_Trac] = 1.0;
         x[EPM_ind_T]    = Tc0;
         x[EPM_ind_P]    = simVars_.pressure_Pa;
-        x[EPM_ind_H2O]  = VAR_[ind_H2O];
-        x[EPM_ind_SO4]  = VAR_[ind_SO4];
+        x[EPM_ind_H2O]  = plume_H2O;
+        x[EPM_ind_SO4]  = plume_SO4;
 
         /* Assume that emitted SO4 is purely gaseous as temperature is high */
         x[EPM_ind_SO4l] = 0.0;
-        x[EPM_ind_SO4g] = VAR_[ind_SO4];
+        x[EPM_ind_SO4g] = plume_SO4;
         x[EPM_ind_SO4s] = 0.0;
         x[EPM_ind_HNO3] = VAR_[ind_HNO3] / n_air_eng;
         x[EPM_ind_Part] = varSoot;
@@ -256,10 +270,84 @@ namespace EPM::Models
         StateObserver observer(obs_Var, obs_Time, EPM_ind, input_.fileName_micro(), 2);
 
         /* Creating ode's right hand side */
+        /* ================================================================== */
+        /* Geo-engineering particle physics: hygroscopic growth, water uptake, */
+        /* combined aerosol PDF, and effective radius for EPM RHS.            */
+        /* ================================================================== */
+        double geoengineering_concentration = input_.backgroundGeoengineeringNumber();
+        double geoengineering_radius        = input_.backgroundGeoengineeringRadius();
+        double geoengineering_shape         = input_.backgroundGeoengineeringShapeFactor();
+        double kappa                        = input_.backgroundGeoengineeringWettability();
+
+        /* Effective dry radius corrected for non-spherical shape factor */
+        /* Shape factor phi = V_particle/V_sphere; r_eff = r_nominal * phi^(-1/3) */
+        double effective_geoengineering_radius = (geoengineering_shape > 1.0e-15)
+                                                 ? geoengineering_radius / std::cbrt(geoengineering_shape)
+                                                 : geoengineering_radius;
+
+        /* Kappa-Koehler hygroscopic growth: grows dry radius to wet radius */
+        /* r_wet = r_dry * (1 + kappa * RH / (1 - RH))^(1/3)              */
+        double p_water_Pa   = plume_H2O * n_air_amb * physConst::kB * temperature_K * 1.0e6;
+        double p_sat_Pa     = pSat_H2Ol(temperature_K);
+        double RH_frac      = std::min(p_water_Pa / std::max(p_sat_Pa, 1.0e-30), 0.999);
+        double Growth_kappa = std::cbrt(1.0 + kappa * RH_frac / std::max(1.0 - RH_frac, 1.0e-3));
+        double wet_geo_radius = effective_geoengineering_radius * Growth_kappa;
+
+        /* Water uptake: remove absorbed H2O from gas-phase mixing ratio */
+        if (geoengineering_concentration > 1.0e-25 && kappa > 1.0e-15) {
+            constexpr double MW_H2O_kg   = 18.015e-3;  /* kg/mol */
+            constexpr double rho_H2O     = 1000.0;     /* kg/m3  */
+            const double vol_H2O_per_mol = MW_H2O_kg / (physConst::Na * rho_H2O); /* m3/molec */
+            double dry_vol = (4.0/3.0) * physConst::PI * std::pow(effective_geoengineering_radius, 3);
+            double wet_vol = (4.0/3.0) * physConst::PI * std::pow(wet_geo_radius, 3);
+            /* water_taken_up [molec/cm3] = N_geo * delta_V / vol_per_molec */
+            double water_taken_up = geoengineering_concentration
+                                    * (wet_vol - dry_vol) / vol_H2O_per_mol;
+            plume_H2O -= water_taken_up;
+            plume_H2O  = std::max(plume_H2O, 0.0);
+        }
+        /* Use wet radius for all subsequent EPM particle calculations */
+        effective_geoengineering_radius = wet_geo_radius;
+
+        /* Number-RMS averaged particle radius (conserves geometric cross-section) */
+        double soot_concentration = varSoot * n_air_eng;  /* [#/cm3] */
+        double radius_soot        = EI_.getSootRad();      /* [m]    */
+        double Total_Number_Density = soot_concentration + geoengineering_concentration;
+
+        double averaged_radius;
+        if (Total_Number_Density > 1.0e-25) {
+            averaged_radius = std::sqrt(
+                (soot_concentration * radius_soot * radius_soot
+                 + geoengineering_concentration * effective_geoengineering_radius
+                                                * effective_geoengineering_radius)
+                / Total_Number_Density);
+        } else {
+            averaged_radius = radius_soot;
+        }
+
+        /* Combined aerosol PDF: merge soot + geo particle distributions */
+        double sSO4_sigma = 1.4;  /* lognormal geometric standard deviation */
+        AIM::Aerosol nPDF_Soot (SO4_rJ, SO4_rE,
+                                soot_concentration, radius_soot,
+                                sSO4_sigma, "lognormal");
+        AIM::Aerosol nPDF_Geo  (SO4_rJ, SO4_rE,
+                                geoengineering_concentration,
+                                effective_geoengineering_radius,
+                                sSO4_sigma, "lognormal");
+        AIM::Aerosol nPDF_Total(nPDF_Soot);
+        nPDF_Total.addAerosolToPDF(nPDF_Geo);  /* merge geo into soot bins */
+
+        /* Ambient particle mixing ratios for RHS dilution targets */
+        double Geo_amb  = (n_air_amb > 1.0e-30) ? geoengineering_concentration / n_air_amb : 0.0;
+        double Part_amb = Soot_amb + Geo_amb;
+
+
+        
         gas_aerosol_rhs rhs(
             temperature_K, simVars_.pressure_Pa, delta_T,
-            H2O_amb, SO4_amb, SO4l_amb, SO4g_amb, HNO3_amb, Soot_amb,
-            EI_.getSootRad(), KernelSO4Soot, nPDF_SO4);
+            H2O_amb, SO4_amb, SO4l_amb, SO4g_amb, HNO3_amb, Part_amb,
+            
+averaged_radius, KernelSO4Soot, nPDF_Total);
 
         /* Total number of steps */
         UInt totSteps = 0;
@@ -379,6 +467,21 @@ namespace EPM::Models
 
              Ice_rad  = PartRad_3mins;
              Ice_den  = PartDens_3mins;
+             
+             double geoengineering_concentration    = input_.backgroundGeoengineeringNumber();
+             double geoengineering_radius           = input_.backgroundGeoengineeringRadius();
+             double geoengineering_shape            = input_.backgroundGeoengineeringShapeFactor();
+             double effective_geoengineering_radius  = sqrt(geoengineering_shape) * geoengineering_radius ;
+
+             if ( geoengineering_concentration > 1.0e-20 ) {
+                                     /* Geo particles are potential ice nucleating particles (INPs). */
+                    /* Conservative upper bound: all geo particles nucleate ice.    */
+                    Ice_den += geoengineering_concentration;  /* [#/cm3] */
+                    /* For precise treatment: filter by backgroundGeoengineeringContactAngle. */
+                    /* See Karcher & Lohmann (2003) for parameterisation.                    */
+                 // or ensure it is accounted for in subsequent phases.
+                 // For now we just ensure variables are defined as per user snippet.
+             }
              Soot_den = 0.0;
              H2O_mol  = pSat_H2Os( final_Temp ); // / ( kB * final_Temp * 1.0E+06 )  ;
 

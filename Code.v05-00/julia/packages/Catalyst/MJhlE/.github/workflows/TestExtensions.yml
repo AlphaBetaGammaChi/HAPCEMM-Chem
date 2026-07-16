@@ -1,0 +1,58 @@
+name: "Extensions Tests"
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  extensions-tests:
+    name: "Extensions Tests"
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - "1"
+          - "lts"
+          - "pre"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: "Setup Julia ${{ matrix.version }}"
+        uses: julia-actions/setup-julia@v2
+        with:
+          version: "${{ matrix.version }}"
+
+      - name: "Cache Julia packages"
+        uses: julia-actions/cache@v3
+        with:
+          token: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: "Build main package"
+        uses: julia-actions/julia-buildpkg@v1
+
+      - name: "Instantiate and precompile extensions environment"
+        run: |
+          julia --check-bounds=yes --compiled-modules=yes --inline=yes \
+                --project=test/extensions -e '
+            using Pkg
+            Pkg.develop(PackageSpec(path=pwd()))
+            Pkg.instantiate()
+            Pkg.precompile()
+          '
+
+      - name: "Run Extensions tests"
+        run: |
+          julia --check-bounds=yes --compiled-modules=yes --inline=yes \
+                --project=test/extensions --color=yes \
+                test/runtests_extensions.jl

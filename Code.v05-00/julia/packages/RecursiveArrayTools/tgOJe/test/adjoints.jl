@@ -1,0 +1,120 @@
+using RecursiveArrayTools, Zygote, ForwardDiff, ReverseDiff, Test
+using Zygote: ChainRulesCore
+
+function loss(x)
+    return sum(abs2, Array(VectorOfArray([x .* i for i in 1:5])))
+end
+
+function loss2(x)
+    return sum(abs2, Array(DiffEqArray([x .* i for i in 1:5], 1:5)))
+end
+
+function loss3(x)
+    y = VectorOfArray([x .* i for i in 1:5])
+    tmp = 0.0
+    for i in 1:5, j in 1:5
+
+        tmp += y[i, j]
+    end
+    return tmp
+end
+
+function loss4(x)
+    y = DiffEqArray([x .* i for i in 1:5], 1:5)
+    tmp = 0.0
+    for i in 1:5, j in 1:5
+
+        tmp += y[i, j]
+    end
+    return tmp
+end
+
+function loss5(x)
+    return sum(abs2, Array(ArrayPartition([x .* i for i in 1:5]...)))
+end
+
+function loss7(x)
+    _x = VectorOfArray([x .* i for i in 1:5])
+    return sum(abs2, _x .- 1)
+end
+
+# use a bunch of broadcasts to test all the adjoints
+function loss8(x)
+    _x = VectorOfArray([x .* i for i in 1:5])
+    res = copy(_x)
+    res = res .+ _x
+    res = res .+ 1
+    res = res .* _x
+    res = res .* 2.0
+    res = res .* res
+    res = res ./ 2.0
+    res = res ./ _x
+    res = 3.0 .- res
+    res = .-res
+    res = identity.(Base.literal_pow.(^, res, Val(2)))
+    res = tanh.(res)
+    res = res .+ im .* res
+    res = conj.(res) .+ real.(res) .+ imag.(res) .+ abs2.(res)
+    return sum(abs2, res)
+end
+
+function loss9(x)
+    return VectorOfArray([collect((3i):(3i + 3)) .* x for i in 1:5])
+end
+
+function loss10(x)
+    voa = VectorOfArray([i * x for i in 1:5])
+    return sum(view(voa, 2:4, 3:5))
+end
+
+function loss11(x)
+    voa = VectorOfArray([i * x for i in 1:5])
+    return sum(view(voa, :, :))
+end
+
+x = float.(6:10)
+loss(x)
+@test Zygote.gradient(loss, x)[1] == ForwardDiff.gradient(loss, x)
+@test Zygote.gradient(loss2, x)[1] == ForwardDiff.gradient(loss2, x)
+@test Zygote.gradient(loss3, x)[1] == ForwardDiff.gradient(loss3, x)
+@test Zygote.gradient(loss4, x)[1] == ForwardDiff.gradient(loss4, x)
+@test Zygote.gradient(loss5, x)[1] == ForwardDiff.gradient(loss5, x)
+@test Zygote.gradient(loss7, x)[1] == ForwardDiff.gradient(loss7, x)
+@test Zygote.gradient(loss8, x)[1] == ForwardDiff.gradient(loss8, x)
+@test ForwardDiff.derivative(loss9, 0.0) ==
+    VectorOfArray([collect((3i):(3i + 3)) for i in 1:5])
+@test Zygote.gradient(loss10, x)[1] == ForwardDiff.gradient(loss10, x)
+@test Zygote.gradient(loss11, x)[1] == ForwardDiff.gradient(loss11, x)
+
+voa = RecursiveArrayTools.VectorOfArray(fill(rand(3), 3))
+voa_gs, = Zygote.gradient(voa) do x
+    sum(sum.(x.u))
+end
+@test voa_gs isa RecursiveArrayTools.VectorOfArray
+
+# issue #595: `sum(::VectorOfArray)` must not assert the element type, which
+# discarded ReverseDiff's `TrackedReal` origin and threw a `TypeError`.
+let g = ReverseDiff.gradient(x -> sum(VectorOfArray([x])), float.(1:3))
+    @test g ≈ ones(3)
+end
+let g = ReverseDiff.gradient(x -> sum(VectorOfArray([VectorOfArray([x])])), float.(1:3))
+    @test g ≈ ones(3)
+end
+
+# A `ZeroTangent`/`AbstractZero` slice in the cotangent (structural zero gradient)
+# must be treated like an absent gradient instead of erroring on `size(::ZeroTangent)`.
+let ext = Base.get_extension(RecursiveArrayTools, :RecursiveArrayToolsZygoteExt)
+    voa = VectorOfArray([Float64[i, i, i] for i in 1:3])
+    dea = DiffEqArray([Float64[i, i, i] for i in 1:3], 1:3)
+    d = Any[Float64[1, 1, 1], ChainRulesCore.ZeroTangent(), Float64[3, 3, 3]]
+    expected = [Float64[1, 1, 1], Float64[0, 0, 0], Float64[3, 3, 3]]
+
+    g_voa = ext.vofa_u_adjoint(d, voa)
+    @test g_voa isa VectorOfArray
+    @test g_voa.u == expected
+
+    g_dea = ext.vofa_u_adjoint(d, dea)
+    @test g_dea isa DiffEqArray
+    @test g_dea.u == expected
+    @test g_dea.t == dea.t
+end

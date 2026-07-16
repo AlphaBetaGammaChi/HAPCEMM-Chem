@@ -1,0 +1,22 @@
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+Manifest.toml
+docs/src/assets/Project.toml
+
+# Vim files
+*.swp
+
+# vscode stuff
+.vscode
+.vscode/*
+
+LocalPreferences.toml
+
+# claude
+.claude
+.claude/*
+.planning
+.planning/*
+CLAUDE.md
+AGENTS.md

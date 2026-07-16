@@ -1,0 +1,7 @@
+1 AddMul(variant = "ADD",)
+2 ├─ AddMul(variant = "MUL",)
+3 │  ├─ Const(2)
+4 │  └─ Sym(x)
+5 └─ Sym(z)
+
+Hint: call SymbolicUtils.pluck(expr, line_number) to get the subexpression starting at line_number

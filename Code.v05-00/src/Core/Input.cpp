@@ -23,6 +23,7 @@ Input::Input( unsigned int iCase,               \
         const std::string author          ):
     Case_          ( iCase                 ),
     simulationTime_( parameters[iCase].at("PLUMEPROCESS")),
+    boxModelDuration_( parameters[iCase].count("BOX_DURATION") ? parameters[iCase].at("BOX_DURATION") : parameters[iCase].at("PLUMEPROCESS")),
     horizDiff_     ( parameters[iCase].at("DH")),
     vertiDiff_     ( parameters[iCase].at("DV")),
 
@@ -49,6 +50,9 @@ Input::Input( unsigned int iCase,               \
     fuelFlow_      ( parameters[iCase].at("FF")),
     aircraftMass_  ( parameters[iCase].at("AMASS")),
 
+    backgroundGeoengineeringType_     ( parameters[iCase].count("Background_Geoengineering_Type")
+                                    ? static_cast<int>(parameters[iCase].at("Background_Geoengineering_Type"))
+                                    : 0 ),
     backgroundGeoengineeringRho_      ( parameters[iCase].count("Background_Geoengineering_Rho") ? parameters[iCase].at("Background_Geoengineering_Rho") : 1769.0 ), 
     backgroundGeoengineeringRadius_   ( parameters[iCase].count("Background_Geoengineering_Radius") ? parameters[iCase].at("Background_Geoengineering_Radius") : 20.0e-9 ),
     backgroundGeoengineeringNumber_ ( parameters[iCase].count("Background_Geoengineering_Number_Density") ? parameters[iCase].at("Background_Geoengineering_Number_Density") : 1.0e8 ),
@@ -90,7 +94,7 @@ Input::~Input()
 /* End of Input.cpp */
 
 void Input::checkInputValidity(){
-        if ( simulationTime_ <= 0.0 || simulationTime_ >= 48.0 ) {
+        if ( simulationTime_ <= 0.0 || simulationTime_ >= 241.0 ) {
         std::cout << " In Input::Input:";
         std::cout << " simulationTime takes an odd value: simulationTime = ";
         std::cout << simulationTime_ << " [hrs]" << std::endl;
@@ -254,6 +258,12 @@ void Input::checkInputValidity(){
         exit(-1);
     }
 
+        if ( backgroundGeoengineeringType_ < 0 || backgroundGeoengineeringType_ > 8 ) {
+        std::cout << " In Input::Input:";
+        std::cout << " backgroundGeoengineeringType_ must be 0-8, got: "
+                  << backgroundGeoengineeringType_ << std::endl;
+        exit(-1);
+    }
     if ( backgroundGeoengineeringRho_  < 0.0E+00 || backgroundGeoengineeringRho_  > 1.0E+09 ) {
         std::cout << " In Input::Input:";
         std::cout << " backgroundGeoengineeringRho_  takes an unrealisable value: backgroundGeoengineeringRho_  = ";

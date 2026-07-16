@@ -1,0 +1,33 @@
+name: Build and deploy documentation to Scripts
+
+on:
+  push:
+    branches:
+      - main
+#       - release-*
+#     tags: '*'
+
+jobs:
+  docs:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: julia-actions/setup-julia@v3
+        with:
+          version: '1.11'
+      - uses: julia-actions/cache@v3
+      - run: |
+          julia --color=yes --project=docs -e '
+            using Pkg
+            Pkg.develop([PackageSpec(path="lib/EnzymeCore"), PackageSpec(path=pwd()), PackageSpec(path="lib/EnzymeTestUtils")])
+            Pkg.instantiate()'
+        env:
+          JULIA_PKG_SERVER_REGISTRY_PREFERENCE: eager
+      - run: |
+          julia --color=yes --project=docs -e '
+            using Documenter: DocMeta, doctest
+            using Enzyme
+            DocMeta.setdocmeta!(Enzyme, :DocTestSetup, :(using Enzyme); recursive=true)
+            doctest(Enzyme)'
+      - run: julia --project=docs docs/make.jl

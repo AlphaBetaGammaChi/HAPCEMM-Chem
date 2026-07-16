@@ -1,0 +1,286 @@
+using RecursiveArrayTools, StaticArrays
+using RecursiveArrayToolsShorthandConstructors
+using Test
+
+t = collect(range(0, stop = 10, length = 200))
+randomized = VectorOfArray([0.01randn(2) for i in 1:10])
+data = convert(Array, randomized)
+@test typeof(data) <: Matrix{Float64}
+
+## Test means
+A = [[1 2; 3 4], [1 3; 4 6], [5 6; 7 8]]
+@test recursive_mean(A) ≈ [
+    2.33333333 3.666666666
+    4.6666666666 6.0
+]
+
+A = zeros(5, 5)
+@test recursive_unitless_eltype(A) == Float64
+
+@test vecvecapply(x -> abs.(x), -1) == 1
+@test vecvecapply(x -> abs.(x), [-1, -2, 3, -4]) == [1, 2, 3, 4]
+v = [[-1 2; 3 -4], [5 -6; -7 -8]]
+vv = [1, 3, 2, 4, 5, 7, 6, 8]
+@test vecvecapply(x -> abs.(x), v) == vv
+@test vecvecapply(x -> abs.(x), VectorOfArray(v)) == vv
+
+using Unitful
+A = zeros(5, 5) * 1u"kg"
+@test recursive_unitless_eltype(A) == Float64
+AA = [zeros(5, 5) for i in 1:5]
+@test recursive_unitless_eltype(AA) == Array{Float64, 2}
+AofA = [copy(A) for i in 1:5]
+@test recursive_unitless_eltype(AofA) == Array{Float64, 2}
+AofSA = [@SVector [2.0, 3.0] for i in 1:5]
+@test recursive_unitless_eltype(AofSA) == SVector{2, Float64}
+AofuSA = [@SVector [2.0u"kg", 3.0u"kg"] for i in 1:5]
+@test recursive_unitless_eltype(AofuSA) == SVector{2, Float64}
+
+A = [AP[ones(1), ones(1)]]
+
+function test_recursive_bottom_eltype()
+    function test_value(val::Any, expected_type::Type)
+        # It should return the expected type for the given expected type
+        @test recursive_bottom_eltype(expected_type) == expected_type
+
+        # It should return the expected type for the given value
+        @test recursive_bottom_eltype(val) == expected_type
+
+        # It should return the expected type for an array of the given value
+        Aval = [val for i in 1:5]
+        @test recursive_bottom_eltype(Aval) == expected_type
+
+        # It should return expected type for a nested array of the gicen value
+        AAval = [Aval for i in 1:5]
+        @test recursive_bottom_eltype(AAval) == expected_type
+
+        # It should return expected type for an array of vectors of chars
+        AVval = [@SVector [val, val] for i in 1:5]
+        return @test recursive_bottom_eltype(AVval) == expected_type
+    end
+
+    # testing chars
+    test_value('c', Char)
+
+    # testing strings
+    # We expect recursive_bottom_eltype to return `Char` for a string, because
+    # `eltype("Some String") == Char`
+    test_value("Some String", Char)
+
+    # testing integer values
+    test_value(1, Int)
+    test_value(1u"kg", eltype(1u"kg"))
+
+    # testing float values
+    test_value(1.0, Float64)
+    return test_value(1.0u"kg", eltype(1.0u"kg"))
+end
+test_recursive_bottom_eltype()
+
+x = zeros(10)
+recursivefill!(x, 1.0)
+@test x == ones(10)
+
+x = [zeros(10), zeros(10)]
+recursivefill!(x, 1.0)
+@test x[1] == ones(10)
+@test x[2] == ones(10)
+
+x = [SVector{10}(zeros(10)), SVector{10}(zeros(10))]
+recursivefill!(x, SVector{10}(ones(10)))
+@test x[1] == SVector{10}(ones(10))
+@test x[2] == SVector{10}(ones(10))
+
+x = [MVector{10}(zeros(10)), MVector{10}(zeros(10))]
+recursivefill!(x, 1.0)
+@test x[1] == MVector{10}(ones(10))
+@test x[2] == MVector{10}(ones(10))
+
+x = [similar(x[1]), similar(x[1])]
+recursivefill!(x, true)
+@test x[1] == MVector{10}(ones(10))
+@test x[2] == MVector{10}(ones(10))
+
+x = similar(x)
+recursivefill!(x, true)
+@test x[1] == MVector{10}(ones(10))
+@test x[2] == MVector{10}(ones(10))
+
+# Test VectorOfArray + recursivefill! + static arrays
+@testset "VectorOfArray + recursivefill! + static arrays" begin
+    Vec3 = SVector{3, Float64}
+    x = [randn(Vec3, n) for n in 1:4]  # vector of vectors of static arrays
+
+    x_voa = VectorOfArray(x)
+    @test eltype(x_voa) === Vec3
+    @test first(x_voa.u) isa AbstractVector{Vec3}
+
+    y_voa = recursivecopy(x_voa)
+    recursivefill!(y_voa, true)
+    @test all(y_voa.u[n] == fill(ones(Vec3), n) for n in 1:4)
+
+    y_voa = recursivecopy(x_voa)
+    recursivefill!(y_voa, ones(Vec3))
+    @test all(y_voa.u[n] == fill(ones(Vec3), n) for n in 1:4)
+end
+
+@testset "VectorOfArray recursivecopy!" begin
+    u1 = VA[fill(2, MVector{2, Float64}), ones(MVector{2, Float64})]
+    u2 = VA[fill(4, MVector{2, Float64}), 2 .* ones(MVector{2, Float64})]
+    recursivecopy!(u1, u2)
+    @test u1.u[1] == [4.0, 4.0]
+    @test u1.u[2] == [2.0, 2.0]
+    @test u1.u[1] isa MVector
+    @test u1.u[2] isa MVector
+
+    u1 = VA[fill(2, SVector{2, Float64}), ones(SVector{2, Float64})]
+    u2 = VA[fill(4, SVector{2, Float64}), 2 .* ones(SVector{2, Float64})]
+    recursivecopy!(u1, u2)
+    @test u1.u[1] == [4.0, 4.0]
+    @test u1.u[2] == [2.0, 2.0]
+    @test u1.u[1] isa SVector
+    @test u1.u[2] isa SVector
+
+    # mixed/nested partition types create a Union eltype for `u`.
+    # recursivecopy! must not fall back to a shallow copy in this case.
+    a = VA[ones(2), VA[1.0, 1.0]]
+    b = recursivecopy(a)
+    recursivecopy!(b, a)
+    @test !(b.u[1] === a.u[1])
+    @test !(b.u[2] === a.u[2])
+    b.u[1][1] = 99.0
+    @test a.u[1][1] == 1.0
+end
+
+@testset "recursivecopyto!" begin
+    # Same-shape scalar arrays — should match copyto!
+    b = zeros(3)
+    a = [1.0, 2.0, 3.0]
+    recursivecopyto!(b, a)
+    @test b == a
+
+    b = zeros(2, 2)
+    a = [1.0 2.0; 3.0 4.0]
+    recursivecopyto!(b, a)
+    @test b == a
+
+    # Issue #589: Matrix ← Vector of matching length (rejected by recursivecopy!,
+    # allowed by recursivecopyto!).
+    b = zeros(2, 3)
+    a = collect(1.0:6.0)
+    recursivecopyto!(b, a)
+    @test b == reshape(a, 2, 3)
+    @test_throws MethodError recursivecopy!(b, a)
+
+    # Vector ← Matrix
+    b = zeros(6)
+    a = reshape(collect(1.0:6.0), 2, 3)
+    recursivecopyto!(b, a)
+    @test b == collect(1.0:6.0)
+
+    # Different-shape matrices, same total length
+    b = zeros(2, 3)
+    a = reshape(collect(1.0:6.0), 3, 2)
+    recursivecopyto!(b, a)
+    @test vec(b) == 1.0:6.0
+
+    # dst longer than src — tail untouched, matches Base.copyto!
+    b = ones(5)
+    a = [10.0, 20.0, 30.0]
+    recursivecopyto!(b, a)
+    @test b == [10.0, 20.0, 30.0, 1.0, 1.0]
+
+    # dst shorter than src — BoundsError, matches Base.copyto!
+    b = zeros(2)
+    a = [1.0, 2.0, 3.0]
+    @test_throws BoundsError recursivecopyto!(b, a)
+
+    # Nested: Vector of Vectors, matching shapes
+    a = [ones(3), 2 * ones(3)]
+    b = [zeros(3), zeros(3)]
+    recursivecopyto!(b, a)
+    @test b[1] == ones(3) && b[2] == 2 * ones(3)
+    # Verify deep copy semantics — mutating dst leaves src untouched
+    b[1][1] = 99.0
+    @test a[1][1] == 1.0
+
+    # Nested with shape mismatch at the leaves — inner copyto! handles it
+    a = [collect(1.0:6.0), collect(7.0:12.0)]
+    b = [zeros(2, 3), zeros(2, 3)]
+    recursivecopyto!(b, a)
+    @test b[1] == reshape(1.0:6.0, 2, 3)
+    @test b[2] == reshape(7.0:12.0, 2, 3)
+
+    # Static array element
+    a = [@SVector([1.0, 2.0]), @SVector([3.0, 4.0])]
+    b = [@SVector(zeros(2)), @SVector(zeros(2))]
+    recursivecopyto!(b, a)
+    @test b == a
+
+    # ArrayPartition with matching shapes (sanity — parity with recursivecopy!)
+    A = ArrayPartition(zeros(2), zeros(3))
+    B = ArrayPartition([1.0, 2.0], [3.0, 4.0, 5.0])
+    recursivecopyto!(A, B)
+    @test A.x[1] == [1.0, 2.0]
+    @test A.x[2] == [3.0, 4.0, 5.0]
+
+    # VectorOfArray
+    u1 = VA[zeros(MVector{2, Float64}), zeros(MVector{2, Float64})]
+    u2 = VA[fill(4, MVector{2, Float64}), 2 .* ones(MVector{2, Float64})]
+    recursivecopyto!(u1, u2)
+    @test u1.u[1] == [4.0, 4.0]
+    @test u1.u[2] == [2.0, 2.0]
+    @test u1.u[1] isa MVector
+end
+
+@testset "VectorOfArray similar with nested scalar leaves" begin
+    a = VA[ones(2), VA[1.0, 1.0]]
+    b = similar(a, Float64)
+    @test b isa typeof(a)
+    @test b.u[1] isa Vector{Float64}
+    @test b.u[2] isa typeof(a.u[2])
+    @test b.u[2].u isa Vector{Float64}
+    @test length(b.u[2].u) == 2
+end
+
+@testset "recursivefill! with nested union partitions" begin
+    a = VA[ones(2), VA[1.0, 1.0]]
+    recursivefill!(a, true)
+    @test a.u[1] == ones(2)
+    @test a.u[2].u == ones(2)
+end
+
+# Test recursivefill! with immutable StaticArrays (issue #461)
+@testset "recursivefill! with immutable StaticArrays (issue #461)" begin
+    # Test with only immutable SVectors
+    x = VA[SVector{2}(ones(2)), SVector{2}(ones(2))]
+    recursivefill!(x, 0.0)
+    @test all(x.u[i] == SVector{2}(zeros(2)) for i in 1:2)
+    @test all(x.u[i] isa SVector for i in 1:2)
+
+    # Test with mixed immutable and mutable StaticArrays
+    x = VA[SVector{2}(ones(2)), MVector{2}(ones(2))]
+    recursivefill!(x, 0.0)
+    @test all(x.u[i] == [0.0, 0.0] for i in 1:2)
+    @test x.u[1] isa SVector
+    @test x.u[2] isa MVector
+
+    # Test fill! on VectorOfArray with immutable SVectors
+    x = VA[SVector{2}(ones(2)), SVector{2}(ones(2))]
+    fill!(x, 0.0)
+    @test all(x.u[i] == SVector{2}(zeros(2)) for i in 1:2)
+    @test all(x.u[i] isa SVector for i in 1:2)
+
+    # Test fill! on VectorOfArray with mixed types
+    x = VA[SVector{2}(ones(2)), MVector{2}(ones(2))]
+    fill!(x, 0.0)
+    @test all(x.u[i] == [0.0, 0.0] for i in 1:2)
+    @test x.u[1] isa SVector
+    @test x.u[2] isa MVector
+end
+
+import KernelAbstractions: get_backend
+@testset "KernelAbstractions" begin
+    v = VectorOfArray([randn(2) for i in 1:10])
+    @test get_backend(v) === get_backend(parent(v)[1])
+end

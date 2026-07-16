@@ -1,0 +1,314 @@
+function contract_variables(graph::BipartiteGraph, var_eq_matching::Matching,
+        var_rename, eq_rename, nelim_eq, nelim_var)
+    dig = DiCMOBiGraph{true}(graph, var_eq_matching)
+
+    # Update bipartite graph
+    var_deps = map(1:ndsts(graph)) do v
+        [var_rename[v′]
+         for v′ in neighborhood(dig, v, Inf; dir = :in) if var_rename[v′] != 0]
+    end
+
+    newgraph = BipartiteGraph(nsrcs(graph) - nelim_eq, ndsts(graph) - nelim_var)
+    for e in 𝑠vertices(graph)
+        ne = eq_rename[e]
+        ne == 0 && continue
+        for v in 𝑠neighbors(graph, e)
+            newvar = var_rename[v]
+            if newvar != 0
+                add_edge!(newgraph, ne, newvar)
+            else
+                for nv in var_deps[v]
+                    add_edge!(newgraph, ne, nv)
+                end
+            end
+        end
+    end
+
+    return newgraph
+end
+
+"""
+    $(TYPEDSIGNATURES)
+
+Preemptively identify observed equations in the system and tear them. This happens before
+any simplification. The equations torn by this process are ones that are already given in
+an explicit form in the system and where the LHS is not present in any other equation of
+the system except for other such preempitvely torn equations.
+
+Optionally passing in the linear coefficient matrix `mm` will update it according to the
+newly torn equations.
+"""
+function trivial_tearing!(ts::TransformationState, mm::Union{SparseMatrixCLIL, Nothing} = nothing)
+    if is_only_discrete(ts.structure)
+        if mm === nothing
+            return ts
+        else
+            return ts, mm
+        end
+    end
+    # equations that can be trivially torn an observed equations
+    trivial_idxs = OrderedSet{Int}()
+    # variables that have been matched to trivially torn equations
+    matched_vars = OrderedSet{Int}()
+
+    complete!(ts.structure)
+    var_to_diff = ts.structure.var_to_diff
+    graph = ts.structure.graph
+    candidates = collect(possibly_explicit_equations(ts))
+    # TODO: Use DiCMOBiGraph here and topsort the equations. It'll remove the `while true`.
+    while true
+        # track whether we added an equation to the trivial list this iteration
+        added_equation = false
+        for (i, vari) in candidates
+            # don't check already torn equations
+            i in trivial_idxs && continue
+            if has_state_priorities(ts.structure)
+                get_state_priorities(ts.structure)[vari] <= 0 || continue
+            end
+
+            # if a variable was the LHS of two trivial observed equations, we wouldn't have
+            # included it in the list. Error if somehow it made it through.
+            @assert !(vari in matched_vars)
+            # don't tear differential/shift equations (or differentiated/shifted variables)
+            var_to_diff[vari] === nothing || continue
+            invview(var_to_diff)[vari] === nothing || continue
+            # get the equations that the candidate matched variable is present in, except
+            # those equations which have already been torn as observed
+            eqidxs = setdiff(𝑑neighbors(graph, vari), trivial_idxs)
+            # it should only be present in this equation
+            length(eqidxs) == 1 || continue
+            eqi = only(eqidxs)
+            @assert eqi == i
+
+            # for every variable present in this equation, make sure it isn't _only_
+            # present in trivial equations
+            isvalid = true
+            for v in 𝑠neighbors(graph, eqi)
+                v == vari && continue
+                v in matched_vars && continue
+                # `> 1` and not `0` because one entry will be this equation (`eqi`)
+                isvalid &= count(!in(trivial_idxs), 𝑑neighbors(graph, v)) > 1
+                isvalid &= invview(var_to_diff)[v] === nothing
+                isvalid || break
+            end
+            isvalid || continue
+
+            added_equation = true
+            push!(trivial_idxs, eqi)
+            push!(matched_vars, vari)
+        end
+
+        # if we didn't add an equation this iteration, we won't add one next iteration
+        added_equation || break
+    end
+    torn_vars_idxs = collect(matched_vars)
+    torn_eqs_idxs = collect(trivial_idxs)
+
+    # For backward compatibility
+    if hasmethod(rm_eqs_vars!, Tuple{typeof(ts), Vector{Int}, Vector{Int}})
+        # `deleteat!` requires sorted indices, but we want to maintain relative order to pass
+        # to `trivial_tearing_postprocess!`
+        trivial_tearing_postprocess!(ts, torn_eqs_idxs, torn_vars_idxs)
+        sort!(torn_eqs_idxs)
+        sort!(torn_vars_idxs)
+        old_to_new_eq, old_to_new_var = rm_eqs_vars!(
+            ts, torn_eqs_idxs, torn_vars_idxs; eqs_sorted_and_uniqued = true,
+            vars_sorted_and_uniqued = true
+        )
+    else
+        # `deleteat!` requires sorted indices, but we want to maintain relative order to pass
+        # to `trivial_tearing_postprocess!`
+        sort!(torn_vars_idxs)
+        sort!(torn_eqs_idxs)
+        old_to_new_eq, old_to_new_var = rm_eqs_vars!(
+            ts.structure, torn_eqs_idxs, torn_vars_idxs; eqs_sorted_and_uniqued = true,
+            vars_sorted_and_uniqued = true
+        )
+        trivial_tearing_postprocess!(ts, trivial_idxs, matched_vars)
+    end
+    if mm !== nothing
+        aliases = Dict{Int, SparseArrays.SparseVector{eltype(mm), Int}}()
+        linear_eqs = Dict{Int, Int}()
+        for (i, eq) in enumerate(mm.nzrows)
+            linear_eqs[eq] = i
+        end
+        torn_vars_set = BitSet(torn_vars_idxs)
+        perm = Int[]
+        for (var, eq) in zip(matched_vars, trivial_idxs)
+            ieq = get(linear_eqs, eq, 0)
+            iszero(ieq) && continue
+            # `trivial_tearing!` considers equations already written by the user in a
+            # solvable form, so we know that the coefficient of `var` must be `-1` and do
+            # not need to be concerned with fractions.
+            eq_vars = mm.row_cols[ieq]
+            eq_coeffs = mm.row_vals[ieq]
+
+            I = Int[]
+            V = Int[]
+            sizehint!(I, length(eq_vars))
+            sizehint!(V, length(eq_vars))
+            can_be_aliased = true
+            for (v, cf) in zip(eq_vars, eq_coeffs)
+                if v == var
+                    @assert cf == -1
+                    continue
+                end
+                alias = get(aliases, v, nothing)
+                if alias === nothing
+                    # If this variable is not aliased to a linear combination,
+                    # and is torn, then this equation is no longer a linear equation
+                    # that can be retained in `mm`.
+                    if v in torn_vars_set
+                        can_be_aliased = false
+                        break
+                    end
+                    push!(I, v)
+                    push!(V, cf)
+                    continue
+                end
+                _I, _V = SparseArrays.findnz(alias)
+                append!(I, _I)
+                append!(V, Iterators.map(Base.Fix1(*, cf), _V))
+            end
+            can_be_aliased || continue
+
+            resize!(perm, length(I))
+            sortperm!(perm, I)
+            I = I[perm]
+            V = V[perm]
+            i = 1
+            for j in Iterators.drop(eachindex(I), 1)
+                if I[j] == I[i]
+                    V[i] += V[j]
+                else
+                    i += 1
+                    I[i] = I[j]
+                    V[i] = V[j]
+                end
+            end
+            
+            aliases[var] = SparseArrays.SparseVector(size(mm, 2), I, V)
+        end
+        mm = get_new_mm(aliases, old_to_new_eq, old_to_new_var, mm)
+        return ts, mm
+    end
+
+    return ts
+end
+
+"""
+    $TYPEDSIGNATURES
+
+Return an iterable of tuples. The first element of each tuple is the index of an equation
+index in `state` which has a single variable (present in `get_fullvars(state)`) on the LHS.
+The second element of each tuple is the index of the variable on the LHS.
+
+These are considered candidates for [`trivial_tearing!`](@ref). Some equations may
+intentionally be filtered out from this list, such as if the variable on the LHS should be
+considered "irreducible" (not to be torn) or redundant equations which reduce to `0 ~ 0`.
+"""
+function possibly_explicit_equations(state::TransformationState)
+    error("This function must be implemented to run `trivial_tearing!`")
+end
+
+"""
+    $TYPEDSIGNATURES
+
+Postprocessing function after running [`trivial_tearing!`](@ref). Update `state` given that
+`torn_eqs` have been preemptively torn. The order of `torn_eqs` is important, as it
+determines a topolgical ordering of the torn equations. `torn_vars` similarly identifies
+the torn variables. The ordering of `torn_vars` corresponds to that of `torn_eqs`.
+
+Prior to calling this function, the minimal required fields of `state.structure` will have
+been updated appropriately (torn elements removed). At minimum, this function should update
+`state` such that [`get_fullvars`](@ref) returns the appropriate subset of variables.
+
+!!! warn
+    This signature is deprecated now.
+"""
+function trivial_tearing_postprocess!(state::TransformationState, torn_eqs::OrderedSet{Int}, torn_vars::OrderedSet{Int})
+    error("This function must be implemented to run `trivial_tearing!`")
+end
+
+"""
+    $TYPEDSIGNATURES
+
+Postprocessing function after running [`trivial_tearing!`](@ref). Update `state` given that
+`torn_eqs` have been preemptively torn. The order of `torn_eqs` is important, as it
+determines a topolgical ordering of the torn equations. `torn_vars` similarly identifies
+the torn variables. The ordering of `torn_vars` corresponds to that of `torn_eqs`.
+
+`torn_eqs` and `torn_vars` will be removed from `state` after this function is called.
+To dispatch to this method, `rm_eqs_vars!` must be implemented for `state`.
+"""
+function trivial_tearing_postprocess!(state::TransformationState, torn_eqs::Vector{Int}, torn_vars::Vector{Int})
+    error("This function must be implemented to run `trivial_tearing!`")
+end
+
+"""
+    $TYPEDSIGNATURES
+
+Find the equations (source vertices of `graph`) which are not matched to a variable present
+in `vars_scc` according to the matching `var_eq_matching`. `varfilter` filters out
+variables to exclude from this process.
+"""
+function free_equations(graph::BipartiteGraph, vars_scc::Vector{Vector{Int}},
+                        var_eq_matching::Matching, varfilter::F) where {F}
+    ne = nsrcs(graph)
+    seen_eqs = falses(ne)
+    for vars in vars_scc, var in vars
+
+        varfilter(var) || continue
+        ieq = var_eq_matching[var]
+        if ieq isa Int
+            seen_eqs[ieq] = true
+        end
+    end
+    findall(!, seen_eqs)
+end
+
+const MatchingT{T} = Matching{T, Vector{Union{T, Int}}}
+const MatchedVarT = Union{Unassigned, SelectedState}
+const VarEqMatchingT = MatchingT{MatchedVarT}
+
+"""
+    $TYPEDEF
+
+A struct containing the results of tearing.
+
+# Fields
+
+$TYPEDFIELDS
+"""
+struct TearingResult
+    """
+    The variable-equation matching. Differential variables are matched to `SelectedState`.
+    The derivative of a differential variable is matched to the corresponding differential
+    equation. Solved variables are matched to the equation they are solved from. Algebraic
+    variables are matched to `unassigned`.
+    """
+    var_eq_matching::VarEqMatchingT
+    """
+    The variable-equation matching prior to tearing. This is the maximal matching used to
+    compute `var_sccs` (see below). For generating the torn system, `var_eq_matching` is
+    the source of truth. This should only be used to identify algebraic equations in each
+    SCC.
+    """
+    full_var_eq_matching::VarEqMatchingT
+    """
+    The partitioning of variables into strongly connected components (SCCs). The SCCs are
+    sorted in dependency order, so each SCC depends on variables in previous SCCs.
+    """
+    var_sccs::Vector{Vector{Int}}
+end
+
+"""
+    $TYPEDEF
+
+Supertype for all tearing algorithms. A tearing algorithm takes as input the
+`SystemStructure` along with any other necessary arguments.
+
+The output of a tearing algorithm must be a `TearingResult` and a `NamedTuple` of
+any additional data computed in the process that may be useful for further processing.
+"""
+abstract type TearingAlgorithm end

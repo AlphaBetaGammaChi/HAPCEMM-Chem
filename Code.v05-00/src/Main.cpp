@@ -57,7 +57,7 @@ int main( int argc, char* argv[])
     unsigned int nCases = 0;
     const unsigned int iOFFSET = 0;
     
-    const unsigned int model = 1;
+    // Legacy model config removed
 
     #ifdef DEBUG
         std::cout << "-------- DEBUG is enabled --------" << std::endl;
@@ -226,6 +226,7 @@ int main( int argc, char* argv[])
             Input_Opt.TS_AERO_FILENAME = "ts_aerosol_case" + std::to_string(iCase) + "_hhmm.nc";
 
             SimStatus case_status;
+            int model = Input_Opt.SIMULATION_BOXMODEL ? 0 : 1;
             switch (model) {
 
                 /* Box Model */

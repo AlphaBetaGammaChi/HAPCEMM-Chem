@@ -1,0 +1,72 @@
+using SciMLBase
+
+struct DummySolution
+    retcode::SciMLBase.ReturnCode.T
+end
+
+SciMLBase.solution_new_retcode(::DummySolution, code) = DummySolution(code)
+
+mutable struct DummyIntegrator{Alg, IIP, U, T} <: SciMLBase.DEIntegrator{Alg, IIP, U, T}
+    uprev::U
+    tprev::T
+    u::U
+    t::T
+    dt::T
+    tdir::Any
+    tstops::Any
+    sol::DummySolution
+
+    function DummyIntegrator()
+        return new{Bool, Bool, Vector{Float64}, Float64}(
+            [0.0], 0, [0.0], 0, 1, 1, [],
+            DummySolution(ReturnCode.Default)
+        )
+    end
+end
+
+function SciMLBase.add_tstop!(integrator::DummyIntegrator, t)
+    integrator.tdir * (t - integrator.t) < 0 &&
+        error("Tried to add a tstop that is behind the current time. This is strictly forbidden")
+    return push!(integrator.tstops, t)
+end
+
+function SciMLBase.step!(integrator::DummyIntegrator)
+    t_next = integrator.t + integrator.dt
+    if !isempty(integrator.tstops) && integrator.tstops[1] < t_next
+        t_next = integrator.tstops[1]
+    end
+    integrator.uprev .= integrator.u
+    integrator.u[1] += 2 * (t_next - integrator.t)
+    integrator.tprev = integrator.t
+    return integrator.t = t_next
+end
+
+function step_dt!(integrator, args...)
+    t = integrator.t
+    step!(integrator, args...)
+    return integrator.t - t
+end
+
+function SciMLBase.done(integrator::DummyIntegrator)
+    return integrator.t > 10
+end
+
+SciMLBase.check_error(::DummyIntegrator) = ReturnCode.Success
+SciMLBase.postamble!(::DummyIntegrator) = nothing
+
+integrator = DummyIntegrator()
+@test step_dt!(integrator, 1.5) == 2
+@test step_dt!(integrator, 1.5, true) == 1.5
+@test_throws ErrorException step!(integrator, -1)
+
+
+@test integrator.sol.retcode == ReturnCode.Default
+@test check_error(integrator) == ReturnCode.Success
+@test integrator.sol.retcode == ReturnCode.Default
+@test SciMLBase.check_error!(integrator) == ReturnCode.Success
+@test integrator.sol.retcode == ReturnCode.Success
+
+let
+    integrator = DummyIntegrator()
+    @test 0 == @allocated SciMLBase.check_error!(integrator)
+end

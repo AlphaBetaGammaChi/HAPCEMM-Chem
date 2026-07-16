@@ -1,0 +1,20 @@
+{
+  "camp-data": [
+    {
+      "name": "toy_dec",
+      "type": "MECHANISM",
+      "reactions": [
+        {
+          "type": "ARRHENIUS",
+          "reactants": {
+            "A": {
+              "qty": 1.0
+            }
+          },
+          "products": {},
+          "A": 0.1
+        }
+      ]
+    }
+  ]
+}

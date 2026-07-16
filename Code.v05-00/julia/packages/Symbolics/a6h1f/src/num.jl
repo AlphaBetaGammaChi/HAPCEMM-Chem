@@ -1,0 +1,331 @@
+@symbolic_wrap struct Num <: Real
+    val::BasicSymbolic{VartypeT}
+
+    function Num(ex::BasicSymbolic{VartypeT})
+        # need `<: Number` instead of `<: Real` to allow the primitive `@number_methods`
+        # methods below to infer. They could be made to infer `Union{Complex{Num}, Num}`
+        # by manually checking the `symtype` of the result and branching instead of using
+        # `wrap`. However, this causes issues with LinearAlgebra methods because it
+        # preallocates a buffer using the inferred result type, and then tries to
+        # e.g. set an integer into it, which fails because `convert(::Type{Union{..}}, ::T)`
+        # doesn't work.
+        @assert symtype(ex) <: Number
+        return new(Const{VartypeT}(ex))
+    end
+    function Num(ex::Number)
+        return new(Const{VartypeT}(unwrap(ex)))
+    end
+end
+
+const RCNum = Union{Num, Complex{Num}}
+
+SymbolicUtils.unwrap(x::Num) = x.val
+SU.infer_vartype(::Type{Num}) = VartypeT
+
+"""
+    Num(val)
+
+Wrap anything in a type that is a subtype of Real
+"""
+Num
+
+const show_numwrap = Ref(false)
+
+Num(x::Num) = x # ideally this should never be called
+(n::Num)(args...) = Num(value(n)(map(value, args)...))
+# Fixes an inference issue with https://github.com/JuliaApproximation/DomainSets.jl/blob/b68ee034ebcd2e3fc10dd334792cee17a8d5c633/src/domains/point.jl#L13
+# causing `Num(::Any)` to infer as `::Any`
+Num(x::DomainSets.Point{<:Number}) = Num(x.x)::Num
+
+SymbolicUtils.@number_methods(Num,
+    Num(f(unwrap(a))),
+    Num(f(unwrap(a), unwrap(b))),
+    [conj, real, transpose, +, -, *, ^, //, /, \])
+
+Base.:+(x::Num) = x
+function Base.:+(x1::Num, xs::Real...)
+    Num(+(unwrap(x1), unwrap.(xs)...))
+end
+function Base.:*(x1::Num, xs::Real...)
+    Num(*(unwrap(x1), unwrap.(xs)...))
+end
+
+Base.:-(x::Num) = Num(-(unwrap(x)))
+for f in [-, ^, /, \]
+    for (T1, T2) in Iterators.product([Num, Real], [Num, Real])
+        T1 === Num || T2 === Num || continue
+        @eval function (::$(typeof(f)))(x1::$T1, x2::$T2)
+            Num($f(unwrap(x1), unwrap(x2)))
+        end
+    end
+end
+for (T1, T2) in Iterators.product([Num, Integer], [Num, Integer])
+    T1 === Num || T2 === Num || continue
+    @eval function Base.://(x1::$T1, x2::$T2)
+        Num(//(unwrap(x1), unwrap(x2)))
+    end
+end
+
+for f in [\, ^]
+    @eval function (::$(typeof(f)))(x1::AbstractArray{<:Real}, x2::Num)
+        $f(x1, unwrap(x2))
+    end
+
+    @eval function (::$(typeof(f)))(x1::Num, x2::AbstractArray{<:Real})
+        $f(unwrap(x1), x2)
+    end
+end
+
+function Base.:(/)(x1::AbstractArray{<:Real}, x2::Num)
+    /(unwrap(x1), unwrap(x2))
+end
+
+function Base.:(/)(x1::Num, x2::AbstractVector{<:Real})
+    /(unwrap(x1), unwrap(x2))
+end
+
+Base.conj(x::Num) = x
+Base.transpose(x::Num) = x
+
+Base.eps(::Type{Num}) = Num(0)
+Base.typemin(::Type{Num}) = Num(-Inf)
+Base.typemax(::Type{Num}) = Num(Inf)
+Base.float(x::Num) = x
+function Base.isapprox(a::Num, b::Num; kw...)
+    err = value(a - b)
+    err isa BasicSymbolic{VartypeT} && return false
+    isapprox(err, 0.0; kw...)
+end
+
+function SymbolicUtils.search_variables!(buffer, expr::Num; kw...)
+    SymbolicUtils.search_variables!(buffer, unwrap(expr); kw...)
+end
+
+"""
+    ifelse(cond::Num, x, y)
+
+Symbolic conditional expression. Returns `x` if `cond` evaluates to true, and `y` if `cond`
+evaluates to false. This allows encoding conditional logic in symbolic expressions.
+
+# Examples
+```julia
+@variables a b c
+ifelse(a > b, c, 0)  # Returns c if a > b, otherwise 0
+```
+"""
+Base.ifelse(x::Num, y, z) = ifelse(unwrap(x), unwrap(y), unwrap(z))
+Base.ifelse(x::Num, y::Num, z) = Num(ifelse(unwrap(x), unwrap(y), unwrap(z)))
+Base.ifelse(x::Num, y, z::Num) = Num(ifelse(unwrap(x), unwrap(y), unwrap(z)))
+Base.ifelse(x::Num, y::Num, z::Num) = Num(ifelse(unwrap(x), unwrap(y), unwrap(z)))
+
+Base.promote_rule(::Type{Bool}, ::Type{Num}) = Num
+Base.promote_rule(::Type{T}, ::Type{Num}) where {T <: AbstractIrrational} = Num
+Base.promote_rule(::Type{Complex{Num}}, ::Type{Num}) = Complex{Num}
+for C in [Complex, Complex{Bool}]
+    @eval begin
+        function Base.:*(x::Num, z::$C)
+            x = unwrap(x)
+            rx = real(x)
+            ix = imag(x)
+            rz = real(z)
+            iz = imag(z)
+            Complex(Num(rx * rz - ix * iz), Num(rx * iz + ix * rz))
+        end
+        function Base.:*(z::$C, x::Num)
+            x = unwrap(x)
+            rx = real(x)
+            ix = imag(x)
+            rz = real(z)
+            iz = imag(z)
+            Complex(Num(rx * rz - ix * iz), Num(rx * iz + ix * rz))
+        end
+        function Base.:/(x::Num, z::$C)
+            x = unwrap(x)
+            rz, iz = reim(z)
+            den = rz^2 + iz^2
+            rx = real(x)
+            ix = imag(x)
+            return Complex(Num((rx * rz + ix * iz) / den), Num((ix * rz - rx * iz) / den))
+        end
+        function Base.:/(z::$C, x::Num)
+            x = unwrap(x)
+            rz, iz = reim(z)
+            rx = real(x)
+            ix = imag(x)
+            den = rx^2 + ix^2
+            return Complex(Num((rx * rz + ix * iz) / den), Num((rx * iz - ix * rz) / den))
+        end
+        function Base.:+(x::Num, z::$C)
+            x = unwrap(x)
+            rx = real(x)
+            ix = imag(x)
+            rz, iz = reim(z)
+            return Complex(Num(rx + rz), Num(ix + iz))
+        end
+        function Base.:+(z::$C, x::Num)
+            x = unwrap(x)
+            rx = real(x)
+            ix = imag(x)
+            rz, iz = reim(z)
+            return Complex(Num(rx + rz), Num(ix + iz))
+        end
+        function Base.:-(x::Num, z::$C)
+            x = unwrap(x)
+            rx = real(x)
+            ix = imag(x)
+            rz, iz = reim(z)
+            return Complex(Num(rx - rz), Num(ix - iz))
+        end
+        function Base.:-(z::$C, x::Num)
+            x = unwrap(x)
+            rx = real(x)
+            ix = imag(x)
+            rz, iz = reim(z)
+            return Complex(Num(rz - rx), Num(iz - ix))
+        end
+    end
+end
+
+function Base.inv(z::Complex{Num})
+    a, b = reim(z)
+    den = a^2 + b^2
+    Complex(a/den, -b/den)
+end
+function Base.:/(x::Complex{Num}, y::Complex{Num})
+    a, b = reim(x)
+    c, d = reim(y)
+    den = c^2 + d^2
+    Complex((a*c + b*d)/den, (b*c - a*d)/den)
+end
+Base.:^(z::Complex{Num}, n::Integer) = Base.power_by_squaring(z, n)
+Base.:^(::Irrational{:ℯ}, x::Num) = exp(x)
+
+function Base.show(io::IO, z::Complex{<:Num})
+    warn_load_latexify()
+    r, i = reim(z)
+    compact = get(io, :compact, false)
+    show(io, r)
+    print(io, (compact ? "+" : " + ") * "(")
+    show(io, i)
+    print(io, ")*im")
+end
+
+SymbolicUtils.symtype(n::Num) = symtype(value(n))
+Base.nameof(n::Num) = nameof(value(n))
+
+Base.iszero(x::Num) = SymbolicUtils._iszero(unwrap(x))
+Base.isone(x::Num) = SymbolicUtils._isone(unwrap(x))
+
+const COMMON_ZERO_NUM = Num(COMMON_ZERO)
+const COMMON_ONE_NUM = Num(COMMON_ONE)
+Base.zero(::Num) = COMMON_ZERO_NUM
+Base.zero(::Type{Num}) = COMMON_ZERO_NUM
+Base.one(::Num) = COMMON_ONE_NUM
+Base.one(::Type{Num}) = COMMON_ONE_NUM
+
+import SymbolicUtils: <ₑ, Term, operation, arguments
+
+function Base.show(io::IO, n::Num)
+    warn_load_latexify()
+    show_numwrap[] ? print(io, :(Num($(value(n))))) : Base.show(io, value(n))
+end
+
+Base.promote_rule(::Type{T}, ::Type{Num}) where {T <: Number} = Num
+Base.promote_rule(::Type{BigFloat}, ::Type{Num}) = Num
+<ₑ(s::Num, x) = value(s) <ₑ value(x)
+<ₑ(s, x::Num) = value(s) <ₑ value(x)
+<ₑ(s::Num, x::Num) = value(s) <ₑ value(x)
+
+function Num(q::AbstractIrrational)
+    args = SymbolicUtils.ArgsT{VartypeT}((q,))
+    Num(Term{VartypeT}(identity, args; type = Real, shape = SymbolicUtils.ShapeVecT()))
+end
+
+for T in (Integer, Rational)
+    @eval Base.:(^)(n::Num, i::$T) = Num(value(n)^i)
+end
+
+macro num_method(f, expr, Ts = nothing)
+    if Ts === nothing
+        Ts = [Any]
+    else
+        @assert Ts.head == :tuple
+        # e.g. a tuple or vector
+        Ts = Ts.args
+    end
+
+    ms = [quote
+              $f(a::$T, b::$Num) = $expr
+              $f(a::$Num, b::$T) = $expr
+          end
+          for T in Ts]
+    quote
+        $f(a::$Num, b::$Num) = $expr
+        $(ms...)
+    end |> esc
+end
+
+# Boolean operations
+for (f, Domain) in
+    [:(==) => :((AbstractFloat, Number)), :(!=) => :((AbstractFloat, Number)),
+    :(<=) => :((Real,)), :(>=) => :((Real,)),
+    :(isless) => :((Real, AbstractFloat)),
+    :(<) => :((Real,)), :(>) => :((Real,)),
+    :(&) => :((Bool,)), :(|) => :((Bool,)),
+    :xor => :((Bool,))]
+    @eval @num_method Base.$f (val = $f(value(a), value(b)); val isa Bool ? val : Num(val)) $Domain
+end
+
+for f in [:!, :~]
+    @eval Base.$f(x::Num) = (val = $f(value(x)); val isa Bool ? val : Num(val))
+end
+@num_method Base.isequal begin
+    va = value(a)
+    vb = value(b)
+    isequal(va, vb)::Bool
+end (AbstractFloat, Number, BasicSymbolic)
+
+Base.to_index(x::Num) = Base.to_index(value(x))
+
+Base.hash(x::Num, h::UInt) = hash(unwrap(x), h)::UInt
+
+function Base.convert(::Type{Num}, x::BasicSymbolic{VartypeT})
+    symtype(x) <: Real || error("`symtype` must be `<:Real`")
+    Num(x)
+end
+
+function LinearAlgebra.lu(
+        x::Union{Adjoint{<:RCNum}, Transpose{<:RCNum}, Array{<:RCNum}}; check = true, kw...)
+    sym_lu(x; check = check)
+end
+
+Code.cse(x::Num) = Code.cse(unwrap(x))
+
+## Documentation
+# This method makes the docstring show all entries in the metadata dict associated with an instance of Num
+function Base.Docs.getdoc(x::Num)
+    x = unwrap(x)
+    strings = ["A variable of type Symbolics.Num (Num wraps anything in a type that is a subtype of Real)";
+               "# Metadata"]
+    for (key, val) in collect(pairs(x.metadata))
+        push!(strings, string(string(key), ": ", string(val)))
+    end
+    Markdown.parse(join(strings, "\n\n  "))
+end
+
+# https://github.com/JuliaSymbolics/Symbolics.jl/issues/1206#issuecomment-2271847091
+"""
+$(TYPEDSIGNATURES)
+
+Return the alignment of printing `x` of type `Num`.
+
+The alignment is a tuple `(left, right)` showing how many characters are needed
+on either side of an alignment feature. This function returns the text width
+of `x` and `0` to avoid matching special characters, such as `e`and `f`, with
+the alignment algorithm in Julia Base, which leads to extra white spaces on the
+left of the characters when displaying array of symbolic variables.
+"""
+function Base.alignment(io::IO, x::Num)
+    s = sprint(show, x, context = Base.nocolor(io), sizehint = 0)
+    textwidth(s), 0
+end

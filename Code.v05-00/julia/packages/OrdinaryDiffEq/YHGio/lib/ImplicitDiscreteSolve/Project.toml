@@ -1,0 +1,47 @@
+name = "ImplicitDiscreteSolve"
+uuid = "3263718b-31ed-49cf-8a0f-35a466e8af96"
+authors = ["vyudu <vincent.duyuan@gmail.com>"]
+version = "2.1.0"
+
+[deps]
+NonlinearSolveBase = "be0214bd-f91f-a760-ac4e-3421ce2b2da0"
+NonlinearSolveFirstOrder = "5959db7a-ea39-4486-b5fe-2dd0bf03d60d"
+OrdinaryDiffEqCore = "bbf590c4-e513-4bbe-9b18-05decba2e5d8"
+ConcreteStructs = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
+SciMLBase = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+SymbolicIndexingInterface = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
+DiffEqBase = "2b5f629d-d688-5b77-993f-72d75c75574e"
+
+[extras]
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+OrdinaryDiffEqSDIRK = "2d112036-d095-4a1e-ab9a-08536f3ecdbf"
+SafeTestsets = "1bc83da4-3b8d-516f-aca4-4fe02f6d838f"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[sources]
+DiffEqBase = {path = "../DiffEqBase"}
+
+[compat]
+Pkg = "1"
+Test = "1.10.0"
+NonlinearSolveBase = "2.23.0"
+OrdinaryDiffEqSDIRK = "2"
+SafeTestsets = "0.1.0"
+SciMLBase = "3.10.0"
+OrdinaryDiffEqCore = "4.1"
+ConcreteStructs = "0.2.3"
+NonlinearSolveFirstOrder = "2.1.1"
+SymbolicIndexingInterface = "0.3.43"
+julia = "1.10"
+DiffEqBase = "7"
+Reexport = "1.2.2"
+
+[targets]
+test = ["OrdinaryDiffEqSDIRK", "Test", "Pkg", "SafeTestsets"]
+
+[sources.OrdinaryDiffEqCore]
+path = "../OrdinaryDiffEqCore"
+
+[sources.OrdinaryDiffEqSDIRK]
+path = "../OrdinaryDiffEqSDIRK"

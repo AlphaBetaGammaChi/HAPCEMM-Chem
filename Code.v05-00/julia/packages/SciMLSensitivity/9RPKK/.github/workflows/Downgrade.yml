@@ -1,0 +1,28 @@
+name: Downgrade
+on:
+  pull_request:
+    branches:
+      - master
+    paths-ignore:
+      - 'docs/**'
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'docs/**'
+jobs:
+  test:
+    # Temporarily disabled - see https://github.com/SciML/SciMLSensitivity.jl/issues/1326
+    if: false
+    name: Downgrade
+    strategy:
+      matrix:
+        julia-version: ['1.10']
+        group: ['Core1']
+    uses: "SciML/.github/.github/workflows/downgrade.yml@v1"
+    with:
+      julia-version: "${{ matrix.julia-version }}"
+      group: "${{ matrix.group }}"
+      skip: "Pkg,TOML"
+      allow-reresolve: false
+    secrets: "inherit"

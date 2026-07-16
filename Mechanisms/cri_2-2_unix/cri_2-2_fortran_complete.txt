@@ -1,0 +1,6869 @@
+Output file for Fortran Subset Extractor
+
+
+***********************************************************************
+Species present in subset
+1 	 TBUACET 
+2 	 METHACET 
+3 	 BOX2PROL 
+4 	 RTN10O2 
+5 	 IPROPOL 
+6 	 ETHGLY 
+7 	 IEPOX 
+8 	 NC7H16 
+9 	 RTN14O2 
+10 	 C2H5CO3H 
+11 	 NC9H20 
+12 	 RU10NO3 
+13 	 RE12NO3 
+14 	 RN36AO2 
+15 	 MIBK 
+16 	 RI15NO3 
+17 	 NBUTACET 
+18 	 RTX22NO3 
+19 	 C4H9CHO 
+20 	 NBUTOL 
+21 	 HEX2ONE 
+22 	 RN30NO3 
+23 	 RN35OOH 
+24 	 RTN26OOH 
+25 	 MIPK 
+26 	 RE12O2 
+27 	 RA16NO3 
+28 	 NPROPOL 
+29 	 RA28NO3 
+30 	 RE18O2 
+31 	 M22C4 
+32 	 NO2 
+33 	 NO3 
+34 	 RN19NO3 
+35 	 H2O2 
+36 	 NRUA20OOH 
+37 	 HOC2H4NO3 
+38 	 HOC2H4OOH 
+39 	 ECARB7 
+40 	 NC5H12 
+41 	 M2HEX 
+42 	 RI15O2 
+43 	 CARB25 
+44 	 CARB26 
+45 	 RN37O2 
+46 	 CARB20 
+47 	 CARB21 
+48 	 CARB22 
+49 	 CARB23 
+50 	 PROPACID 
+51 	 CARB29 
+52 	 ANHY 
+53 	 RU11NO3 
+54 	 RI17O2 
+55 	 RN12O2 
+56 	 CH3CHO 
+57 	 HMML 
+58 	 BENZENE 
+59 	 RI11O2 
+60 	 NRTX28OOH 
+61 	 RN12OOH 
+62 	 MPRK 
+63 	 RN36OOH 
+64 	 NOA 
+65 	 RN18O2 
+66 	 RN32OOH 
+67 	 RN31O2 
+68 	 NRI12O2 
+69 	 CH3OCH3 
+70 	 PETHTOL 
+71 	 RN10O2 
+72 	 RI12O2 
+73 	 RN16O2 
+74 	 TNCARB15 
+75 	 CARB3 
+76 	 TNCARB10 
+77 	 CARB7 
+78 	 CARB6 
+79 	 CARB9 
+80 	 RN13AO2 
+81 	 PHAN 
+82 	 BUT2OL 
+83 	 RN34OOH 
+84 	 RA13NO3 
+85 	 RAROH17 
+86 	 TXCARB24 
+87 	 TXCARB22 
+88 	 BENZAL 
+89 	 OETHTOL 
+90 	 RN28OOH 
+91 	 RN13OOH 
+92 	 PXYL 
+93 	 UCARB10 
+94 	 UCARB12 
+95 	 RE15NO3 
+96 	 CH3OCHO 
+97 	 HOCH2CHO 
+98 	 RN37NO3 
+99 	 C3H7CHO 
+100 	 NRN18OOH 
+101 	 RN21OOH 
+102 	 RU10OOH 
+103 	 METHTOL 
+104 	 NRU12OOH 
+105 	 ETBE 
+106 	 DHPCARB9 
+107 	 ECARB13 
+108 	 RN11OOH 
+109 	 UDCARB20 
+110 	 CH3OOH 
+111 	 NEOP 
+112 	 RN27NO3 
+113 	 TM124B 
+114 	 RU10AO2 
+115 	 THEX2ENE 
+116 	 RN24NO3 
+117 	 CH3CO3H 
+118 	 CYHEXOL 
+119 	 RU10O2 
+120 	 RN9O2 
+121 	 RN32O2 
+122 	 RN28AO2 
+123 	 RN22NO3 
+124 	 CARB31 
+125 	 RN34O2 
+126 	 RU12O2 
+127 	 RN10NO3 
+128 	 RU11OOH 
+129 	 NPROACET 
+130 	 HPUCARB12 
+131 	 RN24AO2 
+132 	 CH4 
+133 	 IC4H10 
+134 	 RN13O2 
+135 	 RN23O2 
+136 	 RU14O2 
+137 	 RA25NO3 
+138 	 RN36NO3 
+139 	 RN11O2 
+140 	 RN16NO3 
+141 	 RN36O2 
+142 	 UDCARB14 
+143 	 MO2EOL 
+144 	 NRI15O2 
+145 	 TNCARB26 
+146 	 RN37OOH 
+147 	 NRU12O2 
+148 	 RN30O2 
+149 	 HCOOH 
+150 	 RU14OOH 
+151 	 PBENZ 
+152 	 RN18NO3 
+153 	 RN19O2 
+154 	 HCHO 
+155 	 RN13NO3 
+156 	 RN17O2 
+157 	 ME3BUT1ENE 
+158 	 IPRCHO 
+159 	 RN9NO3 
+160 	 RN26OOH 
+161 	 IBUTOL 
+162 	 RN15O2 
+163 	 RA13OOH 
+164 	 NRN9O2 
+165 	 NRU14O2 
+166 	 NRN15O2 
+167 	 HOCH2CO3 
+168 	 TBUTOL 
+169 	 RA16O2 
+170 	 RN15NO3 
+171 	 ME2BUT1ENE 
+172 	 RTX22O2 
+173 	 NC8H18 
+174 	 NUCARB12 
+175 	 RTX28O2 
+176 	 CARB33 
+177 	 CARB32 
+178 	 IPBENZ 
+179 	 CARB30 
+180 	 PROPGLY 
+181 	 CARB35 
+182 	 CARB34 
+183 	 RN24OOH 
+184 	 RN25OOH 
+185 	 UDCARB17 
+186 	 UDCARB11 
+187 	 RN27OOH 
+188 	 RN25AO2 
+189 	 HEX1ENE 
+190 	 DHPR12OOH 
+191 	 IPROACET 
+192 	 RU14NO3 
+193 	 RA16BOOH 
+194 	 RN33O2 
+195 	 RN29OOH 
+196 	 MPAN 
+197 	 UDCARB8 
+198 	 RN22OOH 
+199 	 RN20OOH 
+200 	 C2H5CHO 
+201 	 RC18OOH 
+202 	 RN8O2 
+203 	 M2PE 
+204 	 RTN23O2 
+205 	 HEX3ONE 
+206 	 RU11O2 
+207 	 NRN12OOH 
+208 	 CYHEXONE 
+209 	 RN27AO2 
+210 	 RA25O2 
+211 	 NRN6OOH 
+212 	 RN35O2 
+213 	 RA25OOH 
+214 	 RN16OOH 
+215 	 NRN6O2 
+216 	 NRN9OOH 
+217 	 NC6H14 
+218 	 C5H8 
+219 	 HUCARB9 
+220 	 CARB24 
+221 	 RN10OOH 
+222 	 CH3CO3 
+223 	 MXYL 
+224 	 ME3BUOL 
+225 	 NRN15OOH 
+226 	 RN14OOH 
+227 	 CH3NO3 
+228 	 CHEX 
+229 	 RN8OOH 
+230 	 PAN 
+231 	 NRN18O2 
+232 	 RTN10OOH 
+233 	 RN16AO2 
+234 	 RN17OOH 
+235 	 RTX24OOH 
+236 	 RN15OOH 
+237 	 RU12OOH 
+238 	 RN21AO2 
+239 	 RTX28OOH 
+240 	 RTX24NO3 
+241 	 NRN12O2 
+242 	 HNO3 
+243 	 NRUA20O2 
+244 	 DHPR12O2 
+245 	 EOX2EOL 
+246 	 NC4H10 
+247 	 RTN26PAN 
+248 	 RTN25OOH 
+249 	 RN12NO3 
+250 	 RN9OOH 
+251 	 C3H6 
+252 	 IPEBOH 
+253 	 DMC 
+254 	 DMM 
+255 	 C3H8 
+256 	 RA13O2 
+257 	 CARB27 
+258 	 RTX24O2 
+259 	 TM135B 
+260 	 RN31AO2 
+261 	 RUA20O2 
+262 	 RI13NO3 
+263 	 CPENT2ENE 
+264 	 RTN23OOH 
+265 	 CARB28 
+266 	 RN15AO2 
+267 	 C2H6 
+268 	 C2H4 
+269 	 C2H2 
+270 	 RN25NO3 
+271 	 RI12NO3 
+272 	 NRTX28O2 
+273 	 MIBKAOH 
+274 	 RN26O2 
+275 	 ME2BUT2ENE 
+276 	 MTBE 
+277 	 RN24O2 
+278 	 IC3H7OOH 
+279 	 SBUTACET 
+280 	 DIETETHER 
+281 	 CBUT2ENE 
+282 	 CO 
+283 	 RN22O2 
+284 	 NRTN28OOH 
+285 	 M3HEX 
+286 	 IC3H7O2 
+287 	 RTN14OOH 
+288 	 RA28O2 
+289 	 EBENZ 
+290 	 RN20O2 
+291 	 PENT1ENE 
+292 	 RN28O2 
+293 	 TOLUENE 
+294 	 RTN28O2 
+295 	 RTN26O2 
+296 	 OXYL 
+297 	 RE18NO3 
+298 	 RTN25NO3 
+299 	 RA19OOH 
+300 	 RTN24O2 
+301 	 PPN 
+302 	 NC12H26 
+303 	 RTX28NO3 
+304 	 RN21NO3 
+305 	 TBUT2ENE 
+306 	 IC5H12 
+307 	 RU12NO3 
+308 	 RTN25O2 
+309 	 HOCH2CO3H 
+310 	 C2H5NO3 
+311 	 BUOX2ETOH 
+312 	 BUT1ENE 
+313 	 RI13OOH 
+314 	 RUA20OOH 
+315 	 IPECOH 
+316 	 TPENT2ENE 
+317 	 C2H5O2 
+318 	 CH3OH 
+319 	 IPEAOH 
+320 	 RA19AO2 
+321 	 O3 
+322 	 MTBK 
+323 	 RI16OOH 
+324 	 C2H5CO3 
+325 	 RC18O2 
+326 	 RC16O2 
+327 	 RC18NO3 
+328 	 RN31OOH 
+329 	 RTN28NO3 
+330 	 RI16AO2 
+331 	 RN33NO3 
+332 	 RI14OOH 
+333 	 RA22AO2 
+334 	 OH 
+335 	 NRU14OOH 
+336 	 NC10H22 
+337 	 CH3O2 
+338 	 RC14O2 
+339 	 C2H5OH 
+340 	 RA19CO2 
+341 	 RI12OOH 
+342 	 APINENE 
+343 	 CHEX2ENE 
+344 	 AROH17 
+345 	 BPINENE 
+346 	 NC11H24 
+347 	 RN29O2 
+348 	 CARB19 
+349 	 CARB18 
+350 	 RTX22OOH 
+351 	 CARB11 
+352 	 CARB10 
+353 	 CARB13 
+354 	 CARB12 
+355 	 CARB15 
+356 	 CARB14 
+357 	 CARB17 
+358 	 CARB16 
+359 	 MACO3 
+360 	 RA22BO2 
+361 	 RN18OOH 
+362 	 RN30OOH 
+363 	 HOCH2CH2O2 
+364 	 IC3H7NO3 
+365 	 RI15OOH 
+366 	 RN14O2 
+367 	 RN25O2 
+368 	 DIIPRETHER 
+369 	 RA22OOH 
+370 	 RA22NO3 
+371 	 RN18AO2 
+372 	 RN21O2 
+373 	 H2 
+374 	 RN19BO2 
+375 	 AROH14 
+376 	 TM123B 
+377 	 ARNOH14 
+378 	 CCARB12 
+379 	 ARNOH17 
+380 	 M23C4 
+381 	 CCARB14 
+382 	 RI17OOH 
+383 	 STYRENE 
+384 	 CARB11A 
+385 	 C2H5OOH 
+386 	 RTN24OOH 
+387 	 ETHACET 
+388 	 NO 
+389 	 RN19AO2 
+390 	 RN22AO2 
+391 	 MEPROPENE 
+392 	 DIME35EB 
+393 	 CH3CO2H 
+394 	 RN19OOH 
+395 	 RI14O2 
+396 	 RE15O2 
+397 	 PR2OHMOX 
+398 	 RA19NO3 
+399 	 DIEK 
+400 	 NRI12OOH 
+401 	 NRTN28O2 
+402 	 PECOH 
+403 	 CH3COCH3 
+404 	 RI16O2 
+405 	 MEK 
+406 	 RE6O2 
+407 	 RA28OOH 
+408 	 RA16OOH 
+409 	 RN28NO3 
+410 	 M3PE 
+411 	 RA19BO2 
+412 	 RN27O2 
+413 	 RN33OOH 
+414 	 DIET35TOL 
+415 	 RA16BO2 
+416 	 RTN28OOH 
+417 	 RI13O2 
+418 	 RN34NO3 
+419 	 HO2 
+420 	 RN31NO3 
+421 	 RAROH14 
+422 	 DHCARB9 
+423 	 RI16NO3 
+424 	 RN30AO2 
+425 	 C4H6 
+426 	 RI11OOH 
+427 	 NRI15OOH 
+428 	 RN33AO2 
+429 	 RN23OOH 
+430 	 RCOOH25 
+431 	 RN34AO2 
+432 	 RI19O2 
+
+***********************************************************************
+
+
+ Rate expressions fortran routine
+
+subroutine constants(p,t,y)  
+implicit none  
+!     calculates rate constants from arrhenius informtion 
+integer    mnsp,mre
+parameter (mnsp = 3487,mre=20000)
+double precision:: ro2 , kro2no3, temp, p(mre),t
+double precision:: hmix, area, gn2o5, gho2, gch3o2, goh,ghno3, gh2o2, gch3oh, gno3
+double precision:: m, o2, n2, h2o, k0, ki, fc, f, k1, k2, k3, k4, kmt01, kmt02 
+double precision:: kmt03, kmt04, kmt05, kmt06, kmt07, kmt08, kmt09,kmt10,kmt11 
+double precision:: kmt12, kmt13, kmt14, kmt15, kmt16, kmt17, kfpan, kbpan 
+double precision:: fcc,krc,fcd,krd,fc2,fc1,fc3,fc4,fc5,kr1,kr2,kr3,kr4
+double precision:: fc7,fc8,fc9,fc10,fc13,fc14,kr7,kr8,kr9,kr10,kr13,kr14
+double precision:: kc0, kci,kd0,kdi,fd,k10,k1i,f1,k20,k2i,f2,k30,k3i,f3
+double precision:: k40,k4i,f4,k70,k7i,f7,ck80,ck8i,ckr8,cfc8,k80,k8i,f8
+double precision:: k90,k9i,f9,k100,k10i,f10,k130,k13i,f13,k140,k14i,f14
+double precision:: k160,k16i,kr16,fc16,f16, ssign,x
+double precision:: y(mnsp)
+open(13,file='photolysis.txt', status='old')    
+!  calculate zenith angle and temperature for time of day
+
+call zenith(theta, secx, cosx, t)
+
+call temperature(temp, h2o, t)
+
+! ***************************************************************************
+!    define ro2 concentration by adding up concentrations of all 
+!    contributing species. 
+! ***************************************************************************
+
+ro2 = 0.0d+0
+
+
+	 ro2=ro2+y(363) 
+	 ro2=ro2+y(120) 
+	 ro2=ro2+y(55) 
+	 ro2=ro2+y(72) 
+	 ro2=ro2+y(162) 
+	 ro2=ro2+y(266) 
+	 ro2=ro2+y(42) 
+	 ro2=ro2+y(156) 
+	 ro2=ro2+y(330) 
+	 ro2=ro2+y(233) 
+	 ro2=ro2+y(222) 
+	 ro2=ro2+y(202) 
+	 ro2=ro2+y(337) 
+	 ro2=ro2+y(317) 
+	 ro2=ro2+y(324) 
+	 ro2=ro2+y(71) 
+	 ro2=ro2+y(139) 
+	 ro2=ro2+y(286) 
+	 ro2=ro2+y(59) 
+	 ro2=ro2+y(134) 
+	 ro2=ro2+y(366) 
+	 ro2=ro2+y(417) 
+	 ro2=ro2+y(73) 
+	 ro2=ro2+y(404) 
+	 ro2=ro2+y(153) 
+	 ro2=ro2+y(374) 
+	 ro2=ro2+y(432) 
+	 ro2=ro2+y(389) 
+	 ro2=ro2+y(283) 
+	 ro2=ro2+y(390) 
+	 ro2=ro2+y(367) 
+	 ro2=ro2+y(292) 
+	 ro2=ro2+y(67) 
+	 ro2=ro2+y(125) 
+	 ro2=ro2+y(45) 
+	 ro2=ro2+y(325) 
+	 ro2=ro2+y(215) 
+	 ro2=ro2+y(164) 
+	 ro2=ro2+y(241) 
+	 ro2=ro2+y(68) 
+	 ro2=ro2+y(166) 
+	 ro2=ro2+y(144) 
+	 ro2=ro2+y(65) 
+	 ro2=ro2+y(231) 
+	 ro2=ro2+y(256) 
+	 ro2=ro2+y(169) 
+	 ro2=ro2+y(320) 
+	 ro2=ro2+y(340) 
+	 ro2=ro2+y(411) 
+	 ro2=ro2+y(333) 
+	 ro2=ro2+y(360) 
+	 ro2=ro2+y(210) 
+	 ro2=ro2+y(288) 
+	 ro2=ro2+y(261) 
+	 ro2=ro2+y(243) 
+	 ro2=ro2+y(415) 
+	 ro2=ro2+y(206) 
+	 ro2=ro2+y(136) 
+	 ro2=ro2+y(165) 
+	 ro2=ro2+y(80) 
+	 ro2=ro2+y(406) 
+	 ro2=ro2+y(26) 
+	 ro2=ro2+y(396) 
+	 ro2=ro2+y(371) 
+	 ro2=ro2+y(30) 
+	 ro2=ro2+y(395) 
+	 ro2=ro2+y(54) 
+	 ro2=ro2+y(326) 
+	 ro2=ro2+y(294) 
+	 ro2=ro2+y(401) 
+	 ro2=ro2+y(175) 
+	 ro2=ro2+y(272) 
+	 ro2=ro2+y(258) 
+	 ro2=ro2+y(167) 
+	 ro2=ro2+y(238) 
+	 ro2=ro2+y(372) 
+	 ro2=ro2+y(131) 
+	 ro2=ro2+y(209) 
+	 ro2=ro2+y(424) 
+	 ro2=ro2+y(428) 
+	 ro2=ro2+y(14) 
+	 ro2=ro2+y(244) 
+	 ro2=ro2+y(119) 
+	 ro2=ro2+y(114) 
+	 ro2=ro2+y(359) 
+	 ro2=ro2+y(295) 
+	 ro2=ro2+y(308) 
+	 ro2=ro2+y(172) 
+	 ro2=ro2+y(277) 
+	 ro2=ro2+y(412) 
+	 ro2=ro2+y(148) 
+	 ro2=ro2+y(194) 
+	 ro2=ro2+y(141) 
+	 ro2=ro2+y(126) 
+	 ro2=ro2+y(147) 
+	 ro2=ro2+y(338) 
+	 ro2=ro2+y(300) 
+	 ro2=ro2+y(290) 
+	 ro2=ro2+y(135) 
+	 ro2=ro2+y(188) 
+	 ro2=ro2+y(274) 
+	 ro2=ro2+y(122) 
+	 ro2=ro2+y(347) 
+	 ro2=ro2+y(260) 
+	 ro2=ro2+y(121) 
+	 ro2=ro2+y(431) 
+	 ro2=ro2+y(212) 
+	 ro2=ro2+y(204) 
+	 ro2=ro2+y(9) 
+	 ro2=ro2+y(4) 
+
+c 	 WARNING: The following species do not have SMILES strings in the database.
+c 	 If any of these are peroxy radicals the RO2 sum will be wrong. 
+c	 CARB11A = y(384) 
+c	 CARB7 = y(77) 
+c	 CARB11 = y(351) 
+c	 CARB14 = y(356) 
+c	 CARB3 = y(75) 
+c	 AROH14 = y(375) 
+c	 AROH17 = y(344) 
+c	 RAROH14 = y(421) 
+c	 UCARB10 = y(93) 
+c	 ECARB7 = y(39) 
+c	 TNCARB26 = y(145) 
+c	 RCOOH25 = y(430) 
+c	 TXCARB24 = y(86) 
+c	 TXCARB22 = y(87) 
+c	 HOC2H4NO3 = y(37) 
+c	 HOC2H4OOH = y(38) 
+c	 RN9NO3 = y(159) 
+c	 RN9OOH = y(250) 
+c	 RN12NO3 = y(249) 
+c	 RN12OOH = y(61) 
+c	 RI12NO3 = y(271) 
+c	 RI12OOH = y(341) 
+c	 RN15NO3 = y(170) 
+c	 RN15OOH = y(236) 
+c	 CARB13 = y(353) 
+c	 RI15NO3 = y(16) 
+c	 RI15OOH = y(365) 
+c	 RN17OOH = y(234) 
+c	 RI16NO3 = y(423) 
+c	 RI16OOH = y(323) 
+c	 RN16OOH = y(214) 
+c	 RN8OOH = y(229) 
+c	 CARB6 = y(78) 
+c	 C2H5CO3H = y(10) 
+c	 RN10NO3 = y(127) 
+c	 RN10OOH = y(221) 
+c	 RN11OOH = y(108) 
+c	 RI11OOH = y(426) 
+c	 RN13NO3 = y(155) 
+c	 RN13OOH = y(91) 
+c	 RN14OOH = y(226) 
+c	 RI13NO3 = y(262) 
+c	 RI13OOH = y(313) 
+c	 RN16NO3 = y(140) 
+c	 RN19NO3 = y(34) 
+c	 RN19OOH = y(394) 
+c	 RN22NO3 = y(123) 
+c	 RN22OOH = y(198) 
+c	 RN25NO3 = y(270) 
+c	 RN25OOH = y(184) 
+c	 RN28NO3 = y(409) 
+c	 RN28OOH = y(90) 
+c	 RN31NO3 = y(420) 
+c	 RN31OOH = y(328) 
+c	 RN34NO3 = y(418) 
+c	 RN34OOH = y(83) 
+c	 RN37NO3 = y(98) 
+c	 RN37OOH = y(146) 
+c	 RC18NO3 = y(327) 
+c	 RC18OOH = y(201) 
+c	 NRN6OOH = y(211) 
+c	 NRN9OOH = y(216) 
+c	 NRN12OOH = y(207) 
+c	 NRI12OOH = y(400) 
+c	 NRN15OOH = y(225) 
+c	 NRI15OOH = y(427) 
+c	 RN18NO3 = y(152) 
+c	 RN18OOH = y(361) 
+c	 NRN18OOH = y(100) 
+c	 UDCARB8 = y(197) 
+c	 RA13NO3 = y(84) 
+c	 RA13OOH = y(163) 
+c	 UDCARB11 = y(186) 
+c	 RA16NO3 = y(27) 
+c	 RA16OOH = y(408) 
+c	 RAROH17 = y(85) 
+c	 UDCARB14 = y(142) 
+c	 RA19NO3 = y(398) 
+c	 RA19OOH = y(299) 
+c	 CARB9 = y(79) 
+c	 RA22NO3 = y(370) 
+c	 RA22OOH = y(369) 
+c	 UDCARB17 = y(185) 
+c	 RA25NO3 = y(137) 
+c	 RA25OOH = y(213) 
+c	 UDCARB20 = y(109) 
+c	 RA28NO3 = y(29) 
+c	 RA28OOH = y(407) 
+c	 RUA20OOH = y(314) 
+c	 NRUA20OOH = y(36) 
+c	 ARNOH14 = y(377) 
+c	 RA16BOOH = y(193) 
+c	 RU11NO3 = y(53) 
+c	 RU11OOH = y(128) 
+c	 UCARB12 = y(94) 
+c	 RU14NO3 = y(192) 
+c	 RU14OOH = y(150) 
+c	 HPUCARB12 = y(130) 
+c	 NUCARB12 = y(174) 
+c	 NRU14OOH = y(335) 
+c	 RE12NO3 = y(13) 
+c	 ECARB13 = y(107) 
+c	 RE15NO3 = y(95) 
+c	 CARB16 = y(358) 
+c	 RE18NO3 = y(297) 
+c	 RI14OOH = y(332) 
+c	 RI17OOH = y(382) 
+c	 CCARB14 = y(381) 
+c	 RTN28NO3 = y(329) 
+c	 RTN28OOH = y(416) 
+c	 NRTN28OOH = y(284) 
+c	 RTX28NO3 = y(303) 
+c	 RTX28OOH = y(239) 
+c	 NRTX28OOH = y(60) 
+c	 RTX24NO3 = y(240) 
+c	 RTX24OOH = y(235) 
+c	 CARB10 = y(352) 
+c	 CARB15 = y(355) 
+c	 CARB12 = y(354) 
+c	 CARB17 = y(357) 
+c	 CARB19 = y(348) 
+c	 RN21NO3 = y(304) 
+c	 RN21OOH = y(101) 
+c	 CARB20 = y(46) 
+c	 CARB22 = y(48) 
+c	 RN24NO3 = y(116) 
+c	 RN24OOH = y(183) 
+c	 CARB23 = y(49) 
+c	 CARB25 = y(43) 
+c	 RN27NO3 = y(112) 
+c	 RN27OOH = y(187) 
+c	 CARB26 = y(44) 
+c	 CARB28 = y(265) 
+c	 RN30NO3 = y(22) 
+c	 RN30OOH = y(362) 
+c	 CARB29 = y(51) 
+c	 CARB31 = y(124) 
+c	 RN33NO3 = y(331) 
+c	 RN33OOH = y(413) 
+c	 CARB32 = y(177) 
+c	 CARB34 = y(182) 
+c	 RN36NO3 = y(138) 
+c	 RN36OOH = y(63) 
+c	 CARB35 = y(181) 
+c	 ANHY = y(52) 
+c	 ARNOH17 = y(379) 
+c	 RU10NO3 = y(12) 
+c	 RU12NO3 = y(307) 
+c	 IEPOX = y(7) 
+c	 HUCARB9 = y(219) 
+c	 DHPR12OOH = y(190) 
+c	 DHPCARB9 = y(106) 
+c	 RU10OOH = y(102) 
+c	 RTN26OOH = y(24) 
+c	 RTN26PAN = y(247) 
+c	 RTN25NO3 = y(298) 
+c	 RTN25OOH = y(248) 
+c	 RTX22NO3 = y(18) 
+c	 RTX22OOH = y(350) 
+c	 RU12OOH = y(237) 
+c	 DHCARB9 = y(422) 
+c	 NRU12OOH = y(104) 
+c	 CCARB12 = y(378) 
+c	 RTN24OOH = y(386) 
+c	 TNCARB15 = y(74) 
+c	 RN20OOH = y(199) 
+c	 RN23OOH = y(429) 
+c	 RN26OOH = y(160) 
+c	 RN29OOH = y(195) 
+c	 RN32OOH = y(66) 
+c	 RN35OOH = y(23) 
+c	 RTN23OOH = y(264) 
+c	 CARB18 = y(349) 
+c	 CARB21 = y(47) 
+c	 CARB24 = y(220) 
+c	 CARB27 = y(257) 
+c	 CARB30 = y(179) 
+c	 CARB33 = y(176) 
+c	 TNCARB10 = y(76) 
+c	 RTN14OOH = y(287) 
+c	 RTN10OOH = y(232) 
+! ***************************************************************************
+m=2.55e+19
+o2=0.2095*m 
+
+***********************************************************************
+
+***********************************************************************
+! ***************************************************************************
+
+!    define photolysis reaction rates using derwent method from mcm2box.fac
+
+! ***************************************************************************
+rewind(13)
+read(13,*) 
+do i = 1, 35
+	read(13,*) k, l(k), mm(k), nn(k) 
+	if (cosx.lt.1.00d-10) then
+		j(k) = 1.0d-30
+	else
+		j(k) = l(k)*cosx**( mm(k))*dexp(-nn(k)*secx) 
+	endif
+enddo
+
+	p(1)= 2.85D-12*EXP(-345/TEMP) 
+	p(2)= 3.0D-12*EXP(20/TEMP)*0.95 
+	p(3)= 3.0D-12*EXP(20/TEMP)*0.05 
+	p(4)= 4.6D-12*EXP(70/TEMP)*0.494 
+	p(5)= 4.6D-12*EXP(70/TEMP)*0.506 
+	p(6)= 2.6D-12*EXP(200/TEMP)*0.861 
+	p(7)= 2.6D-12*EXP(200/TEMP)*0.139 
+	p(8)= 5.3D-12*EXP(140/TEMP)
+	p(9)= 8.7D-12*0.639 
+	p(10)= 8.7D-12*0.361 
+	p(11)= 2.73D-12*EXP(352/TEMP)*0.352 
+	p(12)= 2.73D-12*EXP(352/TEMP)*0.648
+	p(13)= 1.6D-12*EXP(-121/TEMP) 
+	p(14)= 1.22D-11*0.436 
+	p(15)= 1.22D-11*0.564
+	p(16)=  1.12D-11
+	p(17)=  1.31D-11
+	p(18)=  3.85D-12
+	p(19)= 1.24D-11*0.463 
+	p(20)= 1.24D-11*0.537 
+	p(21)= 1.77D-11*0.261 
+	p(22)= 1.77D-11*0.739 
+	p(23)=  2.88D-12*0.73
+	p(24)=  2.88D-12*0.27
+	p(25)=  J(22)*1.75
+	p(26)= 1.45D-11 
+	p(27)= 1.20D-11*0.387 
+	p(28)= 1.20D-11*0.613 
+	p(29)=  J(11)
+	p(30)=  J(12)
+	p(31)= 5.4D-12*EXP(135/TEMP) 
+	p(32)= 5.5D-16 
+	p(33)=  J(13)
+	p(34)= 4.7D-12*EXP(345/TEMP)
+	p(35)= 1.4D-12*EXP(-1860/TEMP) 
+	p(36)=  J(14)
+	p(37)= 4.9D-12*EXP(405/TEMP) 
+	p(38)= 3.24D-12*EXP(-1860/TEMP) 
+	p(39)=  J(15)
+	p(40)= 6.0D-12*EXP(410/TEMP)
+	p(41)= 1.7D-12*EXP(-1500/TEMP) 
+	p(42)=  J(17)
+	p(43)= 6.8D-12*EXP(410/TEMP)
+	p(44)= 1.67D-12*EXP(-1460/TEMP) 
+	p(45)=  J(15)
+	p(46)=  6.34D-12*EXP(448/TEMP)
+	p(47)=  KNO3AL*5.5
+	p(48)= 1.85D-12*EXP(-1690/TEMP) 
+	p(49)= 6.9D-12*EXP(-1000/TEMP) 
+	p(50)= 7.6D-12*EXP(-585/TEMP)*0.736 
+	p(51)= 7.6D-12*EXP(-585/TEMP)*0.264 
+	p(52)= 9.8D-12*EXP(-425/TEMP)
+	p(53)=  1.16D-17*TEMP**2*EXP(225/TEMP)
+	p(54)=  2.44D-17*TEMP**2*EXP(183/TEMP)
+	p(55)=  3.70D-12
+	p(56)=  1.80D-17*TEMP**2*EXP(-189/TEMP)
+	p(57)=  1.53D-17*TEMP**2*EXP(414/TEMP)
+	p(58)=  5.30D-12
+	p(59)=  5.40D-12
+	p(60)=  3.22D-11*EXP(-781/TEMP)
+	p(61)= 1.24D-17*TEMP**2*EXP(494/TEMP)*0.877 
+	p(62)= 1.24D-17*TEMP**2*EXP(494/TEMP)*0.123 
+	p(63)=  1.59D-17*TEMP**2*EXP(478/TEMP)
+	p(64)=  6.86D-12
+	p(65)= 7.15D-12*0.558 
+	p(66)= 7.15D-12*0.442 
+	p(67)=  2.76D-17*TEMP**2*EXP(378/TEMP)
+	p(68)=  2.51D-17*TEMP**2*EXP(447/TEMP)
+	p(69)=  3.13D-17*TEMP**2*EXP(416/TEMP)
+	p(70)=  1.29D-11
+	p(71)=  1.39D-11
+	p(72)=  2.88D-17*TEMP**2*EXP(309/TEMP)
+	p(73)=  KMT15
+	p(74)= 3.3D-12*EXP(-2880/TEMP) 
+	p(75)= 9.1D-15*EXP(-2580/TEMP)*0.13
+	p(76)= 9.1D-15*EXP(-2580/TEMP)*0.87
+	p(77)=  KMT16
+	p(78)= 4.6D-13*EXP(-1155/TEMP)
+	p(79)= 5.5D-15*EXP(-1880/TEMP)*0.36 
+	p(80)= 5.5D-15*EXP(-1880/TEMP)*0.64 
+	p(81)=  6.55D-12*EXP(467/TEMP)
+	p(82)= 3.2D-13*EXP(-950/TEMP) 
+	p(83)= 3.55D-15*EXP(-1745/TEMP)*0.36 
+	p(84)= 3.55D-15*EXP(-1745/TEMP)*0.64 
+	p(85)=  1.10D-11*EXP(487/TEMP)
+	p(86)=  3.50D-13
+	p(87)=  3.22D-15*EXP(-968/TEMP)*0.69
+	p(88)=  3.22D-15*EXP(-968/TEMP)*0.31
+	p(89)=  1.01D-11*EXP(550/TEMP)
+	p(90)=  3.90D-13
+	p(91)=  6.64D-15*EXP(-1059/TEMP)*0.69
+	p(92)=  6.64D-15*EXP(-1059/TEMP)*0.31
+	p(93)= 9.4D-12*EXP(505/TEMP)
+	p(94)= 3.4D-13
+	p(95)=  2.70D-15*EXP(-1632/TEMP)*0.58
+	p(96)=  2.70D-15*EXP(-1632/TEMP)*0.13
+	p(97)=  2.70D-15*EXP(-1632/TEMP)*0.24
+	p(98)=  2.70D-15*EXP(-1632/TEMP)*0.05
+	p(99)=  5.86D-12*EXP(500/TEMP)
+	p(100)=  1.20D-14
+	p(101)=  1.00D-17*0.36
+	p(102)=  1.00D-17*0.64
+	p(103)=  6.54D-11
+	p(104)=  3.70D-13
+	p(105)=  1.60D-16*0.69
+	p(106)=  1.60D-16*0.31
+	p(107)=  6.69D-11
+	p(108)=  3.70D-13
+	p(109)=  1.60D-16*0.69
+	p(110)=  1.60D-16*0.31
+	p(111)=  6.07D-11
+	p(112)=  3.30D-13
+	p(113)=  1.60D-17*0.82
+	p(114)=  1.60D-17*0.18
+	p(115)=  5.32D-12*EXP(533/TEMP)
+	p(116)= 1.20D-14
+	p(117)=  1.10D-17*0.36
+	p(118)=  1.10D-17*0.64
+	p(119)=  1.92D-11*EXP(450/TEMP)
+	p(120)=  9.37D-12
+	p(121)=  6.51D-15*EXP(-829/TEMP)*0.89
+	p(122)=  6.51D-15*EXP(-829/TEMP)*0.11
+	p(123)=  3.70D-11
+	p(124)=  1.20D-14
+	p(125)=  1.10D-17*0.36
+	p(126)=  1.10D-17*0.64
+	p(127)=  6.00D-11
+	p(128)=  3.70D-13
+	p(129)=  1.60D-16*0.69
+	p(130)=  1.60D-16*0.31
+	p(131)=  6.00D-11
+	p(132)=  3.70D-13
+	p(133)=  1.60D-16*0.69
+	p(134)=  1.60D-16*0.31
+	p(135)=  KMT17*0.364
+	p(136)=  KMT17*0.636
+	p(137)= 2.3D-12*EXP(-190/TEMP)*0.47 
+	p(138)= 2.3D-12*EXP(-190/TEMP)*0.53 
+	p(139)= 1.8D-12*EXP(340/TEMP)*0.82 
+	p(140)= 1.8D-12*EXP(340/TEMP)*0.18 
+	p(141)=  1.36D-11*0.70
+	p(142)=  1.36D-11*0.30
+	p(143)=  2.31D-11*0.70
+	p(144)=  2.31D-11*0.30
+	p(145)=  1.43D-11*0.70
+	p(146)=  1.43D-11*0.30
+	p(147)=  7.00D-12*0.90
+	p(148)=  7.00D-12*0.10
+	p(149)=  5.80D-12*0.55
+	p(150)=  5.80D-12*0.45
+	p(151)=  6.30D-12*0.5
+	p(152)=  6.30D-12*0.5
+	p(153)=  3.27D-11*0.50
+	p(154)=  3.27D-11*0.50
+	p(155)=  3.25D-11*0.50
+	p(156)=  3.25D-11*0.50
+	p(157)=  5.67D-11
+	p(158)=  1.19D-11
+	p(159)=  1.86D-11
+	p(160)=  1.18D-11
+	p(161)=  5.67D-11
+	p(162)=  5.67D-11
+	p(163)=  5.80D-11
+	p(164)=  1.50D-12
+	p(165)=  1.70D-17*0.64
+	p(166)=  1.70D-17*0.36
+	p(167)= 5.9D-12*EXP(225/TEMP) 
+	p(168)=  2.40D-15
+	p(169)=  J(18)*2
+	p(170)=  1.48D-11*EXP(448/TEMP)
+	p(171)=  1.03D-13
+	p(172)=  1.34D-14*EXP(-2283/TEMP)*0.08
+	p(173)=  1.34D-14*EXP(-2283/TEMP)*0.92
+	p(174)= 2.70D-11*EXP(390/TEMP)
+	p(175)= 3.15D-12*EXP(-450/TEMP)
+	p(176)= 1.03D-14*EXP(-1995/TEMP)*0.125
+	p(177)= 1.03D-14*EXP(-1995/TEMP)*0.175
+	p(178)=  1.03D-14*EXP(-1995/TEMP)*0.385
+	p(179)=  1.03D-14*EXP(-1995/TEMP)*0.125
+	p(180)=  1.03D-14*EXP(-1995/TEMP)*0.095
+	p(181)= 1.03D-14*EXP(-1995/TEMP)*0.095
+	p(182)=  9.39D-13*EXP(-461/TEMP)
+	p(183)=  8.54D-19*TEMP**2*EXP(455/TEMP)
+	p(184)=  6.92D-19*TEMP**2*EXP(986/TEMP)
+	p(185)=  1.39D-18*TEMP**2*EXP(991/TEMP)*0.6
+	p(186)=  1.39D-18*TEMP**2*EXP(991/TEMP)*0.4
+	p(187)=  2.64D-13*EXP(770/TEMP)
+	p(188)=  2.48D-18*TEMP**2*EXP(926/TEMP)
+	p(189)=  6.66D-13*EXP(640/TEMP)
+	p(190)=  1.88D-12*EXP(-395/TEMP)
+	p(191)= 5.7D-12*EXP(-215/TEMP) 
+	p(192)=  2.60D-16
+	p(193)=  8.91D-18*TEMP**2*EXP(837/TEMP)
+	p(194)=  2.80D-15
+	p(195)=  6.54D-18*TEMP**2*EXP(483/TEMP)*0.51
+	p(196)=  6.54D-18*TEMP**2*EXP(483/TEMP)*0.49
+	p(197)=  6.40D-16
+	p(198)=  2.20D-12*EXP(457/TEMP)
+	p(199)=  6.50D-15
+	p(200)=  6.82D-18*TEMP**2*EXP(800/TEMP)*0.76
+	p(201)=  6.82D-18*TEMP**2*EXP(800/TEMP)*0.24
+	p(202)=  1.91D-15
+	p(203)=  4.10D-12*EXP(325/TEMP)
+	p(204)=  1.53D-15
+	p(205)=  1.80D-11
+	p(206)=  2.80D-15
+	p(207)=  1.59D-11
+	p(208)=  3.76D-15
+	p(209)=  2.31D-11
+	p(210)=  4.65D-15
+	p(211)=  2.78D-11
+	p(212)=  6.50D-15
+	p(213)=  J(21)
+	p(214)= 8.8D-12*EXP(-1320/TEMP) + 1.7D-14*EXP(423/TEMP) 
+	p(215)=  J(22)
+	p(216)= 1.5D-12*EXP(-90/TEMP) 
+	p(217)=  J(22)
+	p(218)=  4.90D-12
+	p(219)=  J(22)
+	p(220)=  2.00D-12
+	p(221)=  J(22)
+	p(222)=  2.77D-12
+	p(223)=  J(22)
+	p(224)=  9.10D-12
+	p(225)=  J(22)
+	p(226)=  6.90D-12
+	p(227)=  J(22)
+	p(228)=  1.41D-11
+	p(229)=  J(22)
+	p(230)=  1.21D-12
+	p(231)=  J(22)*0.5
+	p(232)=  J(22)*0.5
+	p(233)=  5.40D-12
+	p(234)=  1.20D-11*EXP(444/TEMP)
+	p(235)= 1.2D-12*EXP(490/TEMP) 
+	p(236)= 8.05D-16*EXP(-640/TEMP)*0.80 
+	p(237)= 8.05D-16*EXP(-640/TEMP)*0.175 
+	p(238)= 8.05D-16*EXP(-640/TEMP)*0.025
+	p(239)=  2.38D-11*EXP(357/TEMP)
+	p(240)=  2.51D-12
+	p(241)= 1.35D-15*EXP(-1270/TEMP)*0.35
+	p(242)= 1.35D-15*EXP(-1270/TEMP)*0.20
+	p(243)= 1.35D-15*EXP(-1270/TEMP)*0.25 
+	p(244)= 1.35D-15*EXP(-1270/TEMP)*0.20
+	p(245)=  4.50D-13
+	p(246)=  8.00D-13
+	p(247)= 1.2D-12 
+	p(248)=  4.93D-12
+	p(249)=  3.20D-13
+	p(250)=  KRO2NO*0.995*0.776
+	p(251)=  KRO2NO*0.995*0.224
+	p(252)=  KRO2NO*0.005
+	p(253)=  KRO2NO3*0.776
+	p(254)=  KRO2NO3*0.224
+	p(255)=  2.03D-13*EXP(1250/TEMP)
+	p(256)=  2.00D-12*RO2*0.776
+	p(257)=  2.00D-12*RO2*0.224
+	p(258)=  KRO2NO*0.979
+	p(259)=  KRO2NO*0.021
+	p(260)=  KRO2NO3
+	p(261)=  KRO2HO2*0.520
+	p(262)=  8.80D-13*RO2
+	p(263)=  KRO2NO*0.959
+	p(264)=  KRO2NO*0.041
+	p(265)=  KRO2NO3
+	p(266)=  KRO2HO2*0.625
+	p(267)=  8.80D-13*RO2
+	p(268)=  J(22)
+	p(269)=  3.24D-18*TEMP**2*EXP(414/TEMP)
+	p(270)=  KRO2NO*0.988
+	p(271)=  KRO2NO*0.012
+	p(272)=  KRO2NO3
+	p(273)=  KRO2HO2*0.625
+	p(274)=  6.70D-13*RO2
+	p(275)=  KRO2NO*0.936
+	p(276)=  KRO2NO*0.064
+	p(277)=  KRO2NO3
+	p(278)=  KRO2HO2*0.706
+	p(279)=  8.80D-13*RO2
+	p(280)=  KRO2NO*0.975
+	p(281)=  KRO2NO*0.025
+	p(282)=  KRO2NO3
+	p(283)=  KRO2HO2*0.706
+	p(284)=  8.80D-13*RO2
+	p(285)=  KRO2NO*0.966
+	p(286)=  KRO2NO*0.034
+	p(287)=  KRO2NO3
+	p(288)=  KRO2HO2*0.706
+	p(289)=  6.70D-13*RO2
+	p(290)=  KRO2NO
+	p(291)=  KRO2NO3
+	p(292)=  KRO2HO2*0.770
+	p(293)=  1.40D-12*RO2
+	p(294)=  KRO2NO*0.949
+	p(295)=  KRO2NO*0.051
+	p(296)=  KRO2NO3
+	p(297)=  KRO2HO2*0.706
+	p(298)=  1.30D-12*RO2
+	p(299)=  KRO2NO
+	p(300)=  KRO2NO3
+	p(301)=  KRO2HO2*0.706
+	p(302)=  8.80D-13*RO2
+	p(303)=  KAPNO
+	p(304)=  KRO2NO3*1.60
+	p(305)=  KAPHO2*0.56
+	p(306)=  1.00D-11*RO2
+	p(307)=  KFPAN
+	p(308)=  KAPHO2*0.44
+	p(309)=  J(15)
+	p(310)=  1.00D-11
+	p(311)=  KNO3AL
+	p(312)=  KRO2NO
+	p(313)=  KRO2NO3
+	p(314)=  KRO2HO2*0.520
+	p(315)=  1.40D-12*RO2
+	p(316)=  J(22)
+	p(317)=  1.6D-12*EXP(305/TEMP)
+	p(318)= 2.3D-12*EXP(360/TEMP)*0.999 
+	p(319)= 2.3D-12*EXP(360/TEMP)*0.001 
+	p(320)= 1.2D-12 
+	p(321)= 3.8D-13*EXP(780/TEMP)
+	p(322)= 2*KCH3O2*RO2*7.18*EXP(-885/TEMP) 
+	p(323)= 2*KCH3O2*RO2*0.5*(1-7.18*EXP(-885/TEMP)) 
+	p(324)= 2*KCH3O2*RO2*0.5*(1-7.18*EXP(-885/TEMP)) 
+	p(325)= 2.55D-12*EXP(380/TEMP)*0.991
+	p(326)= 2.55D-12*EXP(380/TEMP)*0.009
+	p(327)=  KRO2NO3
+	p(328)= 4.3D-13*EXP(870/TEMP)
+	p(329)=  3.10D-13*0.6*RO2
+	p(330)=  3.10D-13*0.2*RO2
+	p(331)=  3.10D-13*0.2*RO2
+	p(332)=  KAPNO
+	p(333)=  KRO2NO3*1.60
+	p(334)=  KAPHO2*0.56
+	p(335)=  1.00D-11*RO2
+	p(336)=  KFPAN
+	p(337)=  KAPHO2*0.44
+	p(338)=  2.80D-12*EXP(360/TEMP)*0.980
+	p(339)=  2.80D-12*EXP(360/TEMP)*0.020
+	p(340)=  KRO2NO3
+	p(341)=  KRO2HO2*0.520
+	p(342)=  6.00D-13*0.6*RO2
+	p(343)=  6.00D-13*0.2*RO2
+	p(344)=  6.00D-13*0.2*RO2
+	p(345)=  KRO2NO
+	p(346)=  KRO2NO3
+	p(347)=  KRO2HO2*0.625
+	p(348)=  1.40D-12*RO2
+	p(349)=  2.70D-12*EXP(360/TEMP)*0.958
+	p(350)=  2.70D-12*EXP(360/TEMP)*0.042
+	p(351)=  KRO2NO3
+	p(352)=  KRO2HO2*0.520
+	p(353)=  4.00D-14*0.6*RO2
+	p(354)=  4.00D-14*0.2*RO2
+	p(355)=  4.00D-14*0.2*RO2
+	p(356)=  KRO2NO
+	p(357)=  KRO2NO3
+	p(358)=  KRO2HO2*0.625
+	p(359)=  1.40D-12*RO2
+	p(360)=  KRO2NO*0.917*0.398
+	p(361)=  KRO2NO*0.917*0.602
+	p(362)=  KRO2NO*0.083
+	p(363)=  KRO2NO3*0.398
+	p(364)=  KRO2NO3*0.602
+	p(365)=  KRO2HO2*0.625
+	p(366)=  2.50D-13*RO2*0.398
+	p(367)=  2.50D-13*RO2*0.602
+	p(368)=  KRO2NO
+	p(369)=  KRO2NO3
+	p(370)=  KRO2HO2*0.706
+	p(371)=  1.40D-12*RO2
+	p(372)=  KRO2NO*0.973*0.831
+	p(373)=  KRO2NO*0.973*0.169
+	p(374)=  KRO2NO*0.027
+	p(375)=  KRO2NO3*0.831
+	p(376)=  KRO2NO3*0.169
+	p(377)=  KRO2HO2*0.625
+	p(378)=  6.70D-13*RO2
+	p(379)=  KRO2NO*0.877
+	p(380)=  KRO2NO*0.123
+	p(381)=  KRO2NO3
+	p(382)=  KRO2HO2*0.706
+	p(383)=  2.50D-13*RO2
+	p(384)=  KRO2NO*0.925*0.913
+	p(385)=  KRO2NO*0.925*0.087
+	p(386)=  KRO2NO*0.075
+	p(387)=  KRO2NO3*0.913
+	p(388)=  KRO2NO3*0.087
+	p(389)=  KRO2HO2*0.706
+	p(390)=  6.70D-13*RO2
+	p(391)=  KRO2NO*0.788
+	p(392)=  KRO2NO*0.212
+	p(393)=  KRO2NO3
+	p(394)=  KRO2HO2*0.770
+	p(395)=  2.50D-13*RO2
+	p(396)=  KRO2NO*0.890
+	p(397)=  KRO2NO*0.110
+	p(398)=  KRO2NO3
+	p(399)=  KRO2HO2*0.770
+	p(400)=  2.50D-13*RO2
+	p(401)=  KRO2NO*0.939
+	p(402)=  KRO2NO*0.061
+	p(403)=  KRO2NO3
+	p(404)=  KRO2HO2*0.770
+	p(405)=  6.70D-13*RO2
+	p(406)=  KRO2NO
+	p(407)=  KRO2NO3
+	p(408)=  KRO2HO2*0.770
+	p(409)=  8.80D-13*RO2
+	p(410)=  KRO2NO*0.722
+	p(411)=  KRO2NO*0.278
+	p(412)=  KRO2NO3
+	p(413)=  KRO2HO2*0.820
+	p(414)=  2.50D-13*RO2
+	p(415)=  KRO2NO
+	p(416)=  KRO2NO3
+	p(417)=  KRO2HO2*0.820
+	p(418)=  8.80D-13*RO2
+	p(419)=  KRO2NO*0.654
+	p(420)=  KRO2NO*0.346
+	p(421)=  KRO2NO3
+	p(422)=  KRO2HO2*0.859
+	p(423)=  2.50D-13*RO2
+	p(424)=  KRO2NO*0.607
+	p(425)=  KRO2NO*0.393
+	p(426)=  KRO2NO3
+	p(427)=  KRO2HO2*0.890
+	p(428)=  2.50D-13*RO2
+	p(429)=  KRO2NO*0.583
+	p(430)=  KRO2NO*0.417
+	p(431)=  KRO2NO3
+	p(432)=  KRO2HO2*0.914
+	p(433)=  2.50D-13*RO2
+	p(434)=  KRO2NO*0.569
+	p(435)=  KRO2NO*0.431
+	p(436)=  KRO2NO3
+	p(437)=  KRO2HO2*0.932
+	p(438)=  2.50D-13*RO2
+	p(439)=  KRO2NO*0.560
+	p(440)=  KRO2NO*0.440
+	p(441)=  KRO2NO3
+	p(442)=  KRO2HO2*0.947
+	p(443)=  2.50D-13*RO2
+	p(444)=  KRO2NO*0.922
+	p(445)=  KRO2NO*0.078
+	p(446)=  KRO2NO3
+	p(447)=  KRO2HO2*0.770
+	p(448)=  2.50D-13*RO2
+	p(449)=  KRO2NO
+	p(450)=  KRO2NO3
+	p(451)=  KRO2HO2*0.387
+	p(452)=  6.00D-13*RO2
+	p(453)=  KRO2NO
+	p(454)=  KRO2NO3
+	p(455)=  KRO2HO2*0.520
+	p(456)=  2.30D-13*RO2
+	p(457)=  KRO2NO
+	p(458)=  KRO2NO3
+	p(459)=  KRO2HO2*0.625
+	p(460)=  2.50D-13*RO2
+	p(461)=  KRO2NO
+	p(462)=  KRO2NO3
+	p(463)=  KRO2HO2*0.625
+	p(464)=  1.92D-14*RO2
+	p(465)=  KRO2NO
+	p(466)=  KRO2NO3
+	p(467)=  KRO2HO2*0.706
+	p(468)=  2.50D-13*RO2
+	p(469)=  J(22)*2.86
+	p(470)=  2.06D-11
+	p(471)=  KRO2NO
+	p(472)=  KRO2NO3
+	p(473)=  KRO2HO2*0.706
+	p(474)=  1.92D-14*RO2
+	p(475)=  KRO2NO*0.903
+	p(476)=  KRO2NO*0.097
+	p(477)=  KRO2NO3
+	p(478)=  KRO2HO2*0.770
+	p(479)=  8.80D-13*RO2
+	p(480)=  KRO2NO
+	p(481)=  KRO2NO3
+	p(482)=  KRO2HO2*0.770
+	p(483)=  2.50D-13*RO2
+	p(484)=  J(22)*4.74
+	p(485)=  1.87D-11
+	p(486)=  J(33)
+	p(487)=  3.10D-12*EXP(340/TEMP)*0.8
+	p(488)=  3.10D-12*EXP(340/TEMP)*0.2
+	p(489)=  J(31)
+	p(490)=  J(32)
+	p(491)=  KRO2NO*0.918
+	p(492)=  KRO2NO*0.082
+	p(493)=  KRO2NO3
+	p(494)=  KRO2HO2*0.770
+	p(495)=  8.80D-13*RO2
+	p(496)=  2.63D-11
+	p(497)=  3.78D-12
+	p(498)=  KRO2NO*0.889*0.7
+	p(499)=  KRO2NO*0.889*0.3
+	p(500)=  KRO2NO*0.111
+	p(501)=  KRO2NO3*0.7
+	p(502)=  KRO2NO3*0.3
+	p(503)=  KRO2HO2*0.820
+	p(504)=  8.80D-13*RO2*0.7
+	p(505)=  8.80D-13*RO2*0.3
+	p(506)=  4.65D-11
+	p(507)=  1.25D-11
+	p(508)=  KRO2NO*0.862
+	p(509)=  KRO2NO*0.138
+	p(510)=  KRO2NO3
+	p(511)=  KRO2HO2*0.859
+	p(512)=  8.80D-13*RO2
+	p(513)=  KRO2NO*0.862
+	p(514)=  KRO2NO*0.138
+	p(515)=  KRO2NO3
+	p(516)=  KRO2HO2*0.859
+	p(517)=  8.80D-13*RO2
+	p(518)=  KRO2NO*0.862
+	p(519)=  KRO2NO*0.138
+	p(520)=  KRO2NO3
+	p(521)=  KRO2HO2*0.859
+	p(522)=  8.80D-13*RO2
+	p(523)=  KRO2NO*0.843
+	p(524)=  KRO2NO*0.157
+	p(525)=  KRO2NO3
+	p(526)=  KRO2HO2*0.890
+	p(527)=  8.80D-13*RO2
+	p(528)=  KRO2NO*0.843
+	p(529)=  KRO2NO*0.157
+	p(530)=  KRO2NO3
+	p(531)=  KRO2HO2*0.890
+	p(532)=  8.80D-13*RO2
+	p(533)=  KRO2NO*0.833
+	p(534)=  KRO2NO*0.167
+	p(535)=  KRO2NO3
+	p(536)=  KRO2HO2*0.914
+	p(537)=  8.80D-13*RO2
+	p(538)=  KRO2NO*0.828
+	p(539)=  KRO2NO*0.172
+	p(540)=  KRO2NO3
+	p(541)=  KRO2HO2*0.932
+	p(542)=  8.80D-13*RO2
+	p(543)=  KRO2NO
+	p(544)=  KRO2NO3
+	p(545)=  KRO2HO2*0.859
+	p(546)=  8.80D-13*RO2
+	p(547)=  KRO2NO
+	p(548)=  KRO2NO3
+	p(549)=  KRO2HO2*0.859
+	p(550)=  2.30D-13*RO2
+	p(551)=  2.08D-12
+	p(552)=  KRO2NO
+	p(553)=  KRO2NO3
+	p(554)=  KRO2HO2*0.820
+	p(555)=  8.80D-13*RO2
+	p(556)=  KRO2NO*0.935
+	p(557)=  KRO2NO*0.065
+	p(558)=  KRO2NO3
+	p(559)=  KRO2HO2*0.706
+	p(560)=  2.73D-12*RO2
+	p(561)=  KRO2NO*0.900*0.032
+	p(562)=  KRO2NO*0.900*0.968
+	p(563)=  KRO2NO*0.100
+	p(564)=  KRO2NO3*0.032
+	p(565)=  KRO2NO3*0.968
+	p(566)=  KRO2HO2*0.706
+	p(567)=  1.26D-12*RO2*0.1
+	p(568)=  1.26D-12*RO2*0.9
+	p(569)=  K16ISOM*0.5
+	p(570)=  K16ISOM*0.5
+	p(571)=  1.24D11*EXP(-9750/TEMP)
+	p(572)=  KRO2NO
+	p(573)=  KRO2NO3
+	p(574)=  KRO2HO2*0.706
+	p(575)=  1.30D-12*RO2
+	p(576)=  J(18)*2
+	p(577)= 3.84D-12*EXP(533/TEMP)*0.693
+	p(578)=  KNO3AL*0.415
+	p(579)=  1.20D-15*EXP(-1710/TEMP)*0.32
+	p(580)=  1.20D-15*EXP(-1710/TEMP)*0.68
+	p(581)=  3.84D-12*EXP(533/TEMP)*0.157
+	p(582)=  3.84D-12*EXP(533/TEMP)*0.150
+	p(583)=  KRO2NO
+	p(584)=  KRO2NO3
+	p(585)=  KRO2HO2*0.625
+	p(586)=  8.80D-13*RO2
+	p(587)=  KRO2NO
+	p(588)=  KRO2NO3
+	p(589)=  KRO2HO2*0.387
+	p(590)=  2.00D-12*RO2
+	p(591)=  KRO2NO*0.920
+	p(592)=  KRO2NO*0.080
+	p(593)=  KRO2NO3
+	p(594)=  KRO2HO2*0.625
+	p(595)=  8.80D-13*RO2
+	p(596)=  KRO2NO*0.948
+	p(597)=  KRO2NO*0.052
+	p(598)=  KRO2NO3
+	p(599)=  KRO2HO2*0.706
+	p(600)=  2.00D-12*RO2
+	p(601)=  KRO2NO*0.946
+	p(602)=  KRO2NO*0.054
+	p(603)=  KRO2NO3
+	p(604)=  KRO2HO2*0.770
+	p(605)=  8.80D-13*RO2
+	p(606)=  KRO2NO*0.805
+	p(607)=  KRO2NO*0.195
+	p(608)=  KRO2NO3
+	p(609)=  KRO2HO2*0.770
+	p(610)=  2.00D-12*RO2
+	p(611)=  9.36D-13
+	p(612)=  KRO2NO*0.52
+	p(613)=  KRO2NO*0.48
+	p(614)=  KRO2NO3*0.52
+	p(615)=  KRO2NO3*0.48
+	p(616)=  KRO2HO2*0.706
+	p(617)=  1.40D-12*RO2
+	p(618)=  KRO2NO
+	p(619)=  KRO2NO3
+	p(620)=  KRO2HO2*0.770
+	p(621)=  6.70D-15*RO2
+	p(622)=  KRO2NO*0.932
+	p(623)=  KRO2NO*0.068
+	p(624)=  KRO2NO3
+	p(625)=  KRO2HO2*0.770
+	p(626)=  2.50D-13*RO2
+	p(627)=  KRO2NO*0.767*0.915
+	p(628)=  KRO2NO*0.767*0.085
+	p(629)=  KRO2NO*0.233
+	p(630)=  KRO2NO3
+	p(631)=  KRO2HO2*0.914
+	p(632)=  2.85D-13*RO2
+	p(633)=  KRO2NO
+	p(634)=  KRO2NO3
+	p(635)=  KRO2HO2*0.914
+	p(636)=  1.00D-13*RO2
+	p(637)=  J(15)
+	p(638)=  4.20D-11
+	p(639)=  3.80D-14
+	p(640)=  6.65D-12
+	p(641)=  KRO2NO*0.767*0.915
+	p(642)=  KRO2NO*0.767*0.085
+	p(643)=  KRO2NO*0.233
+	p(644)=  KRO2NO3
+	p(645)=  KRO2HO2*0.914
+	p(646)=  2.00D-12*RO2
+	p(647)=  KRO2NO
+	p(648)=  KRO2NO3
+	p(649)=  KRO2HO2*0.914
+	p(650)=  9.20D-14*RO2
+	p(651)=  KRO2NO*0.843*0.6
+	p(652)=  KRO2NO*0.843*0.4
+	p(653)=  KRO2NO*0.157
+	p(654)=  KRO2NO3
+	p(655)=  KRO2HO2*0.890
+	p(656)=  2.50D-13*RO2
+	p(657)=  1.55D-11
+	p(658)=  4.55D-12
+	p(659)=  1.09D-12
+	p(660)=  J(41)
+	p(661)=  2.13D-11
+	p(662)=  1.31D-12
+	p(663)=  J(41)
+	p(664)=  2.50D-11
+	p(665)=  1.79D-12
+	p(666)=  J(41)
+	p(667)=  3.25D-11
+	p(668)=  8.48D-13
+	p(669)=  J(41)
+	p(670)=  8.10D-12
+	p(671)=  1.03D-11
+	p(672)=  J(41)
+	p(673)=  3.74D-11
+	p(674)=  J(22)*3.00
+	p(675)=  1.65D-11
+	p(676)=  1.32D-12
+	p(677)=  J(41)
+	p(678)=  1.66D-11
+	p(679)=  J(41)
+	p(680)=  3.35D-11
+	p(681)=  J(55)
+	p(682)=  9.67D-13
+	p(683)=  J(41)
+	p(684)=  1.23D-11
+	p(685)=  J(41)
+	p(686)=  4.21D-11
+	p(687)=  J(41)
+	p(688)=  3.70D-12
+	p(689)=  KBPAN
+	p(690)=  3.00D-14
+	p(691)=  KAPNO
+	p(692)=  KRO2NO3*1.60
+	p(693)=  KAPHO2*0.56
+	p(694)=  1.00D-11*RO2
+	p(695)=  KFPAN
+	p(696)=  KAPHO2*0.44
+	p(697)=  J(41)
+	p(698)=  1.20D-11
+	p(699)=  J(34)
+	p(700)=  1.9D-12*EXP(575/TEMP)
+	p(701)=  J(51)
+	p(702)= 4.0D-13*EXP(-845/TEMP) 
+	p(703)=  J(41)
+	p(704)= 5.3D-12*EXP(190/TEMP)*0.6 
+	p(705)= 5.3D-12*EXP(190/TEMP)*0.4 
+	p(706)=  J(52)
+	p(707)=  4.40D-14*EXP(720/TEMP)
+	p(708)=  J(41)
+	p(709)=  1.36D-11
+	p(710)=  J(41)
+	p(711)=  4.42D-12
+	p(712)=  KBPAN
+	p(713)=  1.27D-12
+	p(714)=  J(53)
+	p(715)=  7.30D-13
+	p(716)=  J(41)
+	p(717)=  1.89D-11
+	p(718)=  J(41)
+	p(719)=  2.50D-11
+	p(720)=  J(54)
+	p(721)=  4.90D-13
+	p(722)=  J(41)
+	p(723)=  2.78D-11
+	p(724)=  J(41)
+	p(725)=  6.26D-12
+	p(726)=  J(53)*0.398
+	p(727)=  J(53)*0.602
+	p(728)=  9.20D-13
+	p(729)=  J(41)*0.398
+	p(730)=  J(41)*0.602
+	p(731)=  3.57D-11
+	p(732)=  J(41)
+	p(733)=  3.20D-11
+	p(734)=  J(55)
+	p(735)=  2.23D-13
+	p(736)=  J(41)
+	p(737)=  5.82D-12
+	p(738)=  J(53)
+	p(739)=  1.85D-12
+	p(740)=  J(53)
+	p(741)=  3.02D-12
+	p(742)=  J(41)
+	p(743)=  4.71D-11
+	p(744)=  KRO2NO*0.889
+	p(745)=  KRO2NO*0.111
+	p(746)=  KRO2NO3
+	p(747)=  KRO2HO2*0.820
+	p(748)=  8.80D-13*RO2
+	p(749)=  J(53)
+	p(750)=  3.69D-12
+	p(751)=  J(41)
+	p(752)=  4.85D-11
+	p(753)=  KRO2NO*0.861
+	p(754)=  KRO2NO*0.139
+	p(755)=  KRO2NO3
+	p(756)=  KRO2HO2*0.820
+	p(757)=  8.80D-13*RO2
+	p(758)=  KRO2NO*0.862
+	p(759)=  KRO2NO*0.138
+	p(760)=  KRO2NO3
+	p(761)=  KRO2HO2*0.859
+	p(762)=  8.80D-13*RO2
+	p(763)=  J(53)
+	p(764)=  3.88D-12
+	p(765)=  J(41)
+	p(766)=  4.99D-11
+	p(767)=  KRO2NO*0.843
+	p(768)=  KRO2NO*0.157
+	p(769)=  KRO2NO3
+	p(770)=  KRO2HO2*0.890
+	p(771)=  8.80D-13*RO2
+	p(772)=  J(53)
+	p(773)=  6.76D-12
+	p(774)=  J(41)
+	p(775)=  5.13D-11
+	p(776)=  KRO2NO*0.834
+	p(777)=  KRO2NO*0.166
+	p(778)=  KRO2NO3
+	p(779)=  KRO2HO2*0.914
+	p(780)=  8.80D-13*RO2
+	p(781)=  J(53)
+	p(782)=  8.15D-12
+	p(783)=  J(41)
+	p(784)=  5.27D-11
+	p(785)=  KRO2NO*0.828
+	p(786)=  KRO2NO*0.172
+	p(787)=  KRO2NO3
+	p(788)=  KRO2HO2*0.932
+	p(789)=  8.80D-13*RO2
+	p(790)=  J(53)
+	p(791)=  9.54D-12
+	p(792)=  J(41)
+	p(793)=  5.41D-11
+	p(794)=  KRO2NO*0.824
+	p(795)=  KRO2NO*0.176
+	p(796)=  KRO2NO3
+	p(797)=  KRO2HO2*0.947
+	p(798)=  8.80D-13*RO2
+	p(799)=  J(53)
+	p(800)=  1.09D-11
+	p(801)=  J(41)
+	p(802)=  5.55D-11
+	p(803)=  J(54)
+	p(804)=  3.30D-12
+	p(805)=  J(41)
+	p(806)=  3.53D-11
+	p(807)=  J(41)
+	p(808)=  5.22D-12
+	p(809)=  J(41)
+	p(810)=  6.50D-12
+	p(811)=  J(41)
+	p(812)=  7.15D-12
+	p(813)=  J(41)
+	p(814)=  4.18D-12
+	p(815)=  J(41)
+	p(816)=  9.05D-12
+	p(817)=  J(41)
+	p(818)=  7.00D-12
+	p(819)=  1.34D-11
+	p(820)=  J(41)
+	p(821)=  3.83D-11
+	p(822)=  J(41)
+	p(823)=  1.08D-11
+	p(824)=  J(4)*0.02*0.64
+	p(825)=  J(4)*0.02*0.36
+	p(826)=  5.20D-11*0.50
+	p(827)=  5.20D-11*0.50
+	p(828)=  J(54)
+	p(829)=  7.30D-11
+	p(830)=  J(41)
+	p(831)=  9.77D-11
+	p(832)=  J(4)*0.02*0.55
+	p(833)=  J(4)*0.02*0.45
+	p(834)=  5.58D-11*0.55
+	p(835)=  5.58D-11*0.45
+	p(836)=  J(54)
+	p(837)=  7.16D-11
+	p(838)=  J(41)
+	p(839)=  9.64D-11
+	p(840)=  2.08D-12
+	p(841)=  J(4)*0.02*0.55
+	p(842)=  J(4)*0.02*0.45
+	p(843)=  7.00D-11*0.55
+	p(844)=  7.00D-11*0.45
+	p(845)=  J(54)
+	p(846)=  8.31D-11
+	p(847)=  J(41)
+	p(848)=  1.12D-10
+	p(849)=  J(35)
+	p(850)=  2.40D-13
+	p(851)=  J(54)
+	p(852)=  9.45D-11
+	p(853)=  J(41)
+	p(854)=  1.28D-10
+	p(855)=  J(4)*0.02*0.55
+	p(856)=  J(4)*0.02*0.45
+	p(857)=  7.00D-11*0.55
+	p(858)=  7.00D-11*0.45
+	p(859)=  J(54)
+	p(860)=  9.57D-11
+	p(861)=  J(41)
+	p(862)=  1.28D-10
+	p(863)=  J(4)*0.02*0.55
+	p(864)=  J(4)*0.02*0.45
+	p(865)=  7.00D-11*0.55
+	p(866)=  7.00D-11*0.45
+	p(867)=  J(54)
+	p(868)=  9.67D-11
+	p(869)=  J(41)
+	p(870)=  1.28D-10
+	p(871)=  J(41)
+	p(872)=  6.16D-11
+	p(873)=  6.16D-11
+	p(874)=  9.00D-13
+	p(875)=  9.00D-14
+	p(876)=  J(41)
+	p(877)=  4.66D-12
+	p(878)=  4.21D-11
+	p(879)=  J(41)
+	p(880)=  7.89D-11
+	p(881)=  J(18)*0.5
+	p(882)=  6.42D-11
+	p(883)=  KNO3AL*4.25
+	p(884)=  2.40D-17*0.50
+	p(885)=  2.40D-17*0.25
+	p(886)=  J(18)
+	p(887)= J(18)*0.5
+	p(888)=  2.40D-17*0.25
+	p(889)=  3.00D-11*0.34
+	p(890)=  3.00D-11*0.48
+	p(891)=  3.00D-11*0.18
+	p(892)=  J(55)*0.78
+	p(893)=  7.14D-11*0.09
+	p(894)=  7.14D-11*0.85
+	p(895)=  7.14D-11*0.06
+	p(896)=  J(20)*0.5
+	p(897)=  J(20)*0.5
+	p(898)=  5.20D-11
+	p(899)=  2.40D-17
+	p(900)=  KNO3AL*4.25
+	p(901)=  KRO2NO
+	p(902)=  KRO2NO3
+	p(903)=  KRO2HO2*0.706
+	p(904)=  7.60D-13*RO2
+	p(905)=   K14ISOM1
+	p(906)=  J(56)*8
+	p(907)=  4.16D-11
+	p(908)=  J(56)*8
+	p(909)=  J(41)
+	p(910)=  1.03D-10
+	p(911)=  KRO2NO*0.670
+	p(912)= KRO2NO*0.295
+	p(913)=  KRO2NO*0.035
+	p(914)=  KRO2NO3*0.7
+	p(915)=  KRO2NO3*0.3
+	p(916)=  KRO2HO2*0.625
+	p(917)=  1.83D-12*RO2*0.7
+	p(918)=  1.83D-12*RO2*0.3
+	p(919)=  KRO2NO*0.013
+	p(920)=  KRO2NO*0.987
+	p(921)=  KRO2NO3
+	p(922)=  KRO2HO2*0.625
+	p(923)=  3.60D-13*RO2
+	p(924)=  K14ISOM1
+	p(925)=  KAPNO*0.65
+	p(926)=  KAPNO*0.35
+	p(927)=  KFPAN
+	p(928)=  KRO2NO3*1.74*0.65
+	p(929)=  KRO2NO3*1.74*0.35
+	p(930)=  KAPHO2*0.56
+	p(931)=  KAPHO2*0.44
+	p(932)=  1.00D-11*RO2*0.65
+	p(933)=  1.00D-11*RO2*0.35
+	p(934)=  J(54)
+	p(935)=  7.74D-12
+	p(936)=  7.42D-13
+	p(937)=  J(54)
+	p(938)=  1.48D-12
+	p(939)=  J(22)*3.35
+	p(940)=  1.25D-11
+	p(941)=  J(54)
+	p(942)=  6.00D-13
+	p(943)=  J(41)
+	p(944)=  1.58D-11
+	p(945)=  J(41)
+	p(946)=  4.89D-12
+	p(947)=  1.83D-11
+	p(948)=  4.35D-12
+	p(949)=  J(41)
+	p(950)=  2.38D-11
+	p(951)=  J(41)
+	p(952)=  9.50D-12
+	p(953)=  KAPNO
+	p(954)=  KRO2NO3*1.60
+	p(955)=  KAPHO2*0.56
+	p(956)=  1.00D-11*RO2
+	p(957)=  KFPAN*0.722
+	p(958)=  KAPHO2*0.44
+	p(959)=  KRO2NO*0.840
+	p(960)=  KRO2NO*0.160
+	p(961)=  KRO2NO3
+	p(962)=  KRO2HO2*0.890
+	p(963)=  1.30D-12*RO2
+	p(964)=  3.53D-12
+	p(965)=  J(41)
+	p(966)=  2.00D-11
+	p(967)=  J(41)
+	p(968)=  9.58D-12
+	p(969)=  J(54)
+	p(970)=  6.48D-12
+	p(971)=  J(41)
+	p(972)=  8.59D-11
+	p(973)=  KRO2NO*0.700
+	p(974)=  KRO2NO*0.300
+	p(975)=  KRO2NO3
+	p(976)=  KRO2HO2*0.890
+	p(977)=  2.50D-13*RO2
+	p(978)=  J(22)
+	p(979)=  5.86D-12
+	p(980)=  J(35)
+	p(981)=  4.81D-12
+	p(982)=  J(41)
+	p(983)=  6.19D-12
+	p(984)=  KBPAN
+	p(985)=  1.12D-12
+	p(986)=  J(35)
+	p(987)=  1.38D-12
+	p(988)=  J(22)*1.33
+	p(989)=  4.36D-12
+	p(990)=  J(22)*1.28
+	p(991)=  8.07D-12
+	p(992)=  1.23D-11
+	p(993)=  J(41)
+	p(994)=  5.25D-11
+	p(995)=  J(22)
+	p(996)=  7.89D-12
+	p(997)=  J(22)*1.83
+	p(998)=  7.98D-12
+	p(999)=  1.38D-11
+	p(1000)=  J(41)
+	p(1001)=  5.40D-11
+	p(1002)=  KRO2NO*0.827
+	p(1003)=  KRO2NO*0.173
+	p(1004)=  KRO2NO3
+	p(1005)=  KRO2HO2*0.859
+	p(1006)=  8.80D-13*RO2
+	p(1007)=  J(22)
+	p(1008)=  1.13D-11
+	p(1009)=  J(22)*3.36
+	p(1010)=  6.40D-12
+	p(1011)=  1.48D-11
+	p(1012)=  J(41)
+	p(1013)=  5.55D-11
+	p(1014)=  KRO2NO*0.804
+	p(1015)=  KRO2NO*0.196
+	p(1016)=  KRO2NO3
+	p(1017)=  KRO2HO2*0.890
+	p(1018)=  8.80D-13*RO2
+	p(1019)=  J(22)
+	p(1020)=  1.27D-11
+	p(1021)=  J(22)*4.58
+	p(1022)=  6.47D-12
+	p(1023)=  1.58D-11
+	p(1024)=  J(41)
+	p(1025)=  5.70D-11
+	p(1026)=  KRO2NO*0.792
+	p(1027)=  KRO2NO*0.208
+	p(1028)=  KRO2NO3
+	p(1029)=  KRO2HO2*0.914
+	p(1030)=  8.80D-13*RO2
+	p(1031)=  J(22)
+	p(1032)=  1.42D-11
+	p(1033)=  J(22)*4.13
+	p(1034)=  9.47D-12
+	p(1035)=  1.68D-11
+	p(1036)=  J(41)
+	p(1037)=  5.85D-11
+	p(1038)=  KRO2NO*0.785
+	p(1039)=  KRO2NO*0.215
+	p(1040)=  KRO2NO3
+	p(1041)=  KRO2HO2*0.932
+	p(1042)=  8.80D-13*RO2
+	p(1043)=  J(22)
+	p(1044)=  1.56D-11
+	p(1045)=  J(22)*6.95
+	p(1046)=  8.86D-12
+	p(1047)=  1.78D-11
+	p(1048)=  J(41)
+	p(1049)=  6.00D-11
+	p(1050)=  KRO2NO*0.780
+	p(1051)=  KRO2NO*0.220
+	p(1052)=  KRO2NO3
+	p(1053)=  KRO2HO2*0.947
+	p(1054)=  8.80D-13*RO2
+	p(1055)=  J(22)
+	p(1056)=  1.70D-11
+	p(1057)=  1.50D-12
+	p(1058)=  1.53D-12
+	p(1059)=  3.13D-13
+	p(1060)=  KRO2NO*0.407
+	p(1061)=  KRO2NO*0.388
+	p(1062)=  KRO2NO3*0.422
+	p(1063)=  KRO2NO3*0.402
+	p(1064)=  KRO2HO2*0.706
+	p(1065)=  4.20D-13*RO2*0.422
+	p(1066)=  4.20D-13*RO2*0.402
+	p(1067)=  KRO2NO*0.170
+	p(1068)=  KRO2NO*0.035
+	p(1069)=  KRO2NO3*0.176
+	p(1070)=  4.20D-13*RO2*0.176
+	p(1071)=  K14ISOM1*0.008 
+	p(1072)=  5.26D-13
+	p(1073)=  J(56)*1.6
+	p(1074)= 2.50D-12
+	p(1075)= J(56)*10 
+	p(1076)=  1.16D-11
+	p(1077)=  J(20)*0.5
+	p(1078)=  5.78D-11
+	p(1079)=  5.64D-11
+	p(1080)=  J(17)
+	p(1081)=  J(41)*3
+	p(1082)=  3.64D-11
+	p(1083)=  J(15)
+	p(1084)=  J(41)*2 
+	p(1085)=  KRO2NO*0.5
+	p(1086)=  KRO2NO3*0.5
+	p(1087)=  KRO2HO2*0.706
+	p(1088)=  9.60D-13*RO2*0.5
+	p(1089)=  KRO2NO*0.5
+	p(1090)=  KRO2NO3*0.5
+	p(1091)=  9.60D-13*RO2*0.5
+	p(1092)=  J(41)
+	p(1093)=  3.84D-11
+	p(1094)=  1.60D+16*EXP(-13500/TEMP)
+	p(1095)=  2.90D-11*0.22
+	p(1096)=  2.90D-11*0.78
+	p(1097)=  KRO2NO
+	p(1098)=  KRO2NO3
+	p(1099)=  KRO2HO2*0.770
+	p(1100)=  2.50D-13*RO2
+	p(1101)=  J(41)
+	p(1102)=  1.20D-11
+	p(1103)=  KBPAN
+	p(1104)=  3.66D-12
+	p(1105)=  KRO2NO
+	p(1106)=  KRO2NO3
+	p(1107)=  KRO2HO2*0.890
+	p(1108)=  6.70D-15*RO2
+	p(1109)=  2.88D-12
+	p(1110)=  J(41)
+	p(1111)=  1.66D-11
+	p(1112)=  4.74D-12
+	p(1113)=  J(41)
+	p(1114)=  7.50D-11
+	p(1115)=  KRO2NO
+	p(1116)=  KRO2NO3
+	p(1117)=  KRO2HO2*0.820
+	p(1118)=  1.40D-12*RO2
+	p(1119)=  KRO2NO
+	p(1120)=  KRO2NO3
+	p(1121)=  KRO2HO2*0.859
+	p(1122)=  1.40D-12*RO2
+	p(1123)=  KRO2NO
+	p(1124)=  KRO2NO3
+	p(1125)=  KRO2HO2*0.859
+	p(1126)=  8.80D-13*RO2
+	p(1127)=  KRO2NO
+	p(1128)=  KRO2NO3
+	p(1129)=  KRO2HO2*0.890
+	p(1130)=  1.40D-12*RO2
+	p(1131)=  KRO2NO
+	p(1132)=  KRO2NO3
+	p(1133)=  KRO2HO2*0.890
+	p(1134)=  8.80D-13*RO2
+	p(1135)=  KRO2NO
+	p(1136)=  KRO2NO3
+	p(1137)=  KRO2HO2*0.914
+	p(1138)=  1.40D-12*RO2
+	p(1139)=  KRO2NO
+	p(1140)=  KRO2NO3
+	p(1141)=  KRO2HO2*0.914
+	p(1142)=  8.80D-13*RO2
+	p(1143)=  KRO2NO
+	p(1144)=  KRO2NO3
+	p(1145)=  KRO2HO2*0.932
+	p(1146)=  1.40D-12*RO2
+	p(1147)=  KRO2NO
+	p(1148)=  KRO2NO3
+	p(1149)=  KRO2HO2*0.932
+	p(1150)=  8.80D-13*RO2
+	p(1151)=  KRO2NO
+	p(1152)=  KRO2NO3
+	p(1153)=  KRO2HO2*0.947
+	p(1154)=  1.40D-12*RO2
+	p(1155)=  J(41)
+	p(1156)=  3.50D-11
+	p(1157)=  3.42D-11
+	p(1158)=  J(17)
+	p(1159)=  J(56)
+	p(1160)=  6.70D-13
+	p(1161)=  J(41)
+	p(1162)=  2.65D-11
+	p(1163)=  4.33D-12*0.7
+	p(1164)=  4.33D-12*0.3
+	p(1165)=  4.79D-12
+	p(1166)=  KRO2NO
+	p(1167)=  KRO2NO3
+	p(1168)=  KRO2HO2*0.890
+	p(1169)=  6.70D-15*RO2
+	p(1170)=  J(41)
+	p(1171)=  1.05D-11
+	p(1172)=  1.00D-12
+	p(1173)=  J(41)
+	p(1174)=  3.50D-11
+	p(1175)=  J(41)
+	p(1176)=  3.65D-11
+	p(1177)=  J(41)
+	p(1178)=  3.80D-11
+	p(1179)=  J(41)
+	p(1180)=  3.95D-11
+	p(1181)=  J(41)
+	p(1182)=  4.10D-11
+	p(1183)=  J(41)
+	p(1184)=  4.25D-11
+	p(1185)=  KRO2NO
+	p(1186)=  KRO2NO3
+	p(1187)=  KRO2HO2*0.770
+	p(1188)=  8.80D-13*RO2
+	p(1189)=  J(41)
+	p(1190)=  2.05D-11
+	p(1191)=  J(35)
+	p(1192)=  6.30D-12
+	p(1193)=  J(35)
+	p(1194)=  7.80D-12
+	p(1195)=  J(35)
+	p(1196)=  9.30D-12
+	p(1197)=  J(35)
+	p(1198)=  1.08D-11
+	p(1199)=  J(35)
+	p(1200)=  1.23D-11
+	p(1201)=  J(35)
+	p(1202)=  1.38D-11
+	p(1203)=  J(35)*0.5
+	p(1204)=  1.00D-10
+	p(1205)=  KNO3AL*5.5
+	p(1206)=  J(41)
+	p(1207)=  8.69D-11
+	p(1208)=  KRO2NO
+	p(1209)=  KRO2NO3
+	p(1210)=  KRO2HO2*0.706
+	p(1211)=  2.00D-12*RO2
+	p(1212)=  J(41)
+	p(1213)=  4.23D-12
+	 return 
+ 	 end
+!**************** end of subroutine constants *****************
+
+subroutine zenith(theta, secx, cosx, ttime)
+double precision:: lat,pi,radian,dec,lha,ttime,theta,cosx,secx
+double precision:: sinld,cosld
+! solar declination angle from july 1st - harwell traj model
+dec = 23.79
+! latitude
+lat = 50.0
+pi = 4.0*atan(1.0)
+! local hour angle - representing time of day
+lha = (1.0+ttime/4.32d+4)*pi
+radian = 180.0/pi
+lat = lat/radian
+dec = dec/radian
+theta = acos(cos(lha)*cos(dec)*cos(lat)+sin(dec)*sin(lat))
+sinld = sin(lat)*sin(dec)
+cosld = cos(lat)*cos(dec)
+cosx = (cos(lha)*cosld)+sinld
+cosx = cos(theta)
+secx = 1.0d+0/(cosx+1.0d-30)
+return
+
+end
+
+!**************** end of subroutine zenith *****************
+
+subroutine temperature(temp, h2o, ttime)
+!c subroutine to calculate diurnal variations in temperature
+double precision:: temp,ttime,sin, rh, h2o
+temp = 289.86 + 8.3*sin((7.2722d-5*ttime)-1.9635)
+rh=23.0*sin((7.2722d-5*ttime)+1.1781)+66.5 
+h2o=6.1078*dexp(-1.0d+0*(597.3-0.57*(temp-273.16))*18.0/1.986*(1.0/temp-1.0/273.16))*10./(1.38d-16*temp)*rh 
+return
+end
+!**************** end of subroutine temperature *************
+
+
+***********************************************************************
+
+
+ photolysis.txt, for use when calculating J rate coefficients in constants.f 
+
+      J          L           M          N
+      1      6.073D-05     1.743       0.474
+      2      4.775D-04     0.298       0.080
+      3      1.041D-05     0.723       0.279
+      4      1.165D-02     0.244       0.267
+      5      2.485D-02     0.168       0.108
+      6      1.747D-01     0.155      0.125
+      7      2.644D-03     0.261      0.288
+      8      9.312D-07     1.230      0.307
+     11      4.642D-05     0.762       0.353
+     12      6.853D-05     0.477       0.323
+     13      7.344D-06     1.202       0.417
+     14      2.879D-05     1.067       0.358
+     15      2.792D-05     0.805       0.338
+     16      1.675D-05     0.805       0.338
+     17      7.914D-05     0.764      0.364
+     18      1.482D-06     0.396       0.298
+     19      1.482D-06     0.396      0.298
+     20      7.600D-04     0.396      0.298
+     21      7.992D-07     1.578       0.271
+     22      5.804D-06     1.092      0.377
+     23      2.424D-06     0.395      0.296
+     24      2.424D-06     0.395      0.296
+     31      6.845D-05     0.130      0.201
+     32      1.032D-05     0.130      0.201
+     33      3.802D-05     0.644       0.312
+     34      1.537D-04     0.170       0.208
+     35      3.326D-04     0.148      0.215
+     41      7.649D-06     0.682       0.279
+     51      1.588D-06     1.154      0.318
+     52      1.907D-06     1.244      0.335
+     53      2.485D-06     1.196      0.328
+     54      4.095D-06     1.111       0.316
+     55      1.135D-05     0.974      0.309
+     56      4.365D-05     1.089      0.323
+ 
+
+***********************************************************************
+
+
+ Fortran routine for calculation of rhs of rate equations
+
+subroutine rate_routine(neqn,t,y,isa,nisa,isb,nisb)
+!     routine to calculate right hand sides of rate equations
+!
+!	neqn		- [i] number of species/ rate equations
+!	t		- [i] current timepoint
+!	y		- [i] array of species concentrations
+!	isa(m,n)	- [i] array holding reactant data m=reaction number, n=species number
+!	nisa		- [i] size of isa
+!	isb(m,n)	- [i] array holding product data m=reaction number, n=species number
+!	nisb		- [i] size of isb
+	
+parameter mnsp=4000, mre=12000                   
+double precision:: y(mnsp),dy(mnsp) 
+double precision:: p(mre),r(mre),dy(mnsp)                                  
+integer:: i,nsp,nr,isa(2,20000),isb(2,20000)
+!	constants is the routine in which the values of the rate coefficients are calculated
+external constants
+
+do i = 1,nspecies
+	dy(i) = 0.0d+0   
+enddo             
+ 
+call constants(p,t,y)  
+                                       
+do k = 1,nr                                                    
+	r(k) = p(k) 
+enddo	                                                      
+
+! evaluate the RHS of each rate equation stored in dy()
+do is = 1,nisa     
+	r(isa(1,is)) = r(isa(1,is))*y(isa(2,is))
+enddo
+ 
+do is = 1,nisa
+	dy(isa(2,is)) = dy(isa(2,is))- r(isa(1,is)
+enddo
+
+***********************************************************************
+
+
+ Subset reactants file - reaction number, species number 
+432	1213	 number of species, number of reactions
+1 	 334 
+1 	 318 
+2 	 334 
+2 	 339 
+3 	 334 
+3 	 339 
+4 	 28 
+4 	 334 
+5 	 28 
+5 	 334 
+6 	 334 
+6 	 5 
+7 	 334 
+7 	 5 
+8 	 20 
+8 	 334 
+9 	 82 
+9 	 334 
+10 	 82 
+10 	 334 
+11 	 161 
+11 	 334 
+12 	 161 
+12 	 334 
+13 	 334 
+13 	 168 
+14 	 334 
+14 	 402 
+15 	 334 
+15 	 402 
+16 	 334 
+16 	 319 
+17 	 224 
+17 	 334 
+18 	 334 
+18 	 315 
+19 	 334 
+19 	 252 
+20 	 334 
+20 	 252 
+21 	 118 
+21 	 334 
+22 	 118 
+22 	 334 
+23 	 273 
+23 	 334 
+24 	 273 
+24 	 334 
+25 	 273 
+26 	 6 
+26 	 334 
+27 	 180 
+27 	 334 
+28 	 180 
+28 	 334 
+29 	 154 
+30 	 154 
+31 	 334 
+31 	 154 
+32 	 33 
+32 	 154 
+33 	 56 
+34 	 334 
+34 	 56 
+35 	 33 
+35 	 56 
+36 	 200 
+37 	 334 
+37 	 200 
+38 	 33 
+38 	 200 
+39 	 99 
+40 	 99 
+40 	 334 
+41 	 99 
+41 	 33 
+42 	 158 
+43 	 158 
+43 	 334 
+44 	 33 
+44 	 158 
+45 	 19 
+46 	 19 
+46 	 334 
+47 	 19 
+47 	 33 
+48 	 334 
+48 	 132 
+49 	 334 
+49 	 267 
+50 	 334 
+50 	 255 
+51 	 334 
+51 	 255 
+52 	 334 
+52 	 246 
+53 	 334 
+53 	 133 
+54 	 334 
+54 	 40 
+55 	 334 
+55 	 306 
+56 	 334 
+56 	 111 
+57 	 334 
+57 	 217 
+58 	 334 
+58 	 203 
+59 	 334 
+59 	 410 
+60 	 334 
+60 	 31 
+61 	 334 
+61 	 380 
+62 	 334 
+62 	 380 
+63 	 334 
+63 	 8 
+64 	 334 
+64 	 41 
+65 	 334 
+65 	 285 
+66 	 334 
+66 	 285 
+67 	 334 
+67 	 173 
+68 	 334 
+68 	 11 
+69 	 334 
+69 	 336 
+70 	 334 
+70 	 346 
+71 	 334 
+71 	 302 
+72 	 334 
+72 	 228 
+73 	 334 
+73 	 268 
+74 	 33 
+74 	 268 
+75 	 321 
+75 	 268 
+76 	 321 
+76 	 268 
+77 	 334 
+77 	 251 
+78 	 33 
+78 	 251 
+79 	 321 
+79 	 251 
+80 	 321 
+80 	 251 
+81 	 334 
+81 	 312 
+82 	 33 
+82 	 312 
+83 	 321 
+83 	 312 
+84 	 321 
+84 	 312 
+85 	 334 
+85 	 281 
+86 	 33 
+86 	 281 
+87 	 321 
+87 	 281 
+88 	 321 
+88 	 281 
+89 	 334 
+89 	 305 
+90 	 33 
+90 	 305 
+91 	 321 
+91 	 305 
+92 	 321 
+92 	 305 
+93 	 334 
+93 	 391 
+94 	 33 
+94 	 391 
+95 	 321 
+95 	 391 
+96 	 321 
+96 	 391 
+97 	 321 
+97 	 391 
+98 	 321 
+98 	 391 
+99 	 334 
+99 	 291 
+100 	 33 
+100 	 291 
+101 	 321 
+101 	 291 
+102 	 321 
+102 	 291 
+103 	 334 
+103 	 263 
+104 	 33 
+104 	 263 
+105 	 321 
+105 	 263 
+106 	 321 
+106 	 263 
+107 	 334 
+107 	 316 
+108 	 33 
+108 	 316 
+109 	 321 
+109 	 316 
+110 	 321 
+110 	 316 
+111 	 334 
+111 	 171 
+112 	 33 
+112 	 171 
+113 	 321 
+113 	 171 
+114 	 321 
+114 	 171 
+115 	 334 
+115 	 157 
+116 	 33 
+116 	 157 
+117 	 321 
+117 	 157 
+118 	 321 
+118 	 157 
+119 	 334 
+119 	 275 
+120 	 33 
+120 	 275 
+121 	 321 
+121 	 275 
+122 	 321 
+122 	 275 
+123 	 334 
+123 	 189 
+124 	 33 
+124 	 189 
+125 	 321 
+125 	 189 
+126 	 321 
+126 	 189 
+127 	 334 
+127 	 343 
+128 	 33 
+128 	 343 
+129 	 321 
+129 	 343 
+130 	 321 
+130 	 343 
+131 	 334 
+131 	 115 
+132 	 33 
+132 	 115 
+133 	 321 
+133 	 115 
+134 	 321 
+134 	 115 
+135 	 269 
+135 	 334 
+136 	 269 
+136 	 334 
+137 	 58 
+137 	 334 
+138 	 58 
+138 	 334 
+139 	 293 
+139 	 334 
+140 	 293 
+140 	 334 
+141 	 296 
+141 	 334 
+142 	 296 
+142 	 334 
+143 	 223 
+143 	 334 
+144 	 223 
+144 	 334 
+145 	 92 
+145 	 334 
+146 	 92 
+146 	 334 
+147 	 289 
+147 	 334 
+148 	 289 
+148 	 334 
+149 	 151 
+149 	 334 
+150 	 151 
+150 	 334 
+151 	 178 
+151 	 334 
+152 	 178 
+152 	 334 
+153 	 376 
+153 	 334 
+154 	 376 
+154 	 334 
+155 	 113 
+155 	 334 
+156 	 113 
+156 	 334 
+157 	 259 
+157 	 334 
+158 	 89 
+158 	 334 
+159 	 103 
+159 	 334 
+160 	 70 
+160 	 334 
+161 	 392 
+161 	 334 
+162 	 414 
+162 	 334 
+163 	 334 
+163 	 383 
+164 	 33 
+164 	 383 
+165 	 321 
+165 	 383 
+166 	 321 
+166 	 383 
+167 	 334 
+167 	 88 
+168 	 33 
+168 	 88 
+169 	 88 
+170 	 334 
+170 	 425 
+171 	 33 
+171 	 425 
+172 	 321 
+172 	 425 
+173 	 321 
+173 	 425 
+174 	 334 
+174 	 218 
+175 	 33 
+175 	 218 
+176 	 321 
+176 	 218 
+177 	 321 
+177 	 218 
+178 	 321 
+178 	 218 
+179 	 321 
+179 	 218 
+180 	 321 
+180 	 218 
+181 	 321 
+181 	 218 
+182 	 96 
+182 	 334 
+183 	 2 
+183 	 334 
+184 	 387 
+184 	 334 
+185 	 129 
+185 	 334 
+186 	 129 
+186 	 334 
+187 	 191 
+187 	 334 
+188 	 17 
+188 	 334 
+189 	 279 
+189 	 334 
+190 	 1 
+190 	 334 
+191 	 69 
+191 	 334 
+192 	 69 
+192 	 33 
+193 	 280 
+193 	 334 
+194 	 280 
+194 	 33 
+195 	 276 
+195 	 334 
+196 	 276 
+196 	 334 
+197 	 276 
+197 	 33 
+198 	 368 
+198 	 334 
+199 	 368 
+199 	 33 
+200 	 105 
+200 	 334 
+201 	 105 
+201 	 334 
+202 	 105 
+202 	 33 
+203 	 143 
+203 	 334 
+204 	 143 
+204 	 33 
+205 	 245 
+205 	 334 
+206 	 245 
+206 	 33 
+207 	 397 
+207 	 334 
+208 	 397 
+208 	 33 
+209 	 311 
+209 	 334 
+210 	 311 
+210 	 33 
+211 	 3 
+211 	 334 
+212 	 3 
+212 	 33 
+213 	 403 
+214 	 334 
+214 	 403 
+215 	 405 
+216 	 405 
+216 	 334 
+217 	 62 
+218 	 62 
+218 	 334 
+219 	 399 
+220 	 399 
+220 	 334 
+221 	 25 
+222 	 334 
+222 	 25 
+223 	 21 
+224 	 21 
+224 	 334 
+225 	 205 
+226 	 205 
+226 	 334 
+227 	 15 
+228 	 15 
+228 	 334 
+229 	 322 
+230 	 334 
+230 	 322 
+231 	 208 
+232 	 208 
+233 	 208 
+233 	 334 
+234 	 342 
+234 	 334 
+235 	 342 
+235 	 33 
+236 	 342 
+236 	 321 
+237 	 342 
+237 	 321 
+238 	 342 
+238 	 321 
+239 	 345 
+239 	 334 
+240 	 345 
+240 	 33 
+241 	 345 
+241 	 321 
+242 	 345 
+242 	 321 
+243 	 345 
+243 	 321 
+244 	 345 
+244 	 321 
+245 	 149 
+245 	 334 
+246 	 393 
+246 	 334 
+247 	 50 
+247 	 334 
+248 	 254 
+248 	 334 
+249 	 253 
+249 	 334 
+250 	 363 
+250 	 388 
+251 	 363 
+251 	 388 
+252 	 363 
+252 	 388 
+253 	 363 
+253 	 33 
+254 	 363 
+254 	 33 
+255 	 363 
+255 	 419 
+256 	 363 
+257 	 363 
+258 	 120 
+258 	 388 
+259 	 120 
+259 	 388 
+260 	 120 
+260 	 33 
+261 	 120 
+261 	 419 
+262 	 120 
+263 	 55 
+263 	 388 
+264 	 55 
+264 	 388 
+265 	 55 
+265 	 33 
+266 	 55 
+266 	 419 
+267 	 55 
+268 	 384 
+269 	 334 
+269 	 384 
+270 	 72 
+270 	 388 
+271 	 72 
+271 	 388 
+272 	 72 
+272 	 33 
+273 	 72 
+273 	 419 
+274 	 72 
+275 	 162 
+275 	 388 
+276 	 162 
+276 	 388 
+277 	 162 
+277 	 33 
+278 	 162 
+278 	 419 
+279 	 162 
+280 	 266 
+280 	 388 
+281 	 266 
+281 	 388 
+282 	 266 
+282 	 33 
+283 	 266 
+283 	 419 
+284 	 266 
+285 	 42 
+285 	 388 
+286 	 42 
+286 	 388 
+287 	 42 
+287 	 33 
+288 	 42 
+288 	 419 
+289 	 42 
+290 	 156 
+290 	 388 
+291 	 156 
+291 	 33 
+292 	 156 
+292 	 419 
+293 	 156 
+294 	 330 
+294 	 388 
+295 	 330 
+295 	 388 
+296 	 330 
+296 	 33 
+297 	 330 
+297 	 419 
+298 	 330 
+299 	 233 
+299 	 388 
+300 	 233 
+300 	 33 
+301 	 233 
+301 	 419 
+302 	 233 
+303 	 222 
+303 	 388 
+304 	 222 
+304 	 33 
+305 	 222 
+305 	 419 
+306 	 222 
+307 	 222 
+307 	 32 
+308 	 222 
+308 	 419 
+309 	 97 
+310 	 334 
+310 	 97 
+311 	 33 
+311 	 97 
+312 	 202 
+312 	 388 
+313 	 202 
+313 	 33 
+314 	 202 
+314 	 419 
+315 	 202 
+316 	 77 
+317 	 334 
+317 	 77 
+318 	 337 
+318 	 388 
+319 	 337 
+319 	 388 
+320 	 337 
+320 	 33 
+321 	 337 
+321 	 419 
+322 	 337 
+323 	 337 
+324 	 337 
+325 	 317 
+325 	 388 
+326 	 317 
+326 	 388 
+327 	 317 
+327 	 33 
+328 	 317 
+328 	 419 
+329 	 317 
+330 	 317 
+331 	 317 
+332 	 324 
+332 	 388 
+333 	 324 
+333 	 33 
+334 	 324 
+334 	 419 
+335 	 324 
+336 	 324 
+336 	 32 
+337 	 324 
+337 	 419 
+338 	 71 
+338 	 388 
+339 	 71 
+339 	 388 
+340 	 71 
+340 	 33 
+341 	 71 
+341 	 419 
+342 	 71 
+343 	 71 
+344 	 71 
+345 	 139 
+345 	 388 
+346 	 139 
+346 	 33 
+347 	 139 
+347 	 419 
+348 	 139 
+349 	 286 
+349 	 388 
+350 	 286 
+350 	 388 
+351 	 286 
+351 	 33 
+352 	 286 
+352 	 419 
+353 	 286 
+354 	 286 
+355 	 286 
+356 	 59 
+356 	 388 
+357 	 59 
+357 	 33 
+358 	 59 
+358 	 419 
+359 	 59 
+360 	 134 
+360 	 388 
+361 	 134 
+361 	 388 
+362 	 134 
+362 	 388 
+363 	 134 
+363 	 33 
+364 	 134 
+364 	 33 
+365 	 134 
+365 	 419 
+366 	 134 
+367 	 134 
+368 	 366 
+368 	 388 
+369 	 366 
+369 	 33 
+370 	 366 
+370 	 419 
+371 	 366 
+372 	 417 
+372 	 388 
+373 	 417 
+373 	 388 
+374 	 417 
+374 	 388 
+375 	 417 
+375 	 33 
+376 	 417 
+376 	 33 
+377 	 417 
+377 	 419 
+378 	 417 
+379 	 73 
+379 	 388 
+380 	 73 
+380 	 388 
+381 	 73 
+381 	 33 
+382 	 73 
+382 	 419 
+383 	 73 
+384 	 404 
+384 	 388 
+385 	 404 
+385 	 388 
+386 	 404 
+386 	 388 
+387 	 404 
+387 	 33 
+388 	 404 
+388 	 33 
+389 	 404 
+389 	 419 
+390 	 404 
+391 	 153 
+391 	 388 
+392 	 153 
+392 	 388 
+393 	 153 
+393 	 33 
+394 	 153 
+394 	 419 
+395 	 153 
+396 	 374 
+396 	 388 
+397 	 374 
+397 	 388 
+398 	 374 
+398 	 33 
+399 	 374 
+399 	 419 
+400 	 374 
+401 	 432 
+401 	 388 
+402 	 432 
+402 	 388 
+403 	 432 
+403 	 33 
+404 	 432 
+404 	 419 
+405 	 432 
+406 	 389 
+406 	 388 
+407 	 389 
+407 	 33 
+408 	 389 
+408 	 419 
+409 	 389 
+410 	 283 
+410 	 388 
+411 	 283 
+411 	 388 
+412 	 283 
+412 	 33 
+413 	 283 
+413 	 419 
+414 	 283 
+415 	 390 
+415 	 388 
+416 	 390 
+416 	 33 
+417 	 390 
+417 	 419 
+418 	 390 
+419 	 367 
+419 	 388 
+420 	 367 
+420 	 388 
+421 	 367 
+421 	 33 
+422 	 367 
+422 	 419 
+423 	 367 
+424 	 292 
+424 	 388 
+425 	 292 
+425 	 388 
+426 	 292 
+426 	 33 
+427 	 292 
+427 	 419 
+428 	 292 
+429 	 67 
+429 	 388 
+430 	 67 
+430 	 388 
+431 	 67 
+431 	 33 
+432 	 67 
+432 	 419 
+433 	 67 
+434 	 125 
+434 	 388 
+435 	 125 
+435 	 388 
+436 	 125 
+436 	 33 
+437 	 125 
+437 	 419 
+438 	 125 
+439 	 45 
+439 	 388 
+440 	 45 
+440 	 388 
+441 	 45 
+441 	 33 
+442 	 45 
+442 	 419 
+443 	 45 
+444 	 325 
+444 	 388 
+445 	 325 
+445 	 388 
+446 	 325 
+446 	 33 
+447 	 325 
+447 	 419 
+448 	 325 
+449 	 215 
+449 	 388 
+450 	 215 
+450 	 33 
+451 	 215 
+451 	 419 
+452 	 215 
+453 	 164 
+453 	 388 
+454 	 164 
+454 	 33 
+455 	 164 
+455 	 419 
+456 	 164 
+457 	 241 
+457 	 388 
+458 	 241 
+458 	 33 
+459 	 241 
+459 	 419 
+460 	 241 
+461 	 68 
+461 	 388 
+462 	 68 
+462 	 33 
+463 	 68 
+463 	 419 
+464 	 68 
+465 	 166 
+465 	 388 
+466 	 166 
+466 	 33 
+467 	 166 
+467 	 419 
+468 	 166 
+469 	 351 
+470 	 334 
+470 	 351 
+471 	 144 
+471 	 388 
+472 	 144 
+472 	 33 
+473 	 144 
+473 	 419 
+474 	 144 
+475 	 65 
+475 	 388 
+476 	 65 
+476 	 388 
+477 	 65 
+477 	 33 
+478 	 65 
+478 	 419 
+479 	 65 
+480 	 231 
+480 	 388 
+481 	 231 
+481 	 33 
+482 	 231 
+482 	 419 
+483 	 231 
+484 	 356 
+485 	 334 
+485 	 356 
+486 	 75 
+487 	 334 
+487 	 75 
+488 	 334 
+488 	 75 
+489 	 75 
+490 	 75 
+491 	 256 
+491 	 388 
+492 	 256 
+492 	 388 
+493 	 256 
+493 	 33 
+494 	 256 
+494 	 419 
+495 	 256 
+496 	 334 
+496 	 375 
+497 	 33 
+497 	 375 
+498 	 169 
+498 	 388 
+499 	 169 
+499 	 388 
+500 	 169 
+500 	 388 
+501 	 169 
+501 	 33 
+502 	 169 
+502 	 33 
+503 	 169 
+503 	 419 
+504 	 169 
+505 	 169 
+506 	 334 
+506 	 344 
+507 	 33 
+507 	 344 
+508 	 320 
+508 	 388 
+509 	 320 
+509 	 388 
+510 	 320 
+510 	 33 
+511 	 320 
+511 	 419 
+512 	 320 
+513 	 340 
+513 	 388 
+514 	 340 
+514 	 388 
+515 	 340 
+515 	 33 
+516 	 340 
+516 	 419 
+517 	 340 
+518 	 411 
+518 	 388 
+519 	 411 
+519 	 388 
+520 	 411 
+520 	 33 
+521 	 411 
+521 	 419 
+522 	 411 
+523 	 333 
+523 	 388 
+524 	 333 
+524 	 388 
+525 	 333 
+525 	 33 
+526 	 333 
+526 	 419 
+527 	 333 
+528 	 360 
+528 	 388 
+529 	 360 
+529 	 388 
+530 	 360 
+530 	 33 
+531 	 360 
+531 	 419 
+532 	 360 
+533 	 210 
+533 	 388 
+534 	 210 
+534 	 388 
+535 	 210 
+535 	 33 
+536 	 210 
+536 	 419 
+537 	 210 
+538 	 288 
+538 	 388 
+539 	 288 
+539 	 388 
+540 	 288 
+540 	 33 
+541 	 288 
+541 	 419 
+542 	 288 
+543 	 261 
+543 	 388 
+544 	 261 
+544 	 33 
+545 	 261 
+545 	 419 
+546 	 261 
+547 	 243 
+547 	 388 
+548 	 243 
+548 	 33 
+549 	 243 
+549 	 419 
+550 	 243 
+551 	 421 
+551 	 32 
+552 	 415 
+552 	 388 
+553 	 415 
+553 	 33 
+554 	 415 
+554 	 419 
+555 	 415 
+556 	 206 
+556 	 388 
+557 	 206 
+557 	 388 
+558 	 206 
+558 	 33 
+559 	 206 
+559 	 419 
+560 	 206 
+561 	 136 
+561 	 388 
+562 	 136 
+562 	 388 
+563 	 136 
+563 	 388 
+564 	 136 
+564 	 33 
+565 	 136 
+565 	 33 
+566 	 136 
+566 	 419 
+567 	 136 
+568 	 136 
+569 	 136 
+570 	 136 
+571 	 136 
+572 	 165 
+572 	 388 
+573 	 165 
+573 	 33 
+574 	 165 
+574 	 419 
+575 	 165 
+576 	 93 
+577 	 334 
+577 	 93 
+578 	 33 
+578 	 93 
+579 	 321 
+579 	 93 
+580 	 321 
+580 	 93 
+581 	 334 
+581 	 93 
+582 	 334 
+582 	 93 
+583 	 80 
+583 	 388 
+584 	 80 
+584 	 33 
+585 	 80 
+585 	 419 
+586 	 80 
+587 	 406 
+587 	 388 
+588 	 406 
+588 	 33 
+589 	 406 
+589 	 419 
+590 	 406 
+591 	 26 
+591 	 388 
+592 	 26 
+592 	 388 
+593 	 26 
+593 	 33 
+594 	 26 
+594 	 419 
+595 	 26 
+596 	 396 
+596 	 388 
+597 	 396 
+597 	 388 
+598 	 396 
+598 	 33 
+599 	 396 
+599 	 419 
+600 	 396 
+601 	 371 
+601 	 388 
+602 	 371 
+602 	 388 
+603 	 371 
+603 	 33 
+604 	 371 
+604 	 419 
+605 	 371 
+606 	 30 
+606 	 388 
+607 	 30 
+607 	 388 
+608 	 30 
+608 	 33 
+609 	 30 
+609 	 419 
+610 	 30 
+611 	 334 
+611 	 39 
+612 	 395 
+612 	 388 
+613 	 395 
+613 	 388 
+614 	 395 
+614 	 33 
+615 	 395 
+615 	 33 
+616 	 395 
+616 	 419 
+617 	 395 
+618 	 54 
+618 	 388 
+619 	 54 
+619 	 33 
+620 	 54 
+620 	 419 
+621 	 54 
+622 	 326 
+622 	 388 
+623 	 326 
+623 	 388 
+624 	 326 
+624 	 33 
+625 	 326 
+625 	 419 
+626 	 326 
+627 	 294 
+627 	 388 
+628 	 294 
+628 	 388 
+629 	 294 
+629 	 388 
+630 	 294 
+630 	 33 
+631 	 294 
+631 	 419 
+632 	 294 
+633 	 401 
+633 	 388 
+634 	 401 
+634 	 33 
+635 	 401 
+635 	 419 
+636 	 401 
+637 	 145 
+638 	 334 
+638 	 145 
+639 	 33 
+639 	 145 
+640 	 334 
+640 	 430 
+641 	 175 
+641 	 388 
+642 	 175 
+642 	 388 
+643 	 175 
+643 	 388 
+644 	 175 
+644 	 33 
+645 	 175 
+645 	 419 
+646 	 175 
+647 	 272 
+647 	 388 
+648 	 272 
+648 	 33 
+649 	 272 
+649 	 419 
+650 	 272 
+651 	 258 
+651 	 388 
+652 	 258 
+652 	 388 
+653 	 258 
+653 	 388 
+654 	 258 
+654 	 33 
+655 	 258 
+655 	 419 
+656 	 258 
+657 	 334 
+657 	 86 
+658 	 334 
+658 	 87 
+659 	 334 
+659 	 37 
+660 	 38 
+661 	 334 
+661 	 38 
+662 	 334 
+662 	 159 
+663 	 250 
+664 	 334 
+664 	 250 
+665 	 334 
+665 	 249 
+666 	 61 
+667 	 334 
+667 	 61 
+668 	 334 
+668 	 271 
+669 	 341 
+670 	 334 
+670 	 341 
+671 	 334 
+671 	 170 
+672 	 236 
+673 	 334 
+673 	 236 
+674 	 353 
+675 	 334 
+675 	 353 
+676 	 334 
+676 	 16 
+677 	 365 
+678 	 334 
+678 	 365 
+679 	 234 
+680 	 334 
+680 	 234 
+681 	 423 
+682 	 334 
+682 	 423 
+683 	 323 
+684 	 334 
+684 	 323 
+685 	 214 
+686 	 334 
+686 	 214 
+687 	 117 
+688 	 334 
+688 	 117 
+689 	 230 
+690 	 334 
+690 	 230 
+691 	 167 
+691 	 388 
+692 	 167 
+692 	 33 
+693 	 167 
+693 	 419 
+694 	 167 
+695 	 167 
+695 	 32 
+696 	 167 
+696 	 419 
+697 	 229 
+698 	 334 
+698 	 229 
+699 	 78 
+700 	 334 
+700 	 78 
+701 	 227 
+702 	 334 
+702 	 227 
+703 	 110 
+704 	 334 
+704 	 110 
+705 	 334 
+705 	 110 
+706 	 310 
+707 	 334 
+707 	 310 
+708 	 385 
+709 	 334 
+709 	 385 
+710 	 10 
+711 	 334 
+711 	 10 
+712 	 301 
+713 	 334 
+713 	 301 
+714 	 127 
+715 	 334 
+715 	 127 
+716 	 221 
+717 	 334 
+717 	 221 
+718 	 108 
+719 	 334 
+719 	 108 
+720 	 364 
+721 	 334 
+721 	 364 
+722 	 278 
+723 	 334 
+723 	 278 
+724 	 426 
+725 	 334 
+725 	 426 
+726 	 155 
+727 	 155 
+728 	 334 
+728 	 155 
+729 	 91 
+730 	 91 
+731 	 334 
+731 	 91 
+732 	 226 
+733 	 334 
+733 	 226 
+734 	 262 
+735 	 334 
+735 	 262 
+736 	 313 
+737 	 334 
+737 	 313 
+738 	 140 
+739 	 334 
+739 	 140 
+740 	 34 
+741 	 334 
+741 	 34 
+742 	 394 
+743 	 334 
+743 	 394 
+744 	 238 
+744 	 388 
+745 	 238 
+745 	 388 
+746 	 238 
+746 	 33 
+747 	 238 
+747 	 419 
+748 	 238 
+749 	 123 
+750 	 334 
+750 	 123 
+751 	 198 
+752 	 334 
+752 	 198 
+753 	 372 
+753 	 388 
+754 	 372 
+754 	 388 
+755 	 372 
+755 	 33 
+756 	 372 
+756 	 419 
+757 	 372 
+758 	 131 
+758 	 388 
+759 	 131 
+759 	 388 
+760 	 131 
+760 	 33 
+761 	 131 
+761 	 419 
+762 	 131 
+763 	 270 
+764 	 334 
+764 	 270 
+765 	 184 
+766 	 334 
+766 	 184 
+767 	 209 
+767 	 388 
+768 	 209 
+768 	 388 
+769 	 209 
+769 	 33 
+770 	 209 
+770 	 419 
+771 	 209 
+772 	 409 
+773 	 334 
+773 	 409 
+774 	 90 
+775 	 334 
+775 	 90 
+776 	 424 
+776 	 388 
+777 	 424 
+777 	 388 
+778 	 424 
+778 	 33 
+779 	 424 
+779 	 419 
+780 	 424 
+781 	 420 
+782 	 334 
+782 	 420 
+783 	 328 
+784 	 334 
+784 	 328 
+785 	 428 
+785 	 388 
+786 	 428 
+786 	 388 
+787 	 428 
+787 	 33 
+788 	 428 
+788 	 419 
+789 	 428 
+790 	 418 
+791 	 334 
+791 	 418 
+792 	 83 
+793 	 334 
+793 	 83 
+794 	 14 
+794 	 388 
+795 	 14 
+795 	 388 
+796 	 14 
+796 	 33 
+797 	 14 
+797 	 419 
+798 	 14 
+799 	 98 
+800 	 334 
+800 	 98 
+801 	 146 
+802 	 334 
+802 	 146 
+803 	 327 
+804 	 334 
+804 	 327 
+805 	 201 
+806 	 334 
+806 	 201 
+807 	 211 
+808 	 334 
+808 	 211 
+809 	 216 
+810 	 334 
+810 	 216 
+811 	 207 
+812 	 334 
+812 	 207 
+813 	 400 
+814 	 334 
+814 	 400 
+815 	 225 
+816 	 334 
+816 	 225 
+817 	 427 
+818 	 334 
+818 	 427 
+819 	 334 
+819 	 152 
+820 	 361 
+821 	 334 
+821 	 361 
+822 	 100 
+823 	 334 
+823 	 100 
+824 	 197 
+825 	 197 
+826 	 334 
+826 	 197 
+827 	 334 
+827 	 197 
+828 	 84 
+829 	 334 
+829 	 84 
+830 	 163 
+831 	 334 
+831 	 163 
+832 	 186 
+833 	 186 
+834 	 334 
+834 	 186 
+835 	 334 
+835 	 186 
+836 	 27 
+837 	 334 
+837 	 27 
+838 	 408 
+839 	 334 
+839 	 408 
+840 	 85 
+840 	 32 
+841 	 142 
+842 	 142 
+843 	 334 
+843 	 142 
+844 	 334 
+844 	 142 
+845 	 398 
+846 	 334 
+846 	 398 
+847 	 299 
+848 	 334 
+848 	 299 
+849 	 79 
+850 	 334 
+850 	 79 
+851 	 370 
+852 	 334 
+852 	 370 
+853 	 369 
+854 	 334 
+854 	 369 
+855 	 185 
+856 	 185 
+857 	 334 
+857 	 185 
+858 	 334 
+858 	 185 
+859 	 137 
+860 	 334 
+860 	 137 
+861 	 213 
+862 	 334 
+862 	 213 
+863 	 109 
+864 	 109 
+865 	 334 
+865 	 109 
+866 	 334 
+866 	 109 
+867 	 29 
+868 	 334 
+868 	 29 
+869 	 407 
+870 	 334 
+870 	 407 
+871 	 314 
+872 	 334 
+872 	 314 
+873 	 334 
+873 	 36 
+874 	 334 
+874 	 377 
+875 	 33 
+875 	 377 
+876 	 193 
+877 	 334 
+877 	 193 
+878 	 334 
+878 	 53 
+879 	 128 
+880 	 334 
+880 	 128 
+881 	 94 
+882 	 334 
+882 	 94 
+883 	 33 
+883 	 94 
+884 	 321 
+884 	 94 
+885 	 321 
+885 	 94 
+886 	 94 
+887 	 94 
+888 	 321 
+888 	 94 
+889 	 334 
+889 	 192 
+890 	 334 
+890 	 192 
+891 	 334 
+891 	 192 
+892 	 192 
+893 	 334 
+893 	 150 
+894 	 334 
+894 	 150 
+895 	 334 
+895 	 150 
+896 	 130 
+897 	 130 
+898 	 334 
+898 	 130 
+899 	 321 
+899 	 130 
+900 	 33 
+900 	 130 
+901 	 244 
+901 	 388 
+902 	 244 
+902 	 33 
+903 	 244 
+903 	 419 
+904 	 244 
+905 	 244 
+906 	 174 
+907 	 334 
+907 	 174 
+908 	 174 
+909 	 335 
+910 	 334 
+910 	 335 
+911 	 119 
+911 	 388 
+912 	 119 
+912 	 388 
+913 	 119 
+913 	 388 
+914 	 119 
+914 	 33 
+915 	 119 
+915 	 33 
+916 	 119 
+916 	 419 
+917 	 119 
+918 	 119 
+919 	 114 
+919 	 388 
+920 	 114 
+920 	 388 
+921 	 114 
+921 	 33 
+922 	 114 
+922 	 419 
+923 	 114 
+924 	 114 
+925 	 359 
+925 	 388 
+926 	 359 
+926 	 388 
+927 	 359 
+927 	 32 
+928 	 359 
+928 	 33 
+929 	 359 
+929 	 33 
+930 	 359 
+930 	 419 
+931 	 359 
+931 	 419 
+932 	 359 
+933 	 359 
+934 	 13 
+935 	 334 
+935 	 13 
+936 	 334 
+936 	 107 
+937 	 95 
+938 	 334 
+938 	 95 
+939 	 358 
+940 	 334 
+940 	 358 
+941 	 297 
+942 	 334 
+942 	 297 
+943 	 332 
+944 	 334 
+944 	 332 
+945 	 382 
+946 	 334 
+946 	 382 
+947 	 334 
+947 	 381 
+948 	 334 
+948 	 329 
+949 	 416 
+950 	 334 
+950 	 416 
+951 	 284 
+952 	 334 
+952 	 284 
+953 	 295 
+953 	 388 
+954 	 295 
+954 	 33 
+955 	 295 
+955 	 419 
+956 	 295 
+957 	 295 
+957 	 32 
+958 	 295 
+958 	 419 
+959 	 308 
+959 	 388 
+960 	 308 
+960 	 388 
+961 	 308 
+961 	 33 
+962 	 308 
+962 	 419 
+963 	 308 
+964 	 334 
+964 	 303 
+965 	 239 
+966 	 334 
+966 	 239 
+967 	 60 
+968 	 334 
+968 	 60 
+969 	 240 
+970 	 334 
+970 	 240 
+971 	 235 
+972 	 334 
+972 	 235 
+973 	 172 
+973 	 388 
+974 	 172 
+974 	 388 
+975 	 172 
+975 	 33 
+976 	 172 
+976 	 419 
+977 	 172 
+978 	 352 
+979 	 334 
+979 	 352 
+980 	 355 
+981 	 334 
+981 	 355 
+982 	 309 
+983 	 334 
+983 	 309 
+984 	 81 
+985 	 334 
+985 	 81 
+986 	 354 
+987 	 334 
+987 	 354 
+988 	 357 
+989 	 334 
+989 	 357 
+990 	 348 
+991 	 334 
+991 	 348 
+992 	 334 
+992 	 304 
+993 	 101 
+994 	 334 
+994 	 101 
+995 	 46 
+996 	 334 
+996 	 46 
+997 	 48 
+998 	 334 
+998 	 48 
+999 	 334 
+999 	 116 
+1000 	 183 
+1001 	 334 
+1001 	 183 
+1002 	 277 
+1002 	 388 
+1003 	 277 
+1003 	 388 
+1004 	 277 
+1004 	 33 
+1005 	 277 
+1005 	 419 
+1006 	 277 
+1007 	 49 
+1008 	 334 
+1008 	 49 
+1009 	 43 
+1010 	 334 
+1010 	 43 
+1011 	 334 
+1011 	 112 
+1012 	 187 
+1013 	 334 
+1013 	 187 
+1014 	 412 
+1014 	 388 
+1015 	 412 
+1015 	 388 
+1016 	 412 
+1016 	 33 
+1017 	 412 
+1017 	 419 
+1018 	 412 
+1019 	 44 
+1020 	 334 
+1020 	 44 
+1021 	 265 
+1022 	 334 
+1022 	 265 
+1023 	 334 
+1023 	 22 
+1024 	 362 
+1025 	 334 
+1025 	 362 
+1026 	 148 
+1026 	 388 
+1027 	 148 
+1027 	 388 
+1028 	 148 
+1028 	 33 
+1029 	 148 
+1029 	 419 
+1030 	 148 
+1031 	 51 
+1032 	 334 
+1032 	 51 
+1033 	 124 
+1034 	 334 
+1034 	 124 
+1035 	 334 
+1035 	 331 
+1036 	 413 
+1037 	 334 
+1037 	 413 
+1038 	 194 
+1038 	 388 
+1039 	 194 
+1039 	 388 
+1040 	 194 
+1040 	 33 
+1041 	 194 
+1041 	 419 
+1042 	 194 
+1043 	 177 
+1044 	 334 
+1044 	 177 
+1045 	 182 
+1046 	 334 
+1046 	 182 
+1047 	 334 
+1047 	 138 
+1048 	 63 
+1049 	 334 
+1049 	 63 
+1050 	 141 
+1050 	 388 
+1051 	 141 
+1051 	 388 
+1052 	 141 
+1052 	 33 
+1053 	 141 
+1053 	 419 
+1054 	 141 
+1055 	 181 
+1056 	 334 
+1056 	 181 
+1057 	 334 
+1057 	 52 
+1058 	 334 
+1058 	 379 
+1059 	 33 
+1059 	 379 
+1060 	 126 
+1060 	 388 
+1061 	 126 
+1061 	 388 
+1062 	 126 
+1062 	 33 
+1063 	 126 
+1063 	 33 
+1064 	 126 
+1064 	 419 
+1065 	 126 
+1066 	 126 
+1067 	 126 
+1067 	 388 
+1068 	 126 
+1068 	 388 
+1069 	 126 
+1069 	 33 
+1070 	 126 
+1071 	 126 
+1072 	 334 
+1072 	 12 
+1073 	 12 
+1074 	 334 
+1074 	 307 
+1075 	 307 
+1076 	 334 
+1076 	 7 
+1077 	 219 
+1078 	 334 
+1078 	 219 
+1079 	 334 
+1079 	 190 
+1080 	 190 
+1081 	 190 
+1082 	 334 
+1082 	 106 
+1083 	 106 
+1084 	 106 
+1085 	 147 
+1085 	 388 
+1086 	 147 
+1086 	 33 
+1087 	 147 
+1087 	 419 
+1088 	 147 
+1089 	 147 
+1089 	 388 
+1090 	 147 
+1090 	 33 
+1091 	 147 
+1092 	 102 
+1093 	 334 
+1093 	 102 
+1094 	 196 
+1095 	 334 
+1095 	 196 
+1096 	 334 
+1096 	 196 
+1097 	 338 
+1097 	 388 
+1098 	 338 
+1098 	 33 
+1099 	 338 
+1099 	 419 
+1100 	 338 
+1101 	 24 
+1102 	 334 
+1102 	 24 
+1103 	 247 
+1104 	 334 
+1104 	 247 
+1105 	 300 
+1105 	 388 
+1106 	 300 
+1106 	 33 
+1107 	 300 
+1107 	 419 
+1108 	 300 
+1109 	 334 
+1109 	 298 
+1110 	 248 
+1111 	 334 
+1111 	 248 
+1112 	 334 
+1112 	 18 
+1113 	 350 
+1114 	 334 
+1114 	 350 
+1115 	 290 
+1115 	 388 
+1116 	 290 
+1116 	 33 
+1117 	 290 
+1117 	 419 
+1118 	 290 
+1119 	 135 
+1119 	 388 
+1120 	 135 
+1120 	 33 
+1121 	 135 
+1121 	 419 
+1122 	 135 
+1123 	 188 
+1123 	 388 
+1124 	 188 
+1124 	 33 
+1125 	 188 
+1125 	 419 
+1126 	 188 
+1127 	 274 
+1127 	 388 
+1128 	 274 
+1128 	 33 
+1129 	 274 
+1129 	 419 
+1130 	 274 
+1131 	 122 
+1131 	 388 
+1132 	 122 
+1132 	 33 
+1133 	 122 
+1133 	 419 
+1134 	 122 
+1135 	 347 
+1135 	 388 
+1136 	 347 
+1136 	 33 
+1137 	 347 
+1137 	 419 
+1138 	 347 
+1139 	 260 
+1139 	 388 
+1140 	 260 
+1140 	 33 
+1141 	 260 
+1141 	 419 
+1142 	 260 
+1143 	 121 
+1143 	 388 
+1144 	 121 
+1144 	 33 
+1145 	 121 
+1145 	 419 
+1146 	 121 
+1147 	 431 
+1147 	 388 
+1148 	 431 
+1148 	 33 
+1149 	 431 
+1149 	 419 
+1150 	 431 
+1151 	 212 
+1151 	 388 
+1152 	 212 
+1152 	 33 
+1153 	 212 
+1153 	 419 
+1154 	 212 
+1155 	 237 
+1156 	 334 
+1156 	 237 
+1157 	 334 
+1157 	 422 
+1158 	 422 
+1159 	 64 
+1160 	 334 
+1160 	 64 
+1161 	 104 
+1162 	 334 
+1162 	 104 
+1163 	 334 
+1163 	 57 
+1164 	 334 
+1164 	 57 
+1165 	 334 
+1165 	 378 
+1166 	 204 
+1166 	 388 
+1167 	 204 
+1167 	 33 
+1168 	 204 
+1168 	 419 
+1169 	 204 
+1170 	 386 
+1171 	 334 
+1171 	 386 
+1172 	 334 
+1172 	 74 
+1173 	 199 
+1174 	 334 
+1174 	 199 
+1175 	 429 
+1176 	 334 
+1176 	 429 
+1177 	 160 
+1178 	 334 
+1178 	 160 
+1179 	 195 
+1180 	 334 
+1180 	 195 
+1181 	 66 
+1182 	 334 
+1182 	 66 
+1183 	 23 
+1184 	 334 
+1184 	 23 
+1185 	 9 
+1185 	 388 
+1186 	 9 
+1186 	 33 
+1187 	 9 
+1187 	 419 
+1188 	 9 
+1189 	 264 
+1190 	 334 
+1190 	 264 
+1191 	 349 
+1192 	 334 
+1192 	 349 
+1193 	 47 
+1194 	 334 
+1194 	 47 
+1195 	 220 
+1196 	 334 
+1196 	 220 
+1197 	 257 
+1198 	 334 
+1198 	 257 
+1199 	 179 
+1200 	 334 
+1200 	 179 
+1201 	 176 
+1202 	 334 
+1202 	 176 
+1203 	 76 
+1204 	 334 
+1204 	 76 
+1205 	 33 
+1205 	 76 
+1206 	 287 
+1207 	 334 
+1207 	 287 
+1208 	 4 
+1208 	 388 
+1209 	 4 
+1209 	 33 
+1210 	 4 
+1210 	 419 
+1211 	 4 
+1212 	 232 
+1213 	 334 
+1213 	 232 
+
+***********************************************************************
+
+
+ Subset products file - reaction number, species number 
+1 	 419 
+1 	 154 
+2 	 56 
+2 	 419 
+3 	 363 
+4 	 200 
+4 	 419 
+5 	 120 
+6 	 403 
+6 	 419 
+7 	 120 
+8 	 55 
+9 	 384 
+9 	 419 
+10 	 55 
+11 	 158 
+11 	 419 
+12 	 72 
+13 	 72 
+14 	 399 
+14 	 419 
+15 	 162 
+16 	 266 
+17 	 42 
+18 	 42 
+19 	 25 
+19 	 419 
+20 	 42 
+21 	 208 
+21 	 419 
+22 	 156 
+23 	 330 
+24 	 233 
+25 	 72 
+25 	 222 
+26 	 97 
+26 	 419 
+27 	 202 
+28 	 77 
+28 	 419 
+29 	 282 
+29 	 419 
+29 	 419 
+30 	 373 
+30 	 282 
+31 	 419 
+31 	 282 
+32 	 419 
+32 	 282 
+32 	 242 
+33 	 337 
+33 	 419 
+33 	 282 
+34 	 222 
+35 	 222 
+35 	 242 
+36 	 317 
+36 	 282 
+36 	 419 
+37 	 324 
+38 	 324 
+38 	 242 
+39 	 71 
+39 	 282 
+39 	 419 
+40 	 139 
+41 	 139 
+41 	 242 
+42 	 286 
+42 	 419 
+42 	 282 
+43 	 59 
+44 	 59 
+44 	 242 
+45 	 134 
+45 	 419 
+45 	 282 
+46 	 366 
+47 	 366 
+47 	 242 
+48 	 337 
+49 	 317 
+50 	 286 
+51 	 71 
+52 	 134 
+53 	 417 
+54 	 73 
+55 	 404 
+56 	 330 
+57 	 153 
+58 	 374 
+59 	 374 
+60 	 153 
+61 	 432 
+62 	 389 
+63 	 283 
+64 	 283 
+65 	 283 
+66 	 390 
+67 	 367 
+68 	 292 
+69 	 67 
+70 	 125 
+71 	 45 
+72 	 325 
+73 	 363 
+74 	 215 
+75 	 154 
+75 	 282 
+75 	 419 
+75 	 334 
+76 	 154 
+76 	 149 
+77 	 120 
+78 	 164 
+79 	 154 
+79 	 282 
+79 	 337 
+79 	 334 
+80 	 154 
+80 	 393 
+81 	 55 
+82 	 241 
+83 	 154 
+83 	 282 
+83 	 317 
+83 	 334 
+84 	 154 
+84 	 50 
+85 	 55 
+86 	 241 
+87 	 56 
+87 	 282 
+87 	 337 
+87 	 334 
+88 	 56 
+88 	 393 
+89 	 55 
+90 	 241 
+91 	 56 
+91 	 282 
+91 	 337 
+91 	 334 
+92 	 56 
+92 	 393 
+93 	 72 
+94 	 68 
+95 	 403 
+95 	 282 
+95 	 419 
+95 	 334 
+96 	 403 
+96 	 149 
+97 	 154 
+97 	 202 
+97 	 334 
+98 	 154 
+98 	 403 
+98 	 35 
+99 	 162 
+100 	 166 
+101 	 154 
+101 	 282 
+101 	 71 
+101 	 334 
+102 	 351 
+102 	 149 
+103 	 162 
+104 	 166 
+105 	 200 
+105 	 282 
+105 	 337 
+105 	 334 
+106 	 200 
+106 	 393 
+107 	 162 
+108 	 166 
+109 	 200 
+109 	 282 
+109 	 337 
+109 	 334 
+110 	 200 
+110 	 393 
+111 	 266 
+112 	 166 
+113 	 384 
+113 	 282 
+113 	 419 
+113 	 334 
+114 	 384 
+114 	 149 
+115 	 42 
+116 	 144 
+117 	 351 
+117 	 282 
+117 	 419 
+117 	 334 
+118 	 351 
+118 	 149 
+119 	 42 
+120 	 144 
+121 	 403 
+121 	 282 
+121 	 337 
+121 	 334 
+122 	 403 
+122 	 393 
+123 	 65 
+124 	 231 
+125 	 154 
+125 	 282 
+125 	 134 
+125 	 334 
+126 	 356 
+126 	 149 
+127 	 65 
+128 	 231 
+129 	 200 
+129 	 282 
+129 	 317 
+129 	 334 
+130 	 200 
+130 	 50 
+131 	 65 
+132 	 231 
+133 	 200 
+133 	 282 
+133 	 317 
+133 	 334 
+134 	 200 
+134 	 50 
+135 	 149 
+135 	 282 
+135 	 419 
+136 	 75 
+136 	 334 
+137 	 256 
+138 	 375 
+138 	 419 
+139 	 169 
+140 	 344 
+140 	 419 
+141 	 320 
+142 	 340 
+143 	 320 
+144 	 411 
+145 	 320 
+146 	 411 
+147 	 320 
+148 	 153 
+149 	 333 
+150 	 283 
+151 	 333 
+152 	 432 
+153 	 333 
+154 	 360 
+155 	 333 
+156 	 360 
+157 	 333 
+158 	 333 
+159 	 333 
+160 	 333 
+161 	 210 
+162 	 288 
+163 	 261 
+164 	 243 
+165 	 88 
+165 	 149 
+166 	 154 
+166 	 421 
+166 	 334 
+167 	 415 
+168 	 415 
+168 	 242 
+169 	 419 
+169 	 282 
+169 	 421 
+170 	 206 
+171 	 164 
+172 	 154 
+172 	 154 
+172 	 282 
+172 	 282 
+172 	 419 
+172 	 334 
+173 	 154 
+173 	 154 
+173 	 282 
+173 	 149 
+174 	 136 
+175 	 165 
+176 	 93 
+176 	 282 
+176 	 419 
+176 	 334 
+177 	 93 
+177 	 149 
+178 	 93 
+178 	 154 
+178 	 35 
+179 	 222 
+179 	 154 
+179 	 154 
+179 	 282 
+179 	 334 
+180 	 93 
+180 	 282 
+181 	 154 
+181 	 337 
+181 	 154 
+181 	 282 
+181 	 419 
+182 	 337 
+183 	 317 
+184 	 71 
+185 	 134 
+186 	 80 
+187 	 417 
+188 	 73 
+189 	 73 
+190 	 404 
+191 	 406 
+192 	 242 
+192 	 406 
+193 	 26 
+194 	 26 
+194 	 242 
+195 	 396 
+196 	 42 
+197 	 162 
+197 	 242 
+198 	 371 
+199 	 371 
+199 	 242 
+200 	 30 
+201 	 371 
+202 	 30 
+202 	 242 
+203 	 96 
+203 	 337 
+204 	 96 
+204 	 337 
+204 	 242 
+205 	 39 
+205 	 337 
+206 	 39 
+206 	 337 
+206 	 242 
+207 	 96 
+207 	 317 
+208 	 96 
+208 	 317 
+208 	 242 
+209 	 39 
+209 	 71 
+210 	 39 
+210 	 71 
+210 	 242 
+211 	 39 
+211 	 134 
+212 	 39 
+212 	 134 
+212 	 242 
+213 	 222 
+213 	 337 
+214 	 202 
+215 	 222 
+215 	 317 
+216 	 139 
+217 	 222 
+217 	 71 
+218 	 366 
+219 	 200 
+219 	 317 
+220 	 366 
+221 	 222 
+221 	 286 
+222 	 395 
+223 	 222 
+223 	 134 
+224 	 156 
+225 	 324 
+225 	 71 
+226 	 156 
+227 	 222 
+227 	 417 
+228 	 54 
+229 	 222 
+229 	 417 
+230 	 54 
+231 	 268 
+231 	 251 
+231 	 282 
+232 	 291 
+232 	 282 
+233 	 326 
+234 	 294 
+235 	 401 
+236 	 334 
+236 	 403 
+236 	 371 
+237 	 145 
+237 	 35 
+238 	 430 
+239 	 175 
+240 	 272 
+241 	 258 
+241 	 334 
+242 	 154 
+242 	 86 
+242 	 35 
+243 	 154 
+243 	 87 
+244 	 86 
+244 	 282 
+245 	 419 
+246 	 337 
+247 	 317 
+248 	 406 
+248 	 282 
+248 	 282 
+249 	 406 
+250 	 154 
+250 	 154 
+250 	 419 
+250 	 32 
+251 	 97 
+251 	 419 
+251 	 32 
+252 	 37 
+253 	 154 
+253 	 154 
+253 	 419 
+253 	 32 
+254 	 97 
+254 	 419 
+254 	 32 
+255 	 38 
+256 	 154 
+256 	 154 
+256 	 419 
+257 	 97 
+257 	 419 
+258 	 56 
+258 	 154 
+258 	 419 
+258 	 32 
+259 	 159 
+260 	 56 
+260 	 154 
+260 	 419 
+260 	 32 
+261 	 250 
+262 	 56 
+262 	 154 
+262 	 419 
+263 	 56 
+263 	 56 
+263 	 419 
+263 	 32 
+264 	 249 
+265 	 56 
+265 	 56 
+265 	 419 
+265 	 32 
+266 	 61 
+267 	 56 
+267 	 56 
+267 	 419 
+268 	 222 
+268 	 317 
+269 	 139 
+270 	 403 
+270 	 154 
+270 	 419 
+270 	 32 
+271 	 271 
+272 	 403 
+272 	 154 
+272 	 419 
+272 	 32 
+273 	 341 
+274 	 403 
+274 	 154 
+274 	 419 
+275 	 200 
+275 	 56 
+275 	 419 
+275 	 32 
+276 	 170 
+277 	 200 
+277 	 56 
+277 	 419 
+277 	 32 
+278 	 236 
+279 	 200 
+279 	 56 
+279 	 419 
+280 	 353 
+280 	 419 
+280 	 32 
+281 	 170 
+282 	 353 
+282 	 419 
+282 	 32 
+283 	 236 
+284 	 353 
+284 	 419 
+285 	 403 
+285 	 56 
+285 	 419 
+285 	 32 
+286 	 16 
+287 	 403 
+287 	 56 
+287 	 419 
+287 	 32 
+288 	 365 
+289 	 403 
+289 	 56 
+289 	 419 
+290 	 233 
+290 	 32 
+291 	 233 
+291 	 32 
+292 	 234 
+293 	 233 
+294 	 154 
+294 	 417 
+294 	 32 
+295 	 423 
+296 	 154 
+296 	 417 
+296 	 32 
+297 	 323 
+298 	 154 
+298 	 417 
+299 	 162 
+299 	 32 
+300 	 162 
+300 	 32 
+301 	 214 
+302 	 162 
+303 	 337 
+303 	 32 
+304 	 337 
+304 	 32 
+305 	 117 
+306 	 337 
+307 	 230 
+308 	 337 
+308 	 334 
+309 	 154 
+309 	 282 
+309 	 419 
+309 	 419 
+310 	 167 
+311 	 167 
+311 	 242 
+312 	 222 
+312 	 154 
+312 	 32 
+313 	 222 
+313 	 154 
+313 	 32 
+314 	 229 
+315 	 222 
+315 	 154 
+316 	 222 
+316 	 154 
+316 	 419 
+317 	 78 
+317 	 419 
+318 	 154 
+318 	 419 
+318 	 32 
+319 	 227 
+320 	 154 
+320 	 419 
+320 	 32 
+321 	 110 
+322 	 154 
+322 	 419 
+323 	 154 
+324 	 318 
+325 	 56 
+325 	 419 
+325 	 32 
+326 	 310 
+327 	 56 
+327 	 419 
+327 	 32 
+328 	 385 
+329 	 56 
+329 	 419 
+330 	 56 
+331 	 339 
+332 	 317 
+332 	 32 
+333 	 317 
+333 	 32 
+334 	 10 
+335 	 317 
+336 	 301 
+337 	 317 
+337 	 334 
+338 	 200 
+338 	 419 
+338 	 32 
+339 	 127 
+340 	 200 
+340 	 419 
+340 	 32 
+341 	 221 
+342 	 200 
+342 	 419 
+343 	 200 
+344 	 28 
+345 	 222 
+345 	 56 
+345 	 32 
+346 	 222 
+346 	 56 
+346 	 32 
+347 	 108 
+348 	 222 
+348 	 56 
+349 	 403 
+349 	 419 
+349 	 32 
+350 	 364 
+351 	 403 
+351 	 419 
+351 	 32 
+352 	 278 
+353 	 403 
+353 	 419 
+354 	 403 
+355 	 5 
+356 	 286 
+356 	 32 
+357 	 286 
+357 	 32 
+358 	 426 
+359 	 286 
+360 	 56 
+360 	 317 
+360 	 32 
+361 	 384 
+361 	 419 
+361 	 32 
+362 	 155 
+363 	 56 
+363 	 317 
+363 	 32 
+364 	 384 
+364 	 419 
+364 	 32 
+365 	 91 
+366 	 56 
+366 	 317 
+367 	 384 
+367 	 419 
+368 	 324 
+368 	 56 
+368 	 32 
+369 	 324 
+369 	 56 
+369 	 32 
+370 	 226 
+371 	 324 
+371 	 56 
+372 	 403 
+372 	 337 
+372 	 32 
+373 	 158 
+373 	 419 
+373 	 32 
+374 	 262 
+375 	 403 
+375 	 337 
+375 	 32 
+376 	 158 
+376 	 419 
+376 	 32 
+377 	 313 
+378 	 403 
+378 	 337 
+379 	 266 
+379 	 32 
+380 	 140 
+381 	 266 
+381 	 32 
+382 	 214 
+383 	 266 
+384 	 403 
+384 	 317 
+384 	 32 
+385 	 25 
+385 	 419 
+385 	 32 
+386 	 423 
+387 	 403 
+387 	 317 
+387 	 32 
+388 	 25 
+388 	 419 
+388 	 32 
+389 	 323 
+390 	 403 
+390 	 317 
+391 	 371 
+391 	 32 
+392 	 34 
+393 	 371 
+393 	 32 
+394 	 394 
+395 	 371 
+396 	 371 
+396 	 32 
+397 	 34 
+398 	 371 
+398 	 32 
+399 	 394 
+400 	 371 
+401 	 403 
+401 	 286 
+401 	 32 
+402 	 34 
+403 	 403 
+403 	 286 
+403 	 32 
+404 	 394 
+405 	 403 
+405 	 286 
+406 	 65 
+406 	 32 
+407 	 65 
+407 	 32 
+408 	 394 
+409 	 65 
+410 	 238 
+410 	 32 
+411 	 123 
+412 	 238 
+412 	 32 
+413 	 198 
+414 	 238 
+415 	 372 
+415 	 32 
+416 	 372 
+416 	 32 
+417 	 198 
+418 	 372 
+419 	 131 
+419 	 32 
+420 	 270 
+421 	 131 
+421 	 32 
+422 	 184 
+423 	 131 
+424 	 209 
+424 	 32 
+425 	 409 
+426 	 209 
+426 	 32 
+427 	 90 
+428 	 209 
+429 	 424 
+429 	 32 
+430 	 420 
+431 	 424 
+431 	 32 
+432 	 328 
+433 	 424 
+434 	 428 
+434 	 32 
+435 	 418 
+436 	 428 
+436 	 32 
+437 	 83 
+438 	 428 
+439 	 14 
+439 	 32 
+440 	 98 
+441 	 14 
+441 	 32 
+442 	 146 
+443 	 14 
+444 	 208 
+444 	 419 
+444 	 32 
+445 	 327 
+446 	 208 
+446 	 419 
+446 	 32 
+447 	 201 
+448 	 208 
+448 	 419 
+449 	 154 
+449 	 154 
+449 	 32 
+449 	 32 
+450 	 154 
+450 	 154 
+450 	 32 
+450 	 32 
+451 	 211 
+452 	 154 
+452 	 154 
+452 	 32 
+453 	 56 
+453 	 154 
+453 	 32 
+453 	 32 
+454 	 56 
+454 	 154 
+454 	 32 
+454 	 32 
+455 	 216 
+456 	 56 
+456 	 154 
+456 	 32 
+457 	 56 
+457 	 56 
+457 	 32 
+457 	 32 
+458 	 56 
+458 	 56 
+458 	 32 
+458 	 32 
+459 	 207 
+460 	 56 
+460 	 56 
+460 	 32 
+461 	 403 
+461 	 154 
+461 	 32 
+461 	 32 
+462 	 403 
+462 	 154 
+462 	 32 
+462 	 32 
+463 	 400 
+464 	 403 
+464 	 154 
+464 	 32 
+465 	 200 
+465 	 56 
+465 	 32 
+465 	 32 
+466 	 200 
+466 	 56 
+466 	 32 
+466 	 32 
+467 	 225 
+468 	 200 
+468 	 56 
+468 	 32 
+469 	 222 
+469 	 317 
+470 	 139 
+471 	 403 
+471 	 56 
+471 	 32 
+471 	 32 
+472 	 403 
+472 	 56 
+472 	 32 
+472 	 32 
+473 	 427 
+474 	 403 
+474 	 56 
+474 	 32 
+475 	 200 
+475 	 200 
+475 	 419 
+475 	 32 
+476 	 152 
+477 	 200 
+477 	 200 
+477 	 419 
+477 	 32 
+478 	 361 
+479 	 200 
+479 	 200 
+479 	 419 
+480 	 200 
+480 	 200 
+480 	 32 
+480 	 32 
+481 	 200 
+481 	 200 
+481 	 32 
+481 	 32 
+482 	 100 
+483 	 200 
+483 	 200 
+483 	 32 
+484 	 222 
+484 	 71 
+485 	 366 
+486 	 282 
+486 	 282 
+486 	 419 
+486 	 419 
+487 	 282 
+487 	 282 
+487 	 419 
+488 	 282 
+488 	 334 
+489 	 282 
+489 	 282 
+489 	 373 
+490 	 154 
+490 	 282 
+491 	 75 
+491 	 197 
+491 	 419 
+491 	 32 
+492 	 84 
+493 	 75 
+493 	 197 
+493 	 419 
+493 	 32 
+494 	 163 
+495 	 75 
+495 	 197 
+495 	 419 
+496 	 421 
+497 	 421 
+497 	 242 
+498 	 75 
+498 	 186 
+498 	 419 
+498 	 32 
+499 	 78 
+499 	 197 
+499 	 419 
+499 	 32 
+500 	 27 
+501 	 75 
+501 	 186 
+501 	 419 
+501 	 32 
+502 	 78 
+502 	 197 
+502 	 419 
+502 	 32 
+503 	 408 
+504 	 75 
+504 	 186 
+504 	 419 
+505 	 78 
+505 	 197 
+505 	 419 
+506 	 85 
+507 	 85 
+507 	 242 
+508 	 75 
+508 	 142 
+508 	 419 
+508 	 32 
+509 	 398 
+510 	 75 
+510 	 142 
+510 	 419 
+510 	 32 
+511 	 299 
+512 	 75 
+512 	 142 
+512 	 419 
+513 	 79 
+513 	 197 
+513 	 419 
+513 	 32 
+514 	 398 
+515 	 79 
+515 	 197 
+515 	 419 
+515 	 32 
+516 	 299 
+517 	 75 
+517 	 142 
+517 	 419 
+518 	 78 
+518 	 186 
+518 	 419 
+518 	 32 
+519 	 398 
+520 	 78 
+520 	 186 
+520 	 419 
+520 	 32 
+521 	 299 
+522 	 75 
+522 	 142 
+522 	 419 
+523 	 78 
+523 	 142 
+523 	 419 
+523 	 32 
+524 	 370 
+525 	 78 
+525 	 142 
+525 	 419 
+525 	 32 
+526 	 369 
+527 	 78 
+527 	 142 
+527 	 419 
+528 	 79 
+528 	 186 
+528 	 419 
+528 	 32 
+529 	 370 
+530 	 79 
+530 	 186 
+530 	 419 
+530 	 32 
+531 	 369 
+532 	 79 
+532 	 186 
+532 	 419 
+533 	 78 
+533 	 185 
+533 	 419 
+533 	 32 
+534 	 137 
+535 	 78 
+535 	 185 
+535 	 419 
+535 	 32 
+536 	 213 
+537 	 78 
+537 	 185 
+537 	 419 
+538 	 78 
+538 	 109 
+538 	 419 
+538 	 32 
+539 	 29 
+540 	 78 
+540 	 109 
+540 	 419 
+540 	 32 
+541 	 407 
+542 	 78 
+542 	 109 
+542 	 419 
+543 	 88 
+543 	 154 
+543 	 419 
+543 	 32 
+544 	 88 
+544 	 154 
+544 	 419 
+544 	 32 
+545 	 314 
+546 	 88 
+546 	 154 
+546 	 419 
+547 	 88 
+547 	 154 
+547 	 32 
+547 	 32 
+548 	 88 
+548 	 154 
+548 	 32 
+548 	 32 
+549 	 36 
+550 	 88 
+550 	 154 
+550 	 32 
+551 	 377 
+552 	 421 
+552 	 32 
+553 	 421 
+553 	 32 
+554 	 193 
+555 	 421 
+556 	 56 
+556 	 154 
+556 	 419 
+556 	 32 
+557 	 53 
+558 	 56 
+558 	 154 
+558 	 419 
+558 	 32 
+559 	 128 
+560 	 56 
+560 	 154 
+560 	 419 
+561 	 94 
+561 	 419 
+561 	 32 
+562 	 93 
+562 	 154 
+562 	 419 
+562 	 32 
+563 	 192 
+564 	 94 
+564 	 419 
+564 	 32 
+565 	 93 
+565 	 154 
+565 	 419 
+565 	 32 
+566 	 150 
+567 	 94 
+567 	 419 
+568 	 93 
+568 	 154 
+568 	 419 
+569 	 130 
+569 	 419 
+570 	 244 
+571 	 93 
+571 	 154 
+571 	 334 
+572 	 174 
+572 	 419 
+572 	 32 
+573 	 174 
+573 	 419 
+573 	 32 
+574 	 335 
+575 	 174 
+575 	 419 
+576 	 222 
+576 	 154 
+576 	 419 
+577 	 119 
+578 	 119 
+578 	 242 
+579 	 154 
+579 	 222 
+579 	 282 
+579 	 334 
+580 	 154 
+580 	 78 
+581 	 114 
+582 	 359 
+583 	 55 
+583 	 32 
+584 	 55 
+584 	 32 
+585 	 91 
+586 	 55 
+587 	 96 
+587 	 419 
+587 	 32 
+588 	 96 
+588 	 419 
+588 	 32 
+589 	 96 
+590 	 96 
+590 	 419 
+591 	 39 
+591 	 337 
+591 	 32 
+592 	 13 
+593 	 39 
+593 	 337 
+593 	 32 
+594 	 387 
+595 	 39 
+595 	 337 
+596 	 107 
+596 	 419 
+596 	 32 
+597 	 95 
+598 	 107 
+598 	 419 
+598 	 32 
+599 	 107 
+600 	 107 
+600 	 419 
+601 	 358 
+601 	 419 
+601 	 32 
+602 	 152 
+603 	 358 
+603 	 419 
+603 	 32 
+604 	 361 
+605 	 358 
+605 	 419 
+606 	 107 
+606 	 337 
+606 	 32 
+607 	 297 
+608 	 107 
+608 	 337 
+608 	 32 
+609 	 1 
+610 	 107 
+610 	 337 
+611 	 317 
+612 	 222 
+612 	 403 
+612 	 32 
+613 	 324 
+613 	 56 
+613 	 32 
+614 	 222 
+614 	 403 
+614 	 32 
+615 	 324 
+615 	 56 
+615 	 32 
+616 	 332 
+617 	 222 
+617 	 403 
+618 	 202 
+618 	 403 
+618 	 32 
+619 	 202 
+619 	 403 
+619 	 32 
+620 	 382 
+621 	 202 
+621 	 403 
+622 	 381 
+622 	 419 
+622 	 32 
+623 	 140 
+624 	 381 
+624 	 419 
+624 	 32 
+625 	 214 
+626 	 381 
+626 	 419 
+627 	 145 
+627 	 419 
+627 	 32 
+628 	 403 
+628 	 153 
+628 	 32 
+629 	 329 
+630 	 145 
+630 	 419 
+630 	 32 
+631 	 416 
+632 	 145 
+632 	 419 
+633 	 145 
+633 	 32 
+633 	 32 
+634 	 145 
+634 	 32 
+634 	 32 
+635 	 284 
+636 	 145 
+636 	 32 
+637 	 295 
+637 	 419 
+638 	 295 
+639 	 295 
+639 	 242 
+640 	 308 
+641 	 86 
+641 	 154 
+641 	 419 
+641 	 32 
+642 	 403 
+642 	 153 
+642 	 32 
+643 	 303 
+644 	 86 
+644 	 154 
+644 	 419 
+644 	 32 
+645 	 239 
+646 	 86 
+646 	 154 
+646 	 419 
+647 	 86 
+647 	 154 
+647 	 32 
+647 	 32 
+648 	 86 
+648 	 154 
+648 	 32 
+648 	 32 
+649 	 60 
+650 	 86 
+650 	 154 
+650 	 32 
+651 	 87 
+651 	 419 
+651 	 32 
+652 	 403 
+652 	 80 
+652 	 154 
+652 	 32 
+653 	 240 
+654 	 87 
+654 	 419 
+654 	 32 
+655 	 235 
+656 	 87 
+656 	 419 
+657 	 258 
+658 	 172 
+659 	 97 
+659 	 32 
+660 	 154 
+660 	 154 
+660 	 419 
+660 	 334 
+661 	 97 
+661 	 334 
+662 	 77 
+662 	 32 
+663 	 56 
+663 	 154 
+663 	 419 
+663 	 334 
+664 	 77 
+664 	 334 
+665 	 352 
+665 	 32 
+666 	 56 
+666 	 56 
+666 	 419 
+666 	 334 
+667 	 352 
+667 	 334 
+668 	 403 
+668 	 154 
+668 	 32 
+669 	 403 
+669 	 154 
+669 	 334 
+670 	 72 
+671 	 353 
+671 	 32 
+672 	 200 
+672 	 56 
+672 	 419 
+672 	 334 
+673 	 353 
+673 	 334 
+674 	 202 
+674 	 56 
+674 	 419 
+675 	 134 
+676 	 403 
+676 	 56 
+676 	 32 
+677 	 403 
+677 	 56 
+677 	 334 
+678 	 42 
+679 	 73 
+679 	 334 
+680 	 355 
+680 	 334 
+681 	 403 
+681 	 317 
+681 	 32 
+682 	 403 
+682 	 56 
+682 	 32 
+683 	 403 
+683 	 317 
+683 	 334 
+684 	 403 
+684 	 56 
+684 	 334 
+685 	 266 
+685 	 334 
+686 	 356 
+686 	 334 
+687 	 337 
+687 	 334 
+688 	 222 
+689 	 222 
+689 	 32 
+690 	 154 
+690 	 282 
+690 	 32 
+691 	 419 
+691 	 154 
+691 	 32 
+692 	 419 
+692 	 154 
+692 	 32 
+693 	 309 
+694 	 154 
+694 	 419 
+695 	 81 
+696 	 154 
+696 	 419 
+696 	 334 
+697 	 222 
+697 	 154 
+697 	 334 
+698 	 78 
+698 	 334 
+699 	 222 
+699 	 282 
+699 	 419 
+700 	 222 
+700 	 282 
+701 	 154 
+701 	 419 
+701 	 32 
+702 	 154 
+702 	 32 
+703 	 154 
+703 	 419 
+703 	 334 
+704 	 337 
+705 	 154 
+705 	 334 
+706 	 56 
+706 	 419 
+706 	 32 
+707 	 56 
+707 	 32 
+708 	 56 
+708 	 419 
+708 	 334 
+709 	 56 
+709 	 334 
+710 	 317 
+710 	 334 
+711 	 324 
+712 	 324 
+712 	 32 
+713 	 56 
+713 	 282 
+713 	 32 
+714 	 200 
+714 	 419 
+714 	 32 
+715 	 200 
+715 	 32 
+716 	 200 
+716 	 419 
+716 	 334 
+717 	 200 
+717 	 334 
+718 	 71 
+718 	 334 
+719 	 79 
+719 	 334 
+720 	 403 
+720 	 419 
+720 	 32 
+721 	 403 
+721 	 32 
+722 	 403 
+722 	 419 
+722 	 334 
+723 	 403 
+723 	 334 
+724 	 286 
+724 	 334 
+725 	 59 
+726 	 56 
+726 	 317 
+726 	 32 
+727 	 384 
+727 	 419 
+727 	 32 
+728 	 384 
+728 	 32 
+729 	 56 
+729 	 317 
+729 	 334 
+730 	 384 
+730 	 419 
+730 	 334 
+731 	 384 
+731 	 334 
+732 	 134 
+732 	 334 
+733 	 354 
+733 	 334 
+734 	 403 
+734 	 337 
+734 	 32 
+735 	 403 
+735 	 154 
+735 	 32 
+736 	 403 
+736 	 337 
+736 	 334 
+737 	 403 
+737 	 154 
+737 	 334 
+738 	 162 
+738 	 32 
+739 	 356 
+739 	 32 
+740 	 65 
+740 	 32 
+741 	 357 
+741 	 32 
+742 	 371 
+742 	 334 
+743 	 357 
+743 	 334 
+744 	 348 
+744 	 419 
+744 	 32 
+745 	 304 
+746 	 348 
+746 	 419 
+746 	 32 
+747 	 101 
+748 	 348 
+748 	 419 
+749 	 372 
+749 	 32 
+750 	 46 
+750 	 32 
+751 	 238 
+751 	 334 
+752 	 46 
+752 	 334 
+753 	 351 
+753 	 200 
+753 	 419 
+753 	 32 
+754 	 304 
+755 	 351 
+755 	 200 
+755 	 419 
+755 	 32 
+756 	 101 
+757 	 351 
+757 	 200 
+757 	 419 
+758 	 48 
+758 	 419 
+758 	 32 
+759 	 116 
+760 	 48 
+760 	 419 
+760 	 32 
+761 	 183 
+762 	 48 
+762 	 419 
+763 	 277 
+763 	 32 
+764 	 49 
+764 	 32 
+765 	 131 
+765 	 334 
+766 	 49 
+766 	 334 
+767 	 43 
+767 	 419 
+767 	 32 
+768 	 112 
+769 	 43 
+769 	 419 
+769 	 32 
+770 	 187 
+771 	 43 
+771 	 419 
+772 	 412 
+772 	 32 
+773 	 44 
+773 	 32 
+774 	 209 
+774 	 334 
+775 	 44 
+775 	 334 
+776 	 265 
+776 	 419 
+776 	 32 
+777 	 22 
+778 	 265 
+778 	 419 
+778 	 32 
+779 	 362 
+780 	 265 
+780 	 419 
+781 	 148 
+781 	 32 
+782 	 51 
+782 	 32 
+783 	 424 
+783 	 334 
+784 	 51 
+784 	 334 
+785 	 124 
+785 	 419 
+785 	 32 
+786 	 331 
+787 	 124 
+787 	 419 
+787 	 32 
+788 	 413 
+789 	 124 
+789 	 419 
+790 	 194 
+790 	 32 
+791 	 177 
+791 	 32 
+792 	 428 
+792 	 334 
+793 	 177 
+793 	 334 
+794 	 182 
+794 	 419 
+794 	 32 
+795 	 138 
+796 	 182 
+796 	 419 
+796 	 32 
+797 	 63 
+798 	 182 
+798 	 419 
+799 	 141 
+799 	 32 
+800 	 181 
+800 	 32 
+801 	 14 
+801 	 334 
+802 	 181 
+802 	 334 
+803 	 208 
+803 	 419 
+803 	 32 
+804 	 208 
+804 	 32 
+805 	 208 
+805 	 419 
+805 	 334 
+806 	 208 
+806 	 334 
+807 	 154 
+807 	 154 
+807 	 32 
+807 	 334 
+808 	 154 
+808 	 154 
+808 	 32 
+808 	 334 
+809 	 56 
+809 	 154 
+809 	 32 
+809 	 334 
+810 	 56 
+810 	 154 
+810 	 32 
+810 	 334 
+811 	 56 
+811 	 56 
+811 	 32 
+811 	 334 
+812 	 56 
+812 	 56 
+812 	 32 
+812 	 334 
+813 	 403 
+813 	 154 
+813 	 32 
+813 	 334 
+814 	 403 
+814 	 154 
+814 	 32 
+814 	 334 
+815 	 200 
+815 	 56 
+815 	 32 
+815 	 334 
+816 	 200 
+816 	 56 
+816 	 32 
+816 	 334 
+817 	 403 
+817 	 56 
+817 	 32 
+817 	 334 
+818 	 403 
+818 	 56 
+818 	 32 
+818 	 334 
+819 	 358 
+819 	 32 
+820 	 200 
+820 	 200 
+820 	 419 
+820 	 334 
+821 	 358 
+821 	 334 
+822 	 200 
+822 	 200 
+822 	 32 
+822 	 334 
+823 	 200 
+823 	 200 
+823 	 32 
+823 	 334 
+824 	 317 
+824 	 419 
+825 	 52 
+825 	 419 
+825 	 419 
+826 	 317 
+827 	 52 
+827 	 419 
+828 	 75 
+828 	 197 
+828 	 419 
+828 	 32 
+829 	 75 
+829 	 197 
+829 	 32 
+830 	 75 
+830 	 197 
+830 	 419 
+830 	 334 
+831 	 75 
+831 	 197 
+831 	 334 
+832 	 71 
+832 	 419 
+833 	 52 
+833 	 419 
+833 	 337 
+834 	 71 
+835 	 52 
+835 	 337 
+836 	 75 
+836 	 186 
+836 	 419 
+836 	 32 
+837 	 75 
+837 	 186 
+837 	 32 
+838 	 75 
+838 	 186 
+838 	 419 
+838 	 334 
+839 	 75 
+839 	 186 
+839 	 334 
+840 	 379 
+841 	 134 
+841 	 419 
+842 	 52 
+842 	 419 
+842 	 317 
+843 	 134 
+844 	 52 
+844 	 317 
+845 	 78 
+845 	 186 
+845 	 419 
+845 	 32 
+846 	 78 
+846 	 186 
+846 	 32 
+847 	 78 
+847 	 186 
+847 	 419 
+847 	 334 
+848 	 78 
+848 	 186 
+848 	 334 
+849 	 222 
+849 	 222 
+850 	 120 
+851 	 78 
+851 	 142 
+851 	 419 
+851 	 32 
+852 	 78 
+852 	 142 
+852 	 32 
+853 	 78 
+853 	 142 
+853 	 419 
+853 	 334 
+854 	 78 
+854 	 142 
+854 	 334 
+855 	 73 
+855 	 419 
+856 	 52 
+856 	 419 
+856 	 71 
+857 	 73 
+858 	 52 
+858 	 71 
+859 	 78 
+859 	 185 
+859 	 419 
+859 	 32 
+860 	 78 
+860 	 185 
+860 	 32 
+861 	 78 
+861 	 185 
+861 	 419 
+861 	 334 
+862 	 78 
+862 	 185 
+862 	 334 
+863 	 153 
+863 	 419 
+864 	 52 
+864 	 419 
+864 	 134 
+865 	 153 
+866 	 52 
+866 	 134 
+867 	 78 
+867 	 109 
+867 	 419 
+867 	 32 
+868 	 78 
+868 	 109 
+868 	 32 
+869 	 78 
+869 	 109 
+869 	 419 
+869 	 334 
+870 	 78 
+870 	 109 
+870 	 334 
+871 	 88 
+871 	 154 
+871 	 419 
+871 	 334 
+872 	 88 
+872 	 154 
+872 	 334 
+873 	 88 
+873 	 154 
+873 	 32 
+873 	 334 
+874 	 353 
+874 	 32 
+875 	 353 
+875 	 32 
+875 	 242 
+876 	 421 
+876 	 334 
+877 	 415 
+878 	 56 
+878 	 154 
+878 	 32 
+879 	 56 
+879 	 154 
+879 	 419 
+879 	 334 
+880 	 56 
+880 	 154 
+880 	 334 
+881 	 222 
+881 	 97 
+881 	 282 
+881 	 419 
+882 	 126 
+883 	 126 
+883 	 242 
+884 	 78 
+884 	 282 
+884 	 334 
+884 	 419 
+885 	 75 
+885 	 77 
+885 	 282 
+886 	 126 
+886 	 419 
+887 	 77 
+887 	 282 
+887 	 282 
+887 	 419 
+887 	 419 
+888 	 75 
+888 	 97 
+888 	 222 
+888 	 334 
+889 	 94 
+889 	 32 
+890 	 12 
+890 	 154 
+890 	 419 
+891 	 307 
+891 	 419 
+892 	 93 
+892 	 154 
+892 	 419 
+892 	 32 
+893 	 94 
+893 	 334 
+894 	 7 
+894 	 334 
+895 	 136 
+896 	 219 
+896 	 282 
+896 	 334 
+896 	 334 
+897 	 77 
+897 	 282 
+897 	 282 
+897 	 419 
+897 	 334 
+898 	 219 
+898 	 282 
+898 	 334 
+899 	 75 
+899 	 78 
+899 	 334 
+899 	 334 
+900 	 219 
+900 	 282 
+900 	 334 
+900 	 242 
+901 	 75 
+901 	 229 
+901 	 334 
+901 	 32 
+902 	 75 
+902 	 229 
+902 	 334 
+902 	 32 
+903 	 190 
+904 	 75 
+904 	 229 
+904 	 334 
+905 	 106 
+905 	 282 
+905 	 334 
+906 	 219 
+906 	 282 
+906 	 334 
+906 	 32 
+907 	 147 
+908 	 77 
+908 	 282 
+908 	 282 
+908 	 419 
+908 	 32 
+909 	 174 
+909 	 419 
+909 	 334 
+910 	 174 
+910 	 334 
+911 	 97 
+911 	 222 
+911 	 32 
+912 	 78 
+912 	 154 
+912 	 419 
+912 	 32 
+913 	 12 
+914 	 97 
+914 	 222 
+914 	 32 
+915 	 78 
+915 	 154 
+915 	 419 
+915 	 32 
+916 	 102 
+917 	 97 
+917 	 222 
+918 	 78 
+918 	 154 
+918 	 419 
+919 	 12 
+920 	 77 
+920 	 282 
+920 	 419 
+920 	 32 
+921 	 77 
+921 	 282 
+921 	 419 
+921 	 32 
+922 	 102 
+923 	 77 
+923 	 282 
+923 	 419 
+924 	 77 
+924 	 282 
+924 	 334 
+925 	 337 
+925 	 282 
+925 	 154 
+925 	 419 
+925 	 32 
+926 	 222 
+926 	 154 
+926 	 419 
+926 	 32 
+927 	 196 
+928 	 337 
+928 	 282 
+928 	 154 
+928 	 419 
+928 	 32 
+929 	 222 
+929 	 154 
+929 	 419 
+929 	 32 
+930 	 102 
+931 	 337 
+931 	 282 
+931 	 154 
+931 	 334 
+932 	 337 
+932 	 282 
+932 	 154 
+932 	 419 
+933 	 222 
+933 	 154 
+933 	 419 
+934 	 39 
+934 	 337 
+934 	 32 
+935 	 387 
+935 	 32 
+936 	 417 
+937 	 107 
+937 	 419 
+937 	 32 
+938 	 107 
+938 	 32 
+939 	 202 
+939 	 200 
+939 	 419 
+940 	 73 
+941 	 107 
+941 	 337 
+941 	 32 
+942 	 1 
+942 	 32 
+943 	 222 
+943 	 403 
+943 	 334 
+944 	 395 
+945 	 202 
+945 	 403 
+945 	 334 
+946 	 54 
+947 	 338 
+948 	 145 
+948 	 32 
+949 	 145 
+949 	 419 
+949 	 334 
+950 	 145 
+950 	 334 
+951 	 145 
+951 	 32 
+951 	 334 
+952 	 145 
+952 	 32 
+952 	 334 
+953 	 308 
+953 	 32 
+954 	 308 
+954 	 32 
+955 	 24 
+956 	 308 
+957 	 247 
+958 	 308 
+958 	 334 
+959 	 300 
+959 	 32 
+960 	 298 
+961 	 300 
+961 	 32 
+962 	 248 
+963 	 300 
+964 	 86 
+964 	 154 
+964 	 32 
+965 	 86 
+965 	 154 
+965 	 419 
+965 	 334 
+966 	 175 
+967 	 86 
+967 	 154 
+967 	 32 
+967 	 334 
+968 	 272 
+969 	 87 
+969 	 419 
+969 	 32 
+970 	 87 
+970 	 32 
+971 	 87 
+971 	 419 
+971 	 334 
+972 	 87 
+972 	 334 
+973 	 403 
+973 	 134 
+973 	 32 
+974 	 18 
+975 	 403 
+975 	 134 
+975 	 32 
+976 	 350 
+977 	 403 
+977 	 134 
+978 	 222 
+978 	 56 
+978 	 419 
+979 	 79 
+979 	 419 
+980 	 202 
+980 	 202 
+981 	 162 
+982 	 154 
+982 	 419 
+982 	 334 
+983 	 167 
+984 	 167 
+984 	 32 
+985 	 154 
+985 	 282 
+985 	 32 
+986 	 222 
+986 	 202 
+987 	 55 
+988 	 202 
+988 	 71 
+989 	 156 
+990 	 139 
+990 	 200 
+990 	 419 
+991 	 389 
+992 	 348 
+992 	 32 
+993 	 351 
+993 	 200 
+993 	 419 
+993 	 334 
+994 	 348 
+994 	 334 
+995 	 202 
+995 	 134 
+996 	 290 
+997 	 139 
+997 	 351 
+997 	 419 
+998 	 390 
+999 	 48 
+999 	 32 
+1000 	 351 
+1000 	 351 
+1000 	 419 
+1000 	 334 
+1001 	 48 
+1001 	 334 
+1002 	 351 
+1002 	 351 
+1002 	 419 
+1002 	 32 
+1003 	 116 
+1004 	 351 
+1004 	 351 
+1004 	 419 
+1004 	 32 
+1005 	 183 
+1006 	 351 
+1006 	 351 
+1006 	 419 
+1007 	 139 
+1007 	 134 
+1008 	 135 
+1009 	 366 
+1009 	 351 
+1009 	 419 
+1010 	 188 
+1011 	 43 
+1011 	 32 
+1012 	 356 
+1012 	 351 
+1012 	 419 
+1012 	 334 
+1013 	 43 
+1013 	 334 
+1014 	 356 
+1014 	 351 
+1014 	 419 
+1014 	 32 
+1015 	 112 
+1016 	 351 
+1016 	 356 
+1016 	 419 
+1016 	 32 
+1017 	 187 
+1018 	 356 
+1018 	 351 
+1018 	 419 
+1019 	 139 
+1019 	 73 
+1020 	 274 
+1021 	 366 
+1021 	 356 
+1021 	 419 
+1022 	 122 
+1023 	 265 
+1023 	 32 
+1024 	 356 
+1024 	 356 
+1024 	 419 
+1024 	 334 
+1025 	 265 
+1025 	 334 
+1026 	 356 
+1026 	 356 
+1026 	 419 
+1026 	 32 
+1027 	 22 
+1028 	 356 
+1028 	 356 
+1028 	 419 
+1028 	 32 
+1029 	 362 
+1030 	 356 
+1030 	 356 
+1030 	 419 
+1031 	 366 
+1031 	 73 
+1032 	 347 
+1033 	 156 
+1033 	 356 
+1033 	 419 
+1034 	 260 
+1035 	 124 
+1035 	 32 
+1036 	 357 
+1036 	 356 
+1036 	 419 
+1036 	 334 
+1037 	 124 
+1037 	 334 
+1038 	 357 
+1038 	 356 
+1038 	 419 
+1038 	 32 
+1039 	 331 
+1040 	 357 
+1040 	 356 
+1040 	 419 
+1040 	 32 
+1041 	 413 
+1042 	 357 
+1042 	 356 
+1042 	 419 
+1043 	 366 
+1043 	 153 
+1044 	 121 
+1045 	 156 
+1045 	 357 
+1045 	 419 
+1046 	 431 
+1047 	 182 
+1047 	 32 
+1048 	 357 
+1048 	 357 
+1048 	 419 
+1048 	 334 
+1049 	 182 
+1049 	 334 
+1050 	 357 
+1050 	 357 
+1050 	 419 
+1050 	 32 
+1051 	 138 
+1052 	 357 
+1052 	 357 
+1052 	 419 
+1052 	 32 
+1053 	 63 
+1054 	 357 
+1054 	 357 
+1054 	 419 
+1055 	 156 
+1055 	 153 
+1056 	 212 
+1057 	 363 
+1058 	 358 
+1058 	 32 
+1059 	 358 
+1059 	 32 
+1059 	 242 
+1060 	 78 
+1060 	 97 
+1060 	 419 
+1060 	 32 
+1061 	 75 
+1061 	 77 
+1061 	 419 
+1061 	 32 
+1062 	 78 
+1062 	 97 
+1062 	 419 
+1062 	 32 
+1063 	 75 
+1063 	 77 
+1063 	 419 
+1063 	 32 
+1064 	 237 
+1065 	 222 
+1065 	 97 
+1066 	 75 
+1066 	 77 
+1066 	 419 
+1067 	 77 
+1067 	 167 
+1067 	 32 
+1068 	 307 
+1069 	 77 
+1069 	 167 
+1069 	 32 
+1070 	 77 
+1070 	 167 
+1071 	 422 
+1071 	 282 
+1071 	 334 
+1072 	 77 
+1072 	 282 
+1072 	 32 
+1073 	 222 
+1073 	 97 
+1073 	 32 
+1074 	 77 
+1074 	 75 
+1074 	 32 
+1075 	 78 
+1075 	 97 
+1075 	 419 
+1075 	 32 
+1076 	 126 
+1077 	 78 
+1077 	 282 
+1077 	 419 
+1077 	 334 
+1078 	 78 
+1078 	 282 
+1078 	 419 
+1079 	 106 
+1079 	 282 
+1079 	 334 
+1080 	 106 
+1080 	 282 
+1080 	 334 
+1080 	 419 
+1081 	 75 
+1081 	 229 
+1081 	 334 
+1081 	 334 
+1082 	 229 
+1082 	 282 
+1082 	 334 
+1083 	 229 
+1083 	 282 
+1083 	 419 
+1083 	 334 
+1084 	 78 
+1084 	 154 
+1084 	 334 
+1084 	 334 
+1085 	 64 
+1085 	 282 
+1085 	 419 
+1085 	 32 
+1086 	 64 
+1086 	 282 
+1086 	 419 
+1086 	 32 
+1087 	 104 
+1088 	 64 
+1088 	 282 
+1088 	 419 
+1089 	 64 
+1089 	 75 
+1089 	 419 
+1089 	 32 
+1090 	 64 
+1090 	 75 
+1090 	 419 
+1090 	 32 
+1091 	 64 
+1091 	 75 
+1091 	 419 
+1092 	 222 
+1092 	 97 
+1092 	 334 
+1093 	 77 
+1093 	 282 
+1093 	 334 
+1094 	 359 
+1094 	 32 
+1095 	 77 
+1095 	 282 
+1095 	 32 
+1096 	 57 
+1096 	 33 
+1097 	 378 
+1097 	 419 
+1097 	 32 
+1098 	 378 
+1098 	 419 
+1098 	 32 
+1099 	 226 
+1100 	 378 
+1100 	 419 
+1101 	 308 
+1101 	 334 
+1102 	 295 
+1103 	 295 
+1103 	 32 
+1104 	 403 
+1104 	 358 
+1104 	 32 
+1105 	 204 
+1105 	 32 
+1106 	 204 
+1106 	 32 
+1107 	 386 
+1108 	 204 
+1109 	 403 
+1109 	 74 
+1109 	 32 
+1110 	 300 
+1110 	 334 
+1111 	 308 
+1112 	 403 
+1112 	 378 
+1112 	 32 
+1113 	 403 
+1113 	 134 
+1113 	 334 
+1114 	 403 
+1114 	 378 
+1114 	 334 
+1115 	 153 
+1115 	 32 
+1116 	 153 
+1116 	 32 
+1117 	 199 
+1118 	 153 
+1119 	 283 
+1119 	 32 
+1120 	 283 
+1120 	 32 
+1121 	 429 
+1122 	 283 
+1123 	 277 
+1123 	 32 
+1124 	 277 
+1124 	 32 
+1125 	 184 
+1126 	 277 
+1127 	 367 
+1127 	 32 
+1128 	 367 
+1128 	 32 
+1129 	 160 
+1130 	 367 
+1131 	 412 
+1131 	 32 
+1132 	 412 
+1132 	 32 
+1133 	 90 
+1134 	 412 
+1135 	 292 
+1135 	 32 
+1136 	 292 
+1136 	 32 
+1137 	 195 
+1138 	 292 
+1139 	 148 
+1139 	 32 
+1140 	 148 
+1140 	 32 
+1141 	 328 
+1142 	 148 
+1143 	 67 
+1143 	 32 
+1144 	 67 
+1144 	 32 
+1145 	 66 
+1146 	 67 
+1147 	 194 
+1147 	 32 
+1148 	 194 
+1148 	 32 
+1149 	 83 
+1150 	 194 
+1151 	 125 
+1151 	 32 
+1152 	 125 
+1152 	 32 
+1153 	 23 
+1154 	 125 
+1155 	 78 
+1155 	 97 
+1155 	 419 
+1155 	 334 
+1156 	 102 
+1156 	 282 
+1156 	 419 
+1157 	 78 
+1157 	 419 
+1158 	 77 
+1158 	 282 
+1158 	 419 
+1158 	 419 
+1159 	 222 
+1159 	 154 
+1159 	 32 
+1160 	 78 
+1160 	 32 
+1161 	 64 
+1161 	 75 
+1161 	 419 
+1161 	 334 
+1162 	 64 
+1162 	 75 
+1162 	 334 
+1163 	 78 
+1163 	 334 
+1164 	 149 
+1164 	 222 
+1165 	 55 
+1166 	 403 
+1166 	 9 
+1166 	 32 
+1167 	 403 
+1167 	 9 
+1167 	 32 
+1168 	 264 
+1169 	 403 
+1169 	 9 
+1170 	 204 
+1170 	 334 
+1171 	 300 
+1172 	 266 
+1173 	 153 
+1173 	 334 
+1174 	 349 
+1174 	 334 
+1175 	 283 
+1175 	 334 
+1176 	 47 
+1176 	 334 
+1177 	 367 
+1177 	 334 
+1178 	 220 
+1178 	 334 
+1179 	 292 
+1179 	 334 
+1180 	 257 
+1180 	 334 
+1181 	 67 
+1181 	 334 
+1182 	 179 
+1182 	 334 
+1183 	 125 
+1183 	 334 
+1184 	 176 
+1184 	 334 
+1185 	 154 
+1185 	 76 
+1185 	 419 
+1185 	 32 
+1186 	 154 
+1186 	 76 
+1186 	 419 
+1186 	 32 
+1187 	 287 
+1188 	 154 
+1188 	 76 
+1188 	 419 
+1189 	 403 
+1189 	 9 
+1189 	 334 
+1190 	 204 
+1191 	 139 
+1191 	 202 
+1192 	 65 
+1193 	 139 
+1193 	 139 
+1194 	 372 
+1195 	 366 
+1195 	 139 
+1196 	 277 
+1197 	 366 
+1197 	 366 
+1198 	 412 
+1199 	 156 
+1199 	 366 
+1200 	 148 
+1201 	 156 
+1201 	 156 
+1202 	 194 
+1203 	 222 
+1203 	 222 
+1203 	 282 
+1204 	 4 
+1205 	 4 
+1205 	 242 
+1206 	 76 
+1206 	 154 
+1206 	 419 
+1206 	 334 
+1207 	 9 
+1208 	 202 
+1208 	 282 
+1208 	 32 
+1209 	 202 
+1209 	 282 
+1209 	 32 
+1210 	 232 
+1211 	 202 
+1211 	 282 
+1212 	 202 
+1212 	 282 
+1212 	 334 
+1213 	 4 
+
+***********************************************************************

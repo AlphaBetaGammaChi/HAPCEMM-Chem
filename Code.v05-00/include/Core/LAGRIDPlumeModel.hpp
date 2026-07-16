@@ -15,6 +15,10 @@
 #include "Core/Meteorology.hpp"
 #include "Core/Status.hpp"
 #include "Util/VectorUtils.hpp"
+#include <memory>
+#ifdef USE_MICM
+#include "MICM/MicmBackend.hpp"
+#endif
 
 // Forward declaration
 namespace BoxModel { struct EPMCouplingData; }
@@ -69,6 +73,10 @@ class LAGRIDPlumeModel {
         double solarTime_h_;
         double shear_rep_;
         double WV_exhaust_; // Exhaust water vapour
+
+#ifdef USE_MICM
+        std::vector<std::unique_ptr<HAPCEMM::MicmBackend>> micm_solvers_;
+#endif
 
         typedef std::pair<std::vector<std::vector<int>>, VectorUtils::MaskInfo> MaskType;
         inline MaskType iceNumberMask(double cutoff_ratio = NUM_FILTER_RATIO) {

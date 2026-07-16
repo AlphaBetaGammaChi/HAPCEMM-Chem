@@ -1,0 +1,63 @@
+# NetCDF C Configuration Summary
+==============================
+
+# General
+-------
+NetCDF Version:		4.10.0
+Dispatch Version:       5
+Configured On:		
+Host System:		aarch64-unknown-linux-gnu
+Build Directory: 	/workspace/srcdir/netcdf-c-4.10.0
+Install Prefix:         /workspace/destdir
+
+# Compiling Options
+-----------------
+C Compiler:		/opt/bin/aarch64-linux-gnu-libgfortran5-cxx11-mpi+mpich/cc
+CFLAGS:			-Wno-implicit-function-declaration -fno-strict-aliasing
+CPPFLAGS:		-I/workspace/destdir/include
+LDFLAGS:		-L/workspace/destdir/lib
+AM_CFLAGS:		
+AM_CPPFLAGS:		
+AM_LDFLAGS:		
+Shared Library:		yes
+Static Library:		no
+Extra libraries:	-lhdf5_hl -lhdf5 -lm -lz -ldl -lzip -lsz -lbz2 -lzstd -lblosc -lxml2 -lcurl 
+XML Parser:             libxml2
+Legacy Macros:          yes
+
+# Features
+--------
+Benchmarks:		no
+NetCDF-2 API:		yes
+HDF4 Support:		no
+HDF5 Support:		yes
+CDF5 Support:		yes
+NC-4 Parallel Support:	yes
+PnetCDF Support:	no
+
+DAP2 Support:		yes
+DAP4 Support:		yes
+Byte-Range Support:	yes
+
+S3 Support:	        no
+S3 SDK:  	        none
+
+NCZarr Support:		yes
+NCZarr Zip Support:     yes
+
+Diskless Support:	yes
+MMap Support:		no
+ERANGE Fill Support:	no
+Relaxed Boundary Check:	yes
+
+Plugins Enabled:        no
+Plugin Install Dir:     /workspace/destdir/hdf5/lib/plugin
+Plugin Search Path:     /workspace/destdir/hdf5/lib/plugin:/usr/local/hdf5/lib/plugin
+UDF Self-Load:          yes
+
+Quantization:		yes
+Logging:     		no
+SZIP Write Support:     yes
+Standard Filters:       bz2 deflate szip blosc zstd
+ZSTD Support:           yes
+Parallel Filters:       yes

@@ -14,7 +14,7 @@ namespace EPM::Models {
 Original::Original(const OptInput &optInput, const Input &input, const Aircraft &aircraft,
                     const Emission &EI, const Meteorology &met,
                     const MPMSimVarsWrapper &simVars) :
-    Base(optInput, input, aircraft, EI, met, simVars), VAR_(NVAR)
+    Base(optInput, input, aircraft, EI, met, simVars), VAR_(NSPECALL)
 { }
 
 std::variant<EPM::Output, SimStatus> Original::run() {

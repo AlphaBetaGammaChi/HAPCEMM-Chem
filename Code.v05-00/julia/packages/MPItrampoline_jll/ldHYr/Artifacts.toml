@@ -1,0 +1,130 @@
+[[MPItrampoline]]
+arch = "aarch64"
+git-tree-sha1 = "e38cbfebbb14cba6e6456e28d368f1d8a69ffc16"
+lazy = true
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "macos"
+
+    [[MPItrampoline.download]]
+    sha256 = "461551294a4b2e02dec91eccc45b332b1fc54ce65dd689f4e4a99bd021953efb"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.aarch64-apple-darwin-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "aarch64"
+git-tree-sha1 = "4578a027c2496a5903f7999fc80371ec4e6d22ce"
+lazy = true
+libc = "glibc"
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "linux"
+
+    [[MPItrampoline.download]]
+    sha256 = "525db2780869f41932ab5ff763dcdbb8a2e6a65388d0e91e5558e533cc6ae73d"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.aarch64-linux-gnu-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "aarch64"
+git-tree-sha1 = "55d9425077e37e694b01dd052634df4902d5f821"
+lazy = true
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "freebsd"
+
+    [[MPItrampoline.download]]
+    sha256 = "8b2c8ebb6bfe5feed25a3b07e86948b4607dc654cce0775c934a1713e590c167"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.aarch64-unknown-freebsd-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "armv6l"
+call_abi = "eabihf"
+git-tree-sha1 = "27a9fbd40f5e9dafb8a2c064e8db93ae8bc98e45"
+lazy = true
+libc = "glibc"
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "linux"
+
+    [[MPItrampoline.download]]
+    sha256 = "5ba7913dc14dc6c3ef714c38b320733ecf92d4ed102aaf9e5460b258695a1744"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.armv6l-linux-gnueabihf-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "armv7l"
+call_abi = "eabihf"
+git-tree-sha1 = "f17ed1b9cfd7262ca04f3e866fd67017b06d71d5"
+lazy = true
+libc = "glibc"
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "linux"
+
+    [[MPItrampoline.download]]
+    sha256 = "9651301a9e9337e644af479821a4e4114b58029e3536d881974db893127e49f2"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.armv7l-linux-gnueabihf-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "i686"
+git-tree-sha1 = "7082f7d41a1b57a78a4768a3478a47f3277b99fc"
+lazy = true
+libc = "glibc"
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "linux"
+
+    [[MPItrampoline.download]]
+    sha256 = "a9becb4558c2fdb2ff534573a6c2e073c08a125a1f8fc16c22c230c9e573b1b7"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.i686-linux-gnu-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "powerpc64le"
+git-tree-sha1 = "6dc734b8db912d8007a85f4cb78aaf409a0a90df"
+lazy = true
+libc = "glibc"
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "linux"
+
+    [[MPItrampoline.download]]
+    sha256 = "e8ee726fec1dcea6360b2c6b01911819712b82a8e9bf8d262aa667c453c1acc5"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.powerpc64le-linux-gnu-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "riscv64"
+git-tree-sha1 = "519394e8d5de4e92d96465dee18135a5f826f01f"
+lazy = true
+libc = "glibc"
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "linux"
+
+    [[MPItrampoline.download]]
+    sha256 = "bb4e23023743309cd6591b3e5802f1cfe78f2d7154515bdfd5110328025a554e"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.riscv64-linux-gnu-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "x86_64"
+git-tree-sha1 = "eb52a1eab45c9be5aa3c20756bb4ea775cbf1fe4"
+lazy = true
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "macos"
+
+    [[MPItrampoline.download]]
+    sha256 = "7ae70d0e67e5c64640796577744e2cd45649282fec36ac778379a5da63c6f425"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.x86_64-apple-darwin-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "x86_64"
+git-tree-sha1 = "5facef6460c7e41d022ea19ff91fb97a12e22f3a"
+lazy = true
+libc = "glibc"
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "linux"
+
+    [[MPItrampoline.download]]
+    sha256 = "5b5d3718dbd97f9fff22c8047dab8ce949dc1e779c5eb885e2bf8108850d96ee"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.x86_64-linux-gnu-libgfortran5-mpi+mpitrampoline.tar.gz"
+[[MPItrampoline]]
+arch = "x86_64"
+git-tree-sha1 = "845e1d9426a3ae3c327de96efdffc0e929d38f3b"
+lazy = true
+libgfortran_version = "5.0.0"
+mpi = "mpitrampoline"
+os = "freebsd"
+
+    [[MPItrampoline.download]]
+    sha256 = "fc7616fd5d9fb73ccba4059468d5fe3bf560df3652dae8395b83808cb7089c4b"
+    url = "https://github.com/JuliaBinaryWrappers/MPItrampoline_jll.jl/releases/download/MPItrampoline-v5.5.6+0/MPItrampoline.v5.5.6.x86_64-unknown-freebsd-libgfortran5-mpi+mpitrampoline.tar.gz"

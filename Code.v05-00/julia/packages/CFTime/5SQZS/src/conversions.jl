@@ -1,0 +1,562 @@
+function datenum(::Type{T}, y, m, d) where {T <: AbstractCFDateTime}
+    cm = _cum_month_length(T)
+    # turn year equal to -1 (1 BC) into year = 0
+    if (y < 0) && !_hasyear0(T)
+        y = y + 1
+    end
+
+    if m < 1 || m > 12
+        error("invalid month $(m)")
+    end
+
+    if d < 1 || d > (cm[m + 1] - cm[m])
+        error("invalid day $(d) in $(@sprintf("%04d-%02d-%02d", y, m, d))")
+    end
+
+    return cm[end] * (y - 1) + cm[m] + (d - 1)
+end
+
+# Calendar with regular month-length
+
+function findmonth(cm, t2)
+    mo = length(cm)
+    while cm[mo] > t2
+        mo -= 1
+    end
+    return mo
+end
+
+@inline function datetuple_ymd(::Type{T}, timed_::Number) where {T <: AbstractCFDateTime}
+    cm = _cum_month_length(T)
+    y = fld(Int64(timed_), cm[end])
+    t2 = Int64(timed_) - cm[end] * y
+
+    # find month
+    mo = findmonth(cm, t2)
+    d = t2 - cm[mo]
+
+    # day and year start at 1 (not zero)
+    d = d + 1
+    y = y + 1
+
+    if (y <= 0) && !_hasyear0(T)
+        y = y - 1
+    end
+
+    return (y, mo, d)
+end
+
+@inline _cum_month_length(::Type{DateTimeAllLeap}) =
+    (0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366)
+
+@inline _cum_month_length(::Type{DateTimeNoLeap}) =
+    (0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365)
+
+@inline _cum_month_length(::Type{DateTime360Day}) =
+    (0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 360)
+
+
+function validargs(::Type{T}, arg...) where {T <: AbstractCFDateTime}
+    return nothing
+end
+
+
+"""
+    dt2 = reinterpret(::Type{T}, dt)
+
+Convert a variable `dt` of type [`DateTime`](https://docs.julialang.org/en/v1/stdlib/Dates/#Dates.DateTime), [`DateTimeStandard`](@ref), [`DateTimeJulian`](@ref),
+[`DateTimeProlepticGregorian`](@ref), [`DateTimeAllLeap`](@ref), [`DateTimeNoLeap`](@ref) or
+[`DateTime360Day`](@ref) into the date time type `T` using the same values for
+year, month, day, minute, second, ... attosecond.
+The conversion might fail if a particular date does not exist in the
+target calendar.
+
+For example, the difference of the 1 January 2000 in the Julian and
+and the 1 January 2000 in the standard calendar is 13 days:
+
+
+```julia
+using CFTime, Dates
+dt = DateTimeJulian(2000,1,1)
+Dates.Day(dt - reinterpret(DateTimeStandard,dt))
+# 13 days
+```
+
+"""
+function reinterpret(::Type{T1}, dt::DateTime) where {T1 <: AbstractCFDateTime}
+    return T1(
+        Dates.year(dt), Dates.month(dt), Dates.day(dt),
+        Dates.hour(dt), Dates.minute(dt), Dates.second(dt),
+        Dates.millisecond(dt)
+    )
+end
+
+function reinterpret(::Type{DateTime}, dt::T2) where {T2 <: AbstractCFDateTime}
+    return DateTime(
+        Dates.year(dt), Dates.month(dt), Dates.day(dt),
+        Dates.hour(dt), Dates.minute(dt), Dates.second(dt),
+        Dates.millisecond(dt)
+    )
+end
+
+function reinterpret(::Type{T1}, dt::T2) where {T1 <: AbstractCFDateTime} where {T2 <: AbstractCFDateTime}
+    return T1(datetuple(dt)...)
+end
+
+function parseDT(::Type{Tuple}, str)
+    str = replace(str, "T" => " ")
+
+    # remove Z time zone indicator
+    # all times are assumed to be UTC anyway
+    if endswith(str, "Z")
+        str = str[1:(end - 1)]
+    end
+
+
+    negativeyear = str[1] == '-'
+    if negativeyear
+        str = str[2:end]
+    end
+
+    y, m, d, h, mi, s, subsec... =
+    if occursin(" ", str)
+        datestr, timestr = split(str, ' ')
+        y, m, d = parse.(Int64, split(datestr, '-'))
+
+        timestr, tz = if occursin("+", timestr)
+            ts, tz = split(timestr, "+")
+            ts, tz
+        elseif occursin("-", timestr)
+            ts, tz = split(timestr, "-")
+            ts, string("-", tz)
+        else
+            timestr, "00:00"
+        end
+        if !all(iszero(parse.(Int, split(tz, ":"))))
+            @warn "Time zones are currently not supported by CFTime. Ignoring Time zone information: $(tz)"
+        end
+
+        time_split = split(timestr, ':')
+        h_str, mi_str, s_str =
+        if length(time_split) == 2
+            time_split[1], time_split[2], "00"
+        else
+            time_split
+        end
+
+
+        h = parse(Int64, h_str)
+        mi = parse(Int64, mi_str)
+        s, subsec... =
+        if occursin('.', s_str)
+            # seconds contain a decimal point, e.g. 00:00:00.0
+
+            sec_str, subsec_str = split(s_str, '.', limit = 2)
+
+            # seconds (whole part)
+            s = parse(Int64, sec_str)
+
+            # need to pad 59.99 as 59.990
+            nparts = div(length(subsec_str), 3, RoundUp)
+
+            # subsec are groups of 3 digits
+            # milliseconds, microseconds...
+            subsec =
+                ntuple(nparts) do i
+                istr = (3 * i - 2):min((3 * i), length(subsec_str))
+                parse(Int64, subsec_str[istr]) * 10^(3 - length(istr))
+            end
+
+            (s, subsec...)
+        else
+            (parse(Int64, s_str), Int64(0))
+        end
+
+        (y, m, d, h, mi, s, subsec...)
+    else
+        y, m, d = parse.(Int64, split(str, '-'))
+        (y, m, d, Int64(0), Int64(0), Int64(0), Int64(0))
+    end
+
+    if negativeyear
+        y = -y
+    end
+
+    return (y, m, d, h, mi, s, subsec...)
+end
+
+function _parseunit(units)
+    tunits_mixedcase, starttime = strip.(split(units, " since "))
+    tunits = lowercase(tunits_mixedcase)
+    tunit = rstrip(tunits, 's') # singular
+
+    found = false
+
+    if tunit == "year"
+        # SOLAR_YEAR is in ms
+        factor = SOLAR_YEAR
+        exponent = -3
+        found = true
+    elseif tunit == "month"
+        factor = SOLAR_YEAR ÷ 12
+        exponent = -3
+        found = true
+    else
+        for i in eachindex(TIME_DIVISION)
+            (name, factor, exponent) = TIME_DIVISION[i]
+            if tunit == string(name)
+                found = true
+                break
+            end
+        end
+    end
+
+    if !found
+        error("unknown units \"$(tunits_mixedcase)\"")
+    end
+
+    origintuple = parseDT(Tuple, starttime)
+    origintuple3 = chop0(origintuple, 3)
+
+    return (origintuple3, factor, exponent)
+end
+
+function timetype(::Type{DT}, units::AbstractString, T = Int64) where {DT}
+    (origintuple3, factor, exponent) = _parseunit(units)
+    TPeriod = Period{T, Val(factor), Val(exponent)}
+    return DT{TPeriod, Val(origintuple3)}
+end
+
+function timetype(calendar = "standard")
+    DT =
+    if (calendar == "standard") || (calendar == "gregorian")
+        DateTimeStandard
+    elseif calendar == "proleptic_gregorian"
+        DateTimeProlepticGregorian
+    elseif calendar == "julian"
+        DateTimeJulian
+    elseif (calendar == "noleap") || (calendar == "365_day")
+        DateTimeNoLeap
+    elseif (calendar == "all_leap") || (calendar == "366_day")
+        DateTimeAllLeap
+    elseif calendar == "360_day"
+        DateTime360Day
+    else
+        error("Unsupported calendar: $(calendar)")
+    end
+
+    return DT
+end
+
+"""
+    DT = CFTime.timetype(calendar::AbstractString, units::AbstractString, T::Type{<:Real} = Int64)
+
+Based on the CF calendar type ("standard", "proleptic_gregorian"...)
+and the time units (e.g. "days since 2000-01-01 00:00:00")
+returns the correspond CFTime date time type.
+"""
+function timetype(calendar::AbstractString, units::AbstractString, T::Type{<:Real} = Int64)
+    DT = timetype(calendar)
+    return timetype(DT, units, T)
+end
+
+
+# deprecated, but exported
+function timeunits(::Type{DT}, units) where {DT}
+    periodtype(::Type{DT}) where {DT <: AbstractCFDateTime{T}} where {T} = T
+
+    if DT <: Tuple
+        (t0, factor, exponent) = _parseunit(units)
+    else
+        DDT = timetype(DT, units, Int64)
+        t0 = origin(DDT)
+        Δt = oneunit(periodtype(DDT))
+        factor = _factor(Δt)
+        exponent = _exponent(Δt)
+    end
+
+    # seconds to millisecods
+    exponent = exponent + 3
+
+    if exponent >= 0
+        plength = factor * Int64(10)^exponent
+    else
+        plength = factor // Int64(10)^(-exponent)
+    end
+
+    return t0, plength
+end
+
+"""
+    t0,plength = timeunits(units,calendar = "standard")
+
+Parse time units (e.g. "days since 2000-01-01 00:00:00") and returns the start
+time `t0` and the scaling factor `plength` in milliseconds.
+
+This function is deprecated use `CFTime.timetype` instead.
+"""
+function timeunits(units, calendar = "standard")
+    DT = timetype(calendar)
+    return timeunits(DT, units)
+end
+
+# convert to Float64
+_better_than_Float32(::Type{Float32}) = Float64
+_better_than_Float32(::Type{T}) where {T} = T
+
+
+timedecode(::Type{DT}, x) where {DT <: AbstractCFDateTime{T}} where {T} = DT(T(x))
+timedecode(::Type{DT}, x::Missing) where {DT <: AbstractCFDateTime{T}} where {T} = missing
+
+
+function maybe_to_datetime(dt::AbstractCFDateTime{Period{T, Tfactor, Texponent}}) where
+    {T, Tfactor, Texponent}
+
+    if unwrap(Texponent) >= -3
+        # milliseconds, seconds, ...
+        return round(DateTime, dt)
+    else
+        # do not convert microseconds or smaller
+        return dt
+    end
+end
+maybe_to_datetime(dt::Missing) = missing
+
+"""
+    dt = timedecode(data,units,calendar = "standard"; prefer_datetime = true)
+
+Decode the time information in data as given by the units `units` according to
+the specified calendar (from numeric data to date type).
+
+`units` has the format `"DURATION_UNIT since TIME_ORIGIN"` where
+`DURATION_UNIT` can be the year, month, $(join(getindex.(TIME_DIVISION, 1), ", ", " or "))
+(in singular or plural). The string `TIME_ORIGIN` is a time instance written as
+`year-month-day hour:minute:second.subseconds...`  using 24-hour clock system
+where `subseconds` is the decimal fraction of the second. `day` and `hour` can
+also be separated by the character `T` following ISO 8601.
+
+Valid values for `calendar` are
+`"standard"`, `"gregorian"`, `"proleptic_gregorian"`, `"julian"`, `"noleap"`, `"365_day"`,
+`"all_leap"`, `"366_day"` and `"360_day"`.
+
+If `prefer_datetime` is `true` (default), dates are
+converted to the [`DateTime`](https://docs.julialang.org/en/v1/stdlib/Dates/#Dates.DateTime) type (for the calendars
+"standard", "gregorian", "proleptic_gregorian" and "julian")
+unless the time unit is expressed in microseconds or smaller. Such conversion is
+not possible for the other calendars.
+
+| Calendar            | Type (prefer_datetime=true) | Type (prefer_datetime=false) |
+| ------------------- | --------------------------- | ---------------------------- |
+| `standard`, `gregorian` | `DateTime`                    | `DateTimeStandard`             |
+| `proleptic_gregorian` | `DateTime`                    | `DateTimeProlepticGregorian`   |
+| `julian`              | `DateTime`                    | `DateTimeJulian`               |
+| `noleap`, `365_day`     | `DateTimeNoLeap`              | `DateTimeNoLeap`               |
+| `all_leap`, `366_day`   | `DateTimeAllLeap`             | `DateTimeAllLeap`              |
+| `360_day`             | `DateTime360Day`              | `DateTime360Day`               |
+
+## Example:
+
+```julia
+using CFTime, Dates
+# standard calendar
+dt = CFTime.timedecode([0,1,2,3],"days since 2000-01-01 00:00:00")
+# 4-element Vector{Dates.DateTime}:
+#  2000-01-01T00:00:00
+#  2000-01-02T00:00:00
+#  2000-01-03T00:00:00
+#  2000-01-04T00:00:00
+
+dt = CFTime.timedecode([0,1,2,3],"days since 2000-01-01 00:00:00","360_day")
+# 4-element Vector{DateTime360Day{CFTime.Period{Int64, Val{86400}(), Val{0}()}, Val{(2000, 1, 1)}()}}:
+#  2000-01-01T00:00:00
+#  2000-01-02T00:00:00
+#  2000-01-03T00:00:00
+#  2000-01-04T00:00:00
+```
+
+"""
+function timedecode(data, units, calendar = "standard"; prefer_datetime = true)
+    DT = timetype(calendar)
+    dt = timedecode(DT, data, units)
+
+    if (
+            prefer_datetime &&
+                (DT in (DateTimeStandard, DateTimeProlepticGregorian, DateTimeJulian))
+        )
+        return maybe_to_datetime.(dt)
+    else
+        return dt
+    end
+end
+
+function timedecode(::Type{DT}, data, units) where {DT <: AbstractCFDateTime}
+    DTT = timetype(DT, units, _better_than_Float32(nonmissingtype(eltype(data))))
+    return dt = timedecode.(DTT, data)
+end
+
+function timedecode(::Type{DateTime}, data, units)
+    to_datetime(dt::Missing) = missing
+    to_datetime(dt) = round(DateTime, dt)
+
+    return to_datetime.(timedecode(DateTimeProlepticGregorian, data, units))
+end
+
+timeencode(::Type{DT2}, dt::Missing) where {DT2 <: AbstractCFDateTime{Tperiod}} where {Tperiod} = missing
+# fast pass, prevent type promotion in division
+function timeencode(::Type{DT2}, dt::DT2) where {DT2 <: AbstractCFDateTime{Tperiod}} where {Tperiod}
+    return Dates.value(dt)
+end
+function timeencode(::Type{DT2}, dt) where {DT2 <: AbstractCFDateTime{Tperiod}} where {Tperiod}
+    t0 = origin(DT2)
+    Δt = oneunit(Tperiod)
+    return (dt - t0) / Δt
+end
+
+"""
+    data = timeencode(dt,units,calendar = "standard")
+
+Convert a vector or array of [`DateTime`](https://docs.julialang.org/en/v1/stdlib/Dates/#Dates.DateTime) (or [`DateTimeStandard`](@ref),
+[`DateTimeProlepticGregorian`](@ref), [`DateTimeJulian`](@ref), [`DateTimeNoLeap`](@ref),
+[`DateTimeAllLeap`](@ref), [`DateTime360Day`](@ref)) according to
+the specified units (e.g. `"days since 2000-01-01 00:00:00"`) using the calendar
+`calendar` (i.e. from date type to numeric data).
+
+`units` has the format `"DURATION_UNIT since TIME_ORIGIN"` where
+`DURATION_UNIT` can be the year, month, $(join(getindex.(TIME_DIVISION, 1), ", ", " or "))
+(in singular or plural). The string `TIME_ORIGIN` is a time instance written as
+`year-month-day hour:minute:second.subseconds...`  using 24-hour clock system
+where `subseconds` is the decimal fraction of the second. `day` and `hour` can
+also be separated by the character `T` following ISO 8601.
+
+Valid values for calendar are:
+`"standard"`, `"gregorian"`, `"proleptic_gregorian"`, `"julian"`, `"noleap"`, `"365_day"`,
+`"all_leap"`, `"366_day"`, `"360_day"`.
+
+
+## Example:
+
+```julia
+using CFTime
+dt = [DateTimeStandard(2000,1,1),DateTimeStandard(2000,1,2),DateTimeStandard(2000,1,3)]
+CFTime.timeencode(dt,"days since 2000-01-01 00:00:00")
+# output: [0., 1., 2.]
+```
+
+"""
+function timeencode(
+        data::Union{DT, AbstractArray{DT}}, units,
+        calendar = "standard"
+    ) where {DT <: Union{AbstractCFDateTime, DateTime, Missing}}
+
+    handle_datetime(dt) = dt
+    handle_datetime(dt::DateTime) = convert(DateTimeProlepticGregorian, dt)
+
+    return timeencode(handle_datetime.(data), units, calendar)
+end
+
+function timeencode(
+        data::Union{DT, AbstractArray{DT}}, units,
+        calendar = "standard"
+    ) where {DT <: Union{AbstractCFDateTime, Missing}}
+
+    return timeencode(data, units, timetype(calendar))
+end
+
+function timeencode(
+        data::Union{DT, AbstractArray{DT}}, units,
+        calendar::Type{DateTime}
+    ) where {DT <: Union{AbstractCFDateTime, Missing}}
+
+    to_datetimepg(dt::Missing) = missing
+    to_datetimepg(dt) = convert(DateTimeProlepticGregorian, dt)
+
+    data2 = to_datetimepg.(data)
+    return timeencode(data2, units, DateTimeProlepticGregorian)
+end
+
+
+function timeencode(
+        data::Union{DT, AbstractArray{DT}}, units, Tcalendar::Type
+    ) where {DT <: Union{AbstractCFDateTime, Missing}}
+    T = Int64 # use type promotion?
+    DTT = timetype(Tcalendar, units, T)
+    return timeencode.(DTT, data)
+end
+
+# homogenous array should preserve the type of the underlying duration
+function timeencode(
+        data::Union{DT, AbstractArray{DT}}, units, Tcalendar::Type{<:AbstractCFDateTime},
+    ) where {DT <: AbstractCFDateTime{TPeriod}} where {TPeriod <: Period{T}} where {T}
+    DTT = timetype(Tcalendar, units, T)
+    return timeencode.(DTT, data)
+end
+
+for CFDateTime in [
+        :DateTimeStandard,
+        :DateTimeJulian,
+        :DateTimeProlepticGregorian,
+    ]
+    @eval begin
+        """
+            dt2 = convert(::Type{T}, dt)
+
+        Convert a DateTime `dt` of type [`DateTimeStandard`](@ref), [`DateTimeProlepticGregorian`](@ref),
+        [`DateTimeJulian`](@ref) or `DateTime` into the type `T` which can also be either
+        [`DateTimeStandard`](@ref), [`DateTimeProlepticGregorian`](@ref), [`DateTimeJulian`](@ref) or [`DateTime`](https://docs.julialang.org/en/v1/stdlib/Dates/#Dates.DateTime).
+
+        Conversion is done such that duration (difference of DateTime types) are
+        preserved. For dates on and after 1582-10-15, the year, month and days are the same for
+        the types [`DateTimeStandard`](@ref), [`DateTimeProlepticGregorian`](@ref) and [`DateTime`](https://docs.julialang.org/en/v1/stdlib/Dates/#Dates.DateTime).
+
+        For dates before 1582-10-15, the year, month and days are the same for
+        the types [`DateTimeStandard`](@ref) and [`DateTimeJulian`](@ref).
+        """
+        function convert(::Type{DateTime}, dt::$CFDateTime)
+            origin = _origin_period(dt)
+            ms = Dates.Millisecond(dt.instant + origin + DATETIME_OFFSET)
+            return DateTime(UTInstant{Millisecond}(ms))
+        end
+
+        function convert(::Type{$CFDateTime}, dt::Union{DateTime, Date})
+            _origin(dt::DateTime) = DateTime(UTInstant{Millisecond}(Millisecond(0)))
+            _origin(dt::Date) = Date(UTInstant{Day}(Day(0)))
+
+            T = $CFDateTime
+
+            origin = _origin(dt)
+            y, mdHMS... = (Dates.year(origin), Dates.month(origin), Dates.day(origin))
+
+            if !_hasyear0(DateTimeProlepticGregorian) && y <= 0
+                origintuple = (y - 1, mdHMS...)
+            else
+                origintuple = (y, mdHMS...)
+            end
+
+            p = convert(Period, dt.instant.periods)
+            dt_greg = DateTimeProlepticGregorian{typeof(p), Val(origintuple)}(p)
+            return convert(T, dt_greg)
+        end
+
+
+        # need to convert the time origin because not all origins are valid in
+        # all calendars
+        function convert(::Type{$CFDateTime}, dt::Union{DateTimeStandard, DateTimeProlepticGregorian, DateTimeJulian})
+
+            T = $CFDateTime
+            days, HMS... = timetuplefrac(_origin_period(dt))
+            y, m, d = datetuple_ymd(T, days)
+
+            origintuple = chop0((y, m, d, HMS...), 3)
+            return T{typeof(dt.instant), Val(origintuple)}(dt.instant)
+        end
+
+
+    end
+end
+
+
+function convert(::Type{DT}, dt::AbstractCFDateTime) where {DT <: AbstractCFDateTime{T, Torigintuple}} where {T, Torigintuple}
+    dt0 = DT(T(0))
+    p = convert(T, dt - dt0)
+    return DT(p)
+end

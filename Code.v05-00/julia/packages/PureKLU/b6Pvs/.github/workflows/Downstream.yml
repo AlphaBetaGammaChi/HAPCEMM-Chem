@@ -1,0 +1,25 @@
+name: IntegrationTest
+on:
+  push:
+    branches: [main]
+    tags: [v*]
+  pull_request:
+
+jobs:
+  test:
+    name: ${{ matrix.package.repo }}/${{ matrix.package.group }}/${{ matrix.julia-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        julia-version: ['1']
+        package:
+          - {user: SciML, repo: LinearSolve.jl, group: Core}
+    uses: "SciML/.github/.github/workflows/downstream.yml@v1"
+    with:
+      julia-version: "${{ matrix.julia-version }}"
+      julia-arch: "x64"
+      owner: "${{ matrix.package.user }}"
+      repo: "${{ matrix.package.repo }}"
+      group: "${{ matrix.package.group }}"
+      coverage: false
+    secrets: "inherit"

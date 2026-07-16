@@ -1,0 +1,30 @@
+{
+  "camp-data": [
+    {
+      "name": "ucx",
+      "type": "MECHANISM",
+      "reactions": [
+        {
+          "type": "ARRHENIUS",
+          "reactants": {
+            "O3": {
+              "qty": 1.0
+            },
+            "NO": {
+              "qty": 1.0
+            }
+          },
+          "products": {
+            "NO2": {
+              "yield": 1.0
+            },
+            "O2": {
+              "yield": 1.0
+            }
+          },
+          "A": 2.5e-12
+        }
+      ]
+    }
+  ]
+}

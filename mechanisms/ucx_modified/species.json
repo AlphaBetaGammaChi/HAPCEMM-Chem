@@ -1,0 +1,20 @@
+{
+  "camp-data": [
+    {
+      "name": "O3",
+      "type": "CHEM_SPEC"
+    },
+    {
+      "name": "NO",
+      "type": "CHEM_SPEC"
+    },
+    {
+      "name": "NO2",
+      "type": "CHEM_SPEC"
+    },
+    {
+      "name": "O2",
+      "type": "CHEM_SPEC"
+    }
+  ]
+}

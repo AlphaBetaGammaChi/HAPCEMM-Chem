@@ -1,0 +1,204 @@
+
+###########################
+# An n-dimensional simplex
+###########################
+
+"Supertype of an N-dimensional simplex."
+abstract type Simplex{T,C} <: Domain{T} end
+
+isclosedset(::Simplex{T,:closed}) where {T} = true
+isclosedset(::Simplex{T,:open}) where {T} = false
+
+isopenset(d::Simplex) = !isclosedset(d)
+
+"""
+    UnitSimplex{T,C}
+
+A polytope with the origin and all unit vectors as vertices.
+"""
+abstract type UnitSimplex{T,C} <: Simplex{T,C} end
+
+const ClosedUnitSimplex{T} = UnitSimplex{T,:closed}
+const OpenUnitSimplex{T} = UnitSimplex{T,:open}
+
+"""
+    UnitSimplex([dim::Int])
+    UnitSimplex{T}([dim::Int])
+    UnitSimplex{T,C=:closed}([dim::Int])
+
+The open or closed volume of all points of type `x`, for which the sum of
+components is smaller than (or equal to) 1.
+
+The unit simplex has the origin and all Euclidean unit vector as vertices.
+"""
+UnitSimplex(::Val{N} = Val(3)) where {N} = EuclideanUnitSimplex{N}()
+UnitSimplex(dim::Int) = DynamicUnitSimplex(dim)
+
+UnitSimplex{T}(dim::Int) where {T <: StaticTypes} = StaticUnitSimplex{T}(dim)
+UnitSimplex{T}(::Val{N}) where {N,T} = StaticUnitSimplex{T}(Val(N))
+UnitSimplex{T}() where {T <: StaticTypes} = StaticUnitSimplex{T}()
+UnitSimplex{T}(dim::Int) where {T} = DynamicUnitSimplex{T}(dim)
+
+UnitSimplex{T,C}(dim::Int) where {T <: StaticTypes,C} = StaticUnitSimplex{T,C}(dim)
+UnitSimplex{T,C}(::Val{N}) where {N,T,C} = StaticUnitSimplex{T,C}(Val(N))
+UnitSimplex{T,C}() where {T <: StaticTypes,C} = StaticUnitSimplex{T,C}()
+UnitSimplex{T,C}(dim::Int) where {T,C} = DynamicUnitSimplex{T,C}(dim)
+
+insimplex_closed(x) = mapreduce( t-> t >= 0, &, x) && norm(x,1) <= 1
+insimplex_open(x) = mapreduce( t-> t > 0, &, x) && norm(x,1) < 1
+insimplex_closed(x, tol) = mapreduce( t-> t >= -tol, &, x) && norm(x,1) <= 1+tol
+insimplex_open(x, tol) = mapreduce( t-> t > -tol, &, x) && norm(x,1) < 1+tol
+
+indomain(x, d::ClosedUnitSimplex) = length(x)==dimension(d) && insimplex_closed(x)
+indomain(x, d::OpenUnitSimplex) = length(x)==dimension(d) && insimplex_open(x)
+approx_indomain(x, d::ClosedUnitSimplex, tolerance) = length(x)==dimension(d) && insimplex_closed(x, tolerance)
+approx_indomain(x, d::OpenUnitSimplex, tolerance) = length(x)==dimension(d) && insimplex_open(x, tolerance)
+
+isempty(::UnitSimplex) = false
+
+isequaldomain(d1::UnitSimplex, d2::UnitSimplex) =
+    isclosedset(d1)==isclosedset(d2) && dimension(d1)==dimension(d2)
+domainhash(d::UnitSimplex, h::UInt) = hashrec("UnitSimplex", isclosedset(d), dimension(d), h)
+
+boundingbox(d::UnitSimplex{T}) where {T} = UnitCube{T}(dimension(d))
+
+# TODO: implement when segments are available
+# distance_to(d::UnitSimplex, x) = x ∈ d ? zero(prectype(d)) : minimum(distance_to(el, x) for el in components(boundary(d)))
+
+function normal(d::UnitSimplex, x)
+    z = similar(x)
+    fill!(z, 0)
+    if sum(x) ≈ 1
+        fill!(z, one(eltype(z))/sqrt(length(z)))
+    else
+        index = findmin(x)[2]
+        z[index] = -1
+    end
+    return convert(eltype(d), z/norm(z))
+end
+
+
+"A unit simplex whose dimension is determined by its element type."
+struct StaticUnitSimplex{T,C} <: UnitSimplex{T,C}
+end
+
+StaticUnitSimplex(::Val{N}) where {N} = StaticUnitSimplex{SVector{N,Float64}}()
+
+StaticUnitSimplex{T}() where {T} = StaticUnitSimplex{T,:closed}()
+
+StaticUnitSimplex{T}(dim::Int) where {T} =
+    (@assert dim == euclideandimension(T); StaticUnitSimplex{T}())
+StaticUnitSimplex{T}(::Val{N}) where {N,T} =
+    (@assert N == euclideandimension(T); StaticUnitSimplex{T}())
+
+StaticUnitSimplex{T,C}(dim::Int) where {T,C} =
+    (@assert dim == euclideandimension(T); StaticUnitSimplex{T,C}())
+StaticUnitSimplex{T,C}(::Val{N}) where {N,T,C} =
+    (@assert N == euclideandimension(T); StaticUnitSimplex{T,C}())
+
+const EuclideanUnitSimplex{N,T,C} = StaticUnitSimplex{SVector{N,T},C}
+
+EuclideanUnitSimplex{N}() where {N} = EuclideanUnitSimplex{N,Float64}()
+
+## A StaticUnitSimplex{<:Number} equals the interval [0,1]  (open or closed)
+AbstractInterval(d::StaticUnitSimplex{T,:closed}) where {T <: Number} = UnitInterval{T}()
+AbstractInterval(d::StaticUnitSimplex{T,:open}) where {T <: Number} = OpenInterval{T}(0, 1)
+
+convert(::Type{AbstractInterval}, d::StaticUnitSimplex{T}) where {T <: Number} =
+	AbstractInterval(d)
+
+canonicaldomain(d::StaticUnitSimplex{T}) where {T<:Number} = AbstractInterval(d)
+canonicaldomain(::Equal, d::StaticUnitSimplex{T}) where {T<:Number} = AbstractInterval(d)
+
+boundary(d::StaticUnitSimplex{T}) where {T<:Number} = boundary(AbstractInterval(d))
+
+
+"A unit simplex with vector elements with variable dimension determined by a field."
+struct DynamicUnitSimplex{T,C} <: UnitSimplex{T,C}
+    dimension   ::  Int
+
+    DynamicUnitSimplex{T,C}(dim::Int) where {T,C} = new(dim)
+    DynamicUnitSimplex{T,C}(dim::Int) where {T<:StaticTypes,C} =
+        (@assert dim == euclideandimension(T); new(dim))
+end
+
+DynamicUnitSimplex(dim::Int) = DynamicUnitSimplex{Vector{Float64}}(dim)
+DynamicUnitSimplex{T}(dim::Int) where {T} = DynamicUnitSimplex{T,:closed}(dim)
+
+dimension(d::DynamicUnitSimplex) = d.dimension
+
+const VectorUnitSimplex{T,C} = DynamicUnitSimplex{Vector{T},C}
+
+VectorUnitSimplex(dimension) = VectorUnitSimplex{Float64}(dimension)
+
+show(io::IO, d::EuclideanUnitSimplex{N,Float64,:closed}) where {N} = print(io, "UnitSimplex(Val($(N)))")
+show(io::IO, d::VectorUnitSimplex{Float64,:closed}) = print(io, "UnitSimplex($(dimension(d)))")
+
+
+center(d::EuclideanUnitSimplex{N,T}) where {N,T} = ones(SVector{N,T})/N
+center(d::VectorUnitSimplex{T}) where {T} = ones(T, dimension(d))/dimension(d)
+
+corners(d::UnitSimplex) = vcat([origin(d)], [ unitvector(d, i) for i in 1:dimension(d)])
+# low-dimensional special cases
+corners(d::EuclideanUnitSimplex{1,T}) where T =
+	SVector{2,SVector{1,T}}(SA[0],SA[1])
+corners(d::EuclideanUnitSimplex{2,T}) where T =
+	SVector{3,SVector{2,T}}(SA[0,0],SA[1,0],SA[0,1])
+corners(d::EuclideanUnitSimplex{3,T}) where T =
+	SVector{4,SVector{3,T}}(SA[0,0,0],SA[1,0,0],SA[0,1,0],SA[0,0,1])
+corners(d::EuclideanUnitSimplex{4,T}) where T =
+	SVector{5,SVector{4,T}}(SA[0,0,0,0],SA[1,0,0,0],SA[0,1,0,0],SA[0,0,1,0],SA[0,0,0,1])
+
+interior(d::EuclideanUnitSimplex{N,T}) where {N,T} = EuclideanUnitSimplex{N,T,:open}()
+closure(d::EuclideanUnitSimplex{N,T}) where {N,T} = EuclideanUnitSimplex{N,T,:closed}()
+interior(d::VectorUnitSimplex{T}) where {T} = VectorUnitSimplex{T,:open}(dimension(d))
+closure(d::VectorUnitSimplex{T}) where {T} = VectorUnitSimplex{T,:closed}(dimension(d))
+
+
+# We pick the center point, because it belongs to the domain regardless of
+# whether it is open or closed.
+choice(d::UnitSimplex) = center(d)
+
+similardomain(d::StaticUnitSimplex{S,C}, ::Type{T}) where {S,T,C} =
+    StaticUnitSimplex{T,C}()
+similardomain(d::DynamicUnitSimplex{S,C}, ::Type{T}) where {S,T,C} =
+    DynamicUnitSimplex{T,C}(d.dimension)
+
+
+simplex_face_map(a::Number, b::Number, c::StaticVector{2}, d::StaticVector{2}) =
+	AffineMap((d-c)/(b-a), c - (d-c)/(b-a)*a)
+function simplex_face_map(a::Number, b::Number, c::Vector, d::Vector)
+	@assert length(c) == length(d) == 2
+	AffineMap((d-c)/(b-a), c - (d-c)/(b-a)*a)
+end
+
+function boundary(d::StaticUnitSimplex{<:StaticVector{2,T}}) where T
+    d0 = UnitInterval{T}()
+	T0 = zero(T)
+	T1 = one(T)
+	maps = [
+		simplex_face_map(T0, T1, SVector(T0,T0), SVector(T1,T0)),
+		simplex_face_map(T0, T1, SVector(T1,T0), SVector(T0,T1)),
+		simplex_face_map(T0, T1, SVector(T0,T1), SVector(T0,T0))
+	]
+	faces = map(m -> ParametricDomain(m, d0), maps)
+	UnionDomain(faces)
+end
+
+# function boundary(d::StaticUnitSimplex{<:StaticVector{N,T},:closed}) where {N,T}
+# 	left2 = infimum(d)
+# 	right2 = supremum(d)
+# 	d0 = UnitSimplex{SVector{N-1,T},:closed}()
+# 	T0 = zero(T)
+# 	T1 = one(T)
+#
+# 	map1 = cube_face_map(left1, right1, left2, right2, 1, left2[1])
+# 	MAP = typeof(map1)
+# 	maps = MAP[]
+# 	for dim in 1:N
+# 		push!(maps, cube_face_map(left1, right1, left2, right2, dim, left2[dim]))
+# 		push!(maps, cube_face_map(left1, right1, left2, right2, dim, right2[dim]))
+# 	end
+# 	faces = map(m -> ParametricDomain(m, d_unit), maps)
+# 	UnionDomain(faces)
+# end

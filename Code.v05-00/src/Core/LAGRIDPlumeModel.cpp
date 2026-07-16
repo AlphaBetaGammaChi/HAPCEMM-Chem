@@ -1,5 +1,7 @@
 
 #include "Core/BoxModel.hpp"
+#include "KPP/KPP.hpp"
+#include "Util/JuliaBridge.hpp"
 #include <chrono>
 #include <filesystem>
 #include <memory>
@@ -69,6 +71,17 @@ LAGRIDPlumeModel::LAGRIDPlumeModel(const OptInput &optInput, Input &input) :
 
     timestepVars_.setTimeArray(PlumeModelUtils::BuildTime (
             timestepVars_.tInitial_s, timestepVars_.tFinal_s, timestepVars_.dt));
+
+#ifdef USE_MICM
+    if (input_.CHEMISTRY_SOLVER == ChemistrySolver::MICM) {
+        int max_threads = omp_get_max_threads();
+        micm_solvers_.reserve(max_threads);
+        for(int i = 0; i < max_threads; ++i) {
+            micm_solvers_.push_back(std::make_unique<HAPCEMM::MicmBackend>(optInput_.MICM_MECHANISM_PATH));
+        }
+    }
+#endif
+
     createOutputDirectories();
 }
 
@@ -192,10 +205,9 @@ SimStatus LAGRIDPlumeModel::runFullModel() {
         //    dp/dz = -rho*g = -(n/V)Mg
         Vector_3D& pdfRef = iceAerosol_.getPDF();
         auto pressureEdges = met_.PressEdges();
-        double localND;
         #pragma omp parallel for
         for (std::size_t j=0; j<yCoords_.size(); j++){
-            localND = (pressureEdges[j] - pressureEdges[j+1])/(yEdges_[j+1] - yEdges_[j]);
+            double localND = (pressureEdges[j] - pressureEdges[j+1])/(yEdges_[j+1] - yEdges_[j]);
             for (std::size_t i=0; i<xCoords_.size(); i++){
                 Contrail_[j][i] = Contrail_[j][i] / localND; // parts per trillion
                 H2O_[j][i] = H2O_[j][i] / localND; // parts per trillion
@@ -258,44 +270,96 @@ SimStatus LAGRIDPlumeModel::runFullModel() {
         timestepVars_.nTime++;
 
         #ifdef ENABLE_TIMING
-// Per-cell chemistry option
+        auto chem_start = std::chrono::high_resolution_clock::now();
+        #endif
+
         if (optInput_.SIMULATION_BOXMODEL_MODE == 2) {
-            std::cout << " [LAGRID] Running high-fidelity per-cell chemistry..." << std::endl;
-            Vector_2D temp = met_.Temperature_field();
-            Vector_2D press = met_.Pressure_field();
-            // Flattened call to the parallel solver
-            BoxModel::runPerCellChemistry(
-                optInput_, input_,
-                xCoords_.size(), yCoords_.size(),
-                nullptr, // Species grid placeholder
-                &temp[0][0], &press[0][0], &H2O_[0][0], nullptr,
-                timestepVars_.TRANSPORT_DT * 60.0
-            );
-        }
-        if (optInput_.SIMULATION_BOXMODEL_MODE == 2) {
-            std::cout << "Running per-cell chemistry..." << std::endl;
-            size_t nx = xCoords_.size();
-            size_t ny = yCoords_.size();
-            #pragma omp parallel for collapse(2)
-            for (size_t j = 0; j < ny; j++) {
-                for (size_t i = 0; i < nx; i++) {
-                    double T = met_.Temperature(i, j);
-                    double P = met_.Pressure(i, j);
-                    double airDens = P / (physConst::kB * T) * 1.0e-6;
-                    double fix[NFIX] = {0.0};
-                    std::vector<double> cell_spec(NVAR);
-                    for (int n=0; n<NVAR; n++) cell_spec[n] = Species_[n][j][i];
-                    if (optInput_.ADV_USE_JULIA_CHEMISTRY) {
-                        JuliaBridge::Integrate(cell_spec.data(), fix, 0.0, timestepVars_.TRANSPORT_DT * 60.0, T, P, airDens);
-                    } else {
-                        double rtol[NVAR], atol[NVAR];
-                        for (int n=0; n<NVAR; n++) { rtol[n]=1e-4; atol[n]=1e-6; }
-                        INTEGRATE(cell_spec.data(), fix, 0.0, timestepVars_.TRANSPORT_DT * 60.0, atol, rtol, 0.0);
+            // A. Whole Domain Resolution (0-D Box)
+            if (optInput_.SIMULATION_CHEMISTRY_RESOLUTION == 0) {
+                std::cout << "Running Whole Domain Chemistry (0-D)..." << std::endl;
+                double avg_T = 0, avg_P = 0, avg_airDens = 0, avg_ice_area = 0;
+                std::vector<double> avg_spec(NVAR, 0.0);
+                size_t nx = xCoords_.size();
+                size_t ny = yCoords_.size();
+                double N_cells = nx * ny;
+                for (size_t j = 0; j < ny; j++) {
+                    for (size_t i = 0; i < nx; i++) {
+                        avg_T += met_.temp(j, i);
+                        avg_P += met_.press(j);
+                        for (int n=0; n<NVAR; n++) avg_spec[n] += Species_[n][j][i];
+                        for (size_t k = 0; k < iceAerosol_.getNBin(); k++) {
+                            avg_ice_area += iceAerosol_.getPDF()[k][j][i] * (4.0 * physConst::PI * std::pow(iceAerosol_.getBinCenters()[k], 2.0));
+                        }
                     }
-                    for (int n=0; n<NVAR; n++) Species_[n][j][i] = cell_spec[n];
+                }
+                avg_T /= N_cells; avg_P /= N_cells;
+                avg_airDens = avg_P / (physConst::kB * avg_T) * 1.0e-6;
+                avg_ice_area /= N_cells;
+                for (int n=0; n<NVAR; n++) avg_spec[n] /= N_cells;
+                
+                double fix[NFIX] = {0.0};
+#ifdef USE_MICM
+                if (input_.CHEMISTRY_SOLVER == ChemistrySolver::MICM) {
+                    micm_solvers_[0]->solve(avg_spec.data(), timestepVars_.TRANSPORT_DT * 60.0);
+                } else
+#endif
+                if (optInput_.ADV_USE_JULIA_CHEMISTRY) {
+                    // Update Julia to take avg_ice_area
+                    JuliaBridge::Integrate(avg_spec.data(), fix, 0.0, timestepVars_.TRANSPORT_DT * 60.0, avg_T, avg_P, avg_airDens, avg_ice_area);
+                } else {
+                    double rtol[NVAR], atol[NVAR];
+                    for (int n=0; n<NVAR; n++) { rtol[n]=1e-4; atol[n]=1e-6; }
+                    INTEGRATE(avg_spec.data(), fix, 0.0, timestepVars_.TRANSPORT_DT * 60.0, atol, rtol, 0.0);
+                }
+                for (size_t j = 0; j < ny; j++) {
+                    for (size_t i = 0; i < nx; i++) {
+                        for (int n=0; n<NVAR; n++) Species_[n][j][i] = avg_spec[n];
+                    }
+                }
+            } 
+            // B. Per Grid Cell Resolution (2-D)
+            else if (optInput_.SIMULATION_CHEMISTRY_RESOLUTION == 1) {
+                std::cout << "Running Per-Cell Chemistry (2-D)..." << std::endl;
+                size_t nx = xCoords_.size();
+                size_t ny = yCoords_.size();
+                #pragma omp parallel for collapse(2)
+                for (size_t j = 0; j < ny; j++) {
+                    for (size_t i = 0; i < nx; i++) {
+                        double T = met_.temp(j, i);
+                        double P = met_.press(j);
+                        double airDens = P / (physConst::kB * T) * 1.0e-6;
+                        double local_ice_area = 0.0;
+                        for (size_t k = 0; k < iceAerosol_.getNBin(); k++) {
+                            local_ice_area += iceAerosol_.getPDF()[k][j][i] * (4.0 * physConst::PI * std::pow(iceAerosol_.getBinCenters()[k], 2.0));
+                        }
+                        double fix[NFIX] = {0.0};
+                        std::vector<double> cell_spec(NVAR);
+                        for (int n=0; n<NVAR; n++) cell_spec[n] = Species_[n][j][i];
+#ifdef USE_MICM
+                        if (input_.CHEMISTRY_SOLVER == ChemistrySolver::MICM) {
+                            int tid = omp_get_thread_num();
+                            micm_solvers_[tid]->solve(cell_spec.data(), timestepVars_.TRANSPORT_DT * 60.0);
+                        } else
+#endif
+                        if (optInput_.ADV_USE_JULIA_CHEMISTRY) {
+                            JuliaBridge::Integrate(cell_spec.data(), fix, 0.0, timestepVars_.TRANSPORT_DT * 60.0, T, P, airDens, local_ice_area);
+                        } else {
+                            double rtol[NVAR], atol[NVAR];
+                            for (int n=0; n<NVAR; n++) { rtol[n]=1e-4; atol[n]=1e-6; }
+                            INTEGRATE(cell_spec.data(), fix, 0.0, timestepVars_.TRANSPORT_DT * 60.0, atol, rtol, 0.0);
+                        }
+                        for (int n=0; n<NVAR; n++) Species_[n][j][i] = cell_spec[n];
+                    }
                 }
             }
         }
+        #ifdef ENABLE_TIMING
+        auto chem_end = std::chrono::high_resolution_clock::now();
+        auto chem_duration = std::chrono::duration_cast<std::chrono::milliseconds>(chem_end - chem_start);
+        std::cout << " [LAGRID] 2D Chemistry loop duration: " << chem_duration.count() << " ms" << std::endl;
+        #endif
+
+        #ifdef ENABLE_TIMING
         auto save_start = std::chrono::high_resolution_clock::now();
         #endif
 
@@ -668,6 +732,20 @@ void LAGRIDPlumeModel::runTransport(double timestep) {
             }
         }
     }
+    //Transport and settling of Geoengineering/Custom particles
+    if (input_.backgroundGeoengineeringNumber() > 0.0 &&
+        input_.backgroundGeoengineeringType() > 0) { // Calculating settling velocity using custom density and radius from input.yaml
+    	double vFall_geo = AIM::GeoSettlingVelocity( input_.backgroundGeoengineeringRadius(), input_.backgroundGeoengineeringRho(), met_.tempRef(), simVars_.pressure_Pa )[0];
+
+        // FVM solver with settling advection
+        FVM_ANDS::FVM_Solver solver(fvmSolverInitParams, xCoords_, yCoords_, ZERO_BC_INIT, FVM_ANDS::std2dVec_to_eigenVec(BackgroundGeo_field_)); solver.updateTimestep(timestep); solver.updateDiffusion(input_.horizDiff(), input_.vertiDiff());
+
+        //-vFall_geo represents the downward settling speed, shear_rep_ the wind shear
+        solver.updateAdvection(0, -vFall_geo, shear_rep_);
+
+        // Solve transport and update the 2D field
+        solver.operatorSplitSolve2DVec(BackgroundGeo_field_, ZERO_BC);
+    }
 
     #ifdef ENABLE_TIMING
     end = std::chrono::high_resolution_clock::now();
@@ -811,10 +889,9 @@ void LAGRIDPlumeModel::remapAllVars(double remapTimestep, const std::vector<std:
     // included it). This uses the hydrostatic assumption:
     //    dp/dz = -rho*g = -(n/V)Mg
     auto pressureEdges = met_.PressEdges(); 
-    double localND;
     #pragma omp parallel for
     for (std::size_t j=0; j<yCoords_.size(); j++){
-        localND = (pressureEdges[j] - pressureEdges[j+1])/(yEdges_[j+1] - yEdges_[j]);
+        double localND = (pressureEdges[j] - pressureEdges[j+1])/(yEdges_[j+1] - yEdges_[j]);
         for (std::size_t i=0; i<xCoords_.size(); i++){
             Contrail_[j][i] = Contrail_[j][i] * localND;
             H2O_[j][i] = H2O_[j][i] * localND;
